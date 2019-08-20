@@ -1,4 +1,7 @@
 % data pre-processing
+clear;
+clc;
+
 load BankSet;
 load Survived_Banks;
 load Failed_Banks;
@@ -30,15 +33,17 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 Max_Missing_Cov_Failed = I1;
 
 %preprocess the data
-is_fixed_size = false;
-Sample_All_Banks = htet_pre_process_bank_data(All, 0.34, is_fixed_size);
-Sample_Survived_Banks = htet_pre_process_bank_data(Survived, 0.34, is_fixed_size);
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, is_fixed_size);
+fixed_size = 10;
+Sample_All_Banks = htet_pre_process_bank_data(All, 0.34, fixed_size);
+Sample_Survived_Banks = htet_pre_process_bank_data(Survived, 0.34, fixed_size);
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, fixed_size);
 [M2, I2] = max(Nan_Sum_Percent_Survived);
 Max_Missing_Cov_Survived = I2;
 
 
 warning('off');
+Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+
 
 i = 1;
 algo = 'emfis';
@@ -119,6 +124,25 @@ for Z = 1: 2
         comp_result(m).num_rules = system.num_rules;
         r = [system.RMSE system.num_rules system.MAE system.MSE system.R];
         FINAL_RESULT = [FINAL_RESULT; r];
+
+        % implementation code for trained system prediction
+        % disp('Trained system prediction starts....');
+        % net = system;
+        % trained_system = mar_trainOnline(ie_rules_no ,create_ie_rule, data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight, net);
+        % trained_system = ron_calcErrors(trained_system, data_target);
+        % trained_system.num_rules = mean(trained_system.net.ruleCount);
+        %
+        % figure;
+        % str = [sprintf('Actual VS Predicted for the trained system <-> '), num2str(max_cluster)];
+        % title(str);
+        %
+        % for l = 1:size(data_target,2)
+        %     hold on;
+        %     plot(1:size(data_target,1),data_target(1:size(data_target,1)), 'b');
+        %     plot(1:size(trained_system.predicted,1),trained_system.predicted(1:size(data_target,1)), 'r');
+        % end
+        %
+        % legend('Actual','Predicted');
     end
     clear data_input data_target;
     disp('Final RMSE and Rules');

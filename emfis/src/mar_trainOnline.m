@@ -59,6 +59,9 @@ function D = mar_trainOnline(ie_rules_no ,create_ie_rule,data_input, data_target
 
         system.net.outputClusterCount = zeros(size(data_target,1), 1);
         system.net.spatioTemporal = zeros(size(data_target,1), 1);
+    else
+        system = varargin{1};
+        system.dataProcessed = 0;
     end
 
     for i = 1 : size(data_target, 1)
@@ -98,6 +101,8 @@ function D = mar_trainOnline(ie_rules_no ,create_ie_rule,data_input, data_target
             end
             continue;
         end
+
+        disp('HN DEBUG never comes here');
 
         net = system.net;
 

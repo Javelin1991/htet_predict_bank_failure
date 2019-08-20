@@ -12,7 +12,9 @@ Survived = Survived_Banks;
 Failed = Failed_Banks;
 Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 
-%calculate mising rows for failed banks
+% calculate number of missing rows for failed banks for each feature/column
+% get the feature with maximum number of missing items
+% use it as the target output
 Total_Failed_Banks = size(Failed, 1);
 NaN_Rows_Failed = isnan(Failed);
 NaN_Sum_Failed = sum(isnan(Failed(:,(3:12))));
@@ -20,20 +22,19 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 [M1, I1] = max(Nan_Sum_Percent_Failed);
 Max_Missing_Cov_Failed = I1;
 
-%preprocess the data
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 1000);
-
+%preprocess the data by random sampling and afterwards, sorted by sorted by bank and year
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 0);
 
 warning('off');
 
-%%% failed banks
-disp('Training 34% random failed bank data, sorted by bank and year');
+
+% parameter setup
 data_input = Sample_Failed_Banks(:, 3:12);
 %correlation matrix
 %data_input_cov = cov(data_input);
 %[R_Failed, R_Failed_Sigma] = corrcov(data_input_cov);
 data_target = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
-% parameter setup
+
 train_data = data_input
 train_output = data_target
 ite = 2
@@ -57,19 +58,23 @@ sorted_data_input = data_input(:,inx);
 sorted_labels = Labels(:, inx);
 RMSE = [];
 
-for itr = 1: size(ranking,1)
-    %%% failed bankss
+% iterate through each feature starting from the higest rank to lowest rank
+for itr = 1: size(ranking, 1)
+
+    % failed banks
+    disp('Training random failed bank data, sorted by bank and year');
+
+    % experiment setup
     spec = 10;
     algo = 'emfis';
-
-    disp('Training 34% random failed bank data, sorted by bank and year');
     max_cluster = 40;
-    half_life = 10; %half_life = 10 works best
+    half_life = 10;
     threshold_mf = 0.9999;
     min_rule_weight = 0.7;
     x = sorted_data_input(:, 1:itr);
     y = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
     start_test = size(x, 1) * 0.8;
+
     inMF = zeros(size(spec, 2), size(data_input, 2));
     outMF = zeros(size(spec, 2), size(data_target, 2));
 
@@ -96,6 +101,7 @@ for itr = 1: size(ranking,1)
 
     % comp_result(m).rmse = system.RMSE;
     % comp_result(m).num_rules = system.num_rules;
+
     disp('data input is now')
     disp(x)
 
