@@ -1,15 +1,15 @@
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX MAR_ONLINE_RULE XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-% 
+%
 % Author    :   Mario Hartanto
 % Date      :   Jan 25 2014
 % Function  :   creates rules incrementally
 % Syntax    :   mar_online_rule(net, data_input, data_target, current_count)
-% 
+%
 % net - FIS network structure
 % data_input - input data, can have multiple columns (attributes) but one
 % row
 % data_target - target data, can have multiple columns (outputs) but one row
-% 
+%
 % Algorithm -
 % 1) Finds winning fuzzy set of each input and output
 % 2) Searches for the same rule or inconsistent rule in net.rule by matching the antecedents and consequents
@@ -25,7 +25,7 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
     num_attributes = size(data_input, 2);
     num_outputs = size(data_target, 2);
     forgettor = net.forgettor;
-    
+
     % find fuzzy set the input data belongs to
     max_mf = zeros(1, num_attributes);
     max_set = zeros(1, num_attributes);
@@ -48,7 +48,7 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
 
     % f for firing strength of this particular invocation
     f = min(max_mf);
-    
+
     % find fuzzy set the target data belongs to
     max_mf = zeros(1, num_outputs);
     max_set = zeros(1, num_outputs);
@@ -63,14 +63,14 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
         % get winning membership values and winning fuzzy sets
         [max_mf(i), max_set(i)] = max(mf_values);
 
-        
+
         net.output(i).mf(max_set(i)).num_invoked = net.output(i).mf(max_set(i)).num_invoked + 1;
     end
     % consequent is array with winning fuzzy set of each output
     consequent = max_set;
     % u is 'strength' of the output of this particular invocation
     u = min(max_mf);
-    
+
     if ~isfield(net, 'rule')
         % if the field rule does not exist, it means this is the first data
         net.rule(1).antecedent = antecedent;
@@ -83,25 +83,25 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
         net.rule(1).lastUpdate = current_count;
         net.rule(1).belong = 1;
         net.rule(1).active = 1;
-        
+
         D = net;
         return;
     end
-    
-    
+
+
     rule_exists = 0; inconsistent_found = 0;
     num_rules = size(net.rule, 2);
 
     for i = 1 : num_rules
         % looking for same rule i.e. same antecedents, same consequents
         if sum(antecedent == net.rule(i).antecedent) == num_attributes && sum(consequent == net.rule(i).consequent) == num_outputs
-            
+
             if(net.rule(i).baseCache == 0)
                 thetha = 0;
             else
                 thetha = net.rule(i).topCache / net.rule(i).baseCache;
             end
-            
+
             assoc = f * u * (u - thetha);
             net.rule(i) = mar_update_sliding_threshold(net.rule(i), u, forgettor);
 
@@ -114,14 +114,14 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
             % if found, increase number of times invoked
             net.rule(i).num_invoked = net.rule(i).num_invoked + 1;
             net.rule(i).lastUpdate = current_count;
-            
+
             rule_exists = 1;
 
         % if same antecedent but different consequents (inconsistent rule)
         elseif sum(antecedent == net.rule(i).antecedent) == num_attributes && sum(consequent == net.rule(i).consequent) ~= num_outputs
             % only keep the one with the higher weight
             if net.rule(i).weight < (new_rule_weight_factor * f * u)
-                net.rule(i).weight = new_rule_weight_factor * f * u;            
+                net.rule(i).weight = new_rule_weight_factor * f * u;
                 net.rule(i).consequent = consequent;
                 net.rule(i).num_invoked = 1;
                 net.rule(i).topCache = 0;
@@ -133,13 +133,13 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
             inconsistent_found = 1;
 
         else
-            net.rule(i) = mar_update_sliding_threshold(net.rule(i), 0, forgettor);            
+            net.rule(i) = mar_update_sliding_threshold(net.rule(i), 0, forgettor);
         end
     end
 
     if rule_exists == 0 && inconsistent_found == 0
-        
- 
+
+
         net.rule(num_rules + 1).antecedent = antecedent;
         net.rule(num_rules + 1).consequent = consequent;
         net.rule(num_rules + 1).weight = new_rule_weight_factor * f * u;
@@ -153,8 +153,8 @@ function D = mar_online_rule(net, data_input, data_target, current_count)
 
 
     end
-    
+
     net = mar_normalize_weights(net);
-    
+
     D = net;
 end

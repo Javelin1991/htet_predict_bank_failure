@@ -80,6 +80,22 @@ function D = mar_trainOnline(ie_rules_no ,create_ie_rule,data_input, data_target
         %if(current_count <= start_test)
         % only learn if training is required i.e. no system is provided
         if ~isempty(varargin)
+            if current_count == 1
+                system.net.predicted(current_count, :) = 0;
+                system.predicted(current_count, :) = 0;
+            else
+                % predict result of each component network individually
+                system.net.predicted(current_count, :) = mar_cri(data_input(i, :), system.net);
+
+                if isnan(system.net.predicted(current_count, :))
+                    system.net.predicted(current_count, :) = 0;
+                    system.predicted(current_count, :) = 0;
+                    continue;
+                else
+                    % system prediction is weighted average of individual prediction
+                    system.predicted(current_count, :) =  system.net.predicted(current_count, :);
+                end
+            end
             continue;
         end
 

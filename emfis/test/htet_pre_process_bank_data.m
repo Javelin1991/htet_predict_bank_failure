@@ -7,12 +7,12 @@
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function sample = pre_process_bank_data(input, data_percent, is_fixed_size)
+function sample = pre_process_bank_data(input, data_percent, fixed_size)
   input(any(isnan(input), 2), :) = [];
   [m,n] = size(input);
-  if (is_fixed_size)
+  if (fixed_size ~= 0)
     %sample size is fixed to 2000
-    idx = randperm(m, 2000); %random permutation, sampling without replacement
+    idx = randperm(m, fixed_size); %random permutation, sampling without replacement
     sample = input(idx,:);
   else
     idx = randperm(m, round(data_percent*m)); %random permutation,   sampling without replacement

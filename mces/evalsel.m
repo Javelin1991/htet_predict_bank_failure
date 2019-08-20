@@ -34,6 +34,7 @@ action = zeros(idim,2);
 average = mean(x);
 
 for loop = 1:epoch    % number of iterations
+    display('Processing...')
     for i = 1:edim  % For all examples
         % Get current input vector and output
         ip = x(i,:);
@@ -59,10 +60,10 @@ for loop = 1:epoch    % number of iterations
         end
 
         % Get input1 and input2.
-        % ip1 = ip.*m1;   % Input with original mask.
-        % ip2 = ip.*m2;   % Input with modified mask.
-        ip1 = ip;
-        ip2 = ip;
+        ip1 = ip.*m1;   % Input with original mask.
+        ip2 = ip.*m2;   % Input with modified mask.
+        % ip1 = ip;
+        % ip2 = ip;
         for j = 1:idim
             if m1(1,j) == 0
                 ip1(1,j) = average(1,j);
@@ -73,8 +74,8 @@ for loop = 1:epoch    % number of iterations
         end
 
         % Get actual output from the underlying model.
-        y1 = test_model(net,ip1,model);
-        y2 = test_model(net,ip2,model);
+        y1 = test_model(net,ip1,model, i);
+        y2 = test_model(net,ip2,model, i);
 
         % Get the mean square error of the actual output.
         % se1 = mmse(y1,y(i));
@@ -99,49 +100,56 @@ for loop = 1:epoch    % number of iterations
     end
 
     weight(:,2) = action(1:idim,1)./action(1:idim,2);
-    display('Processing...')
+    display('Processing of one MCES iteration completed ')
+
 end
 
-% Calculating the largest bound (SBP) of weight for each feature.
-for i = 1:idim
-    m_x = x;
-    m_x(:,i) = average(i);
-    % weight(i,1) = mean(test_model(net,m_x,model)-test_model(net,x,model));
-    y1 = test_model(net,m_x,model);
-    y2 = test_model(net,x,model);
+display('Processing of MCES completed')
 
-    for j = 1:edim
-        if (abs(y2(j)-y(j)) < (abs(y1(j)-y(j))+ tol)) % y2 is nearer than y1 to true solution, y
-            r = abs(y1(j)-y2(j));     % Get positive reinforcement
-        else
-            r = -abs(y2(j)-y1(j));    % Get negative reinforcement
-        end
-
-        weight(i,1) = weight(i,1)+r;
-    end
-    weight(i,1) = weight(i,1)/edim;
-end
-
-% Calculating the smallest bound of weight for each feature.
-m_x = zeros(edim,idim);
-for i = 1:idim
-    m_x(:,i) = average(i);
-end
-nominal = test_model(net,m_x,model);
-for i = 1:idim
-    m_x(:,i) = x(:,i);
-    % weight(i,3) = mean(nominal-test_model(net,m_x,model));
-    y1 = nominal;
-    y2 = test_model(net,m_x,model);
-
-    for j = 1:edim
-        if (abs(y2(j)-y(j)) < (abs(y1(j)-y(j))+ tol)) % y2 is nearer than y1 to true solution, y
-            r = abs(y1(j)-y2(j));     % Get positive reinforcement
-        else
-            r = -abs(y2(j)-y1(j));    % Get negative reinforcement
-        end
-
-        weight(i,3) = weight(i,1)+r;
-    end
-    weight(i,3) = weight(i,1)/edim;
-end
+% display('Calculating smallest and largest bounds for weights...')
+%
+% % Calculating the largest bound (SBP) of weight for each feature.
+% for i = 1:idim
+%     m_x = x;
+%     m_x(:,i) = average(i);
+%     % weight(i,1) = mean(test_model(net,m_x,model)-test_model(net,x,model));
+%     y1 = test_model(net,m_x,model,i);
+%     y2 = test_model(net,x,model,i);
+%
+%     for j = 1:edim
+%         if (abs(y2(j)-y(j)) < (abs(y1(j)-y(j))+ tol)) % y2 is nearer than y1 to true solution, y
+%             r = abs(y1(j)-y2(j));     % Get positive reinforcement
+%         else
+%             r = -abs(y2(j)-y1(j));    % Get negative reinforcement
+%         end
+%
+%         weight(i,1) = weight(i,1)+r;
+%     end
+%     weight(i,1) = weight(i,1)/edim;
+% end
+%
+% % Calculating the smallest bound of weight for each feature.
+% m_x = zeros(edim,idim);
+% for i = 1:idim
+%     m_x(:,i) = average(i);
+% end
+% nominal = test_model(net,m_x,model);
+% for i = 1:idim
+%     m_x(:,i) = x(:,i);
+%     % weight(i,3) = mean(nominal-test_model(net,m_x,model));
+%     y1 = nominal;
+%     y2 = test_model(net,m_x,model,i);
+%
+%     for j = 1:edim
+%         if (abs(y2(j)-y(j)) < (abs(y1(j)-y(j))+ tol)) % y2 is nearer than y1 to true solution, y
+%             r = abs(y1(j)-y2(j));     % Get positive reinforcement
+%         else
+%             r = -abs(y2(j)-y1(j));    % Get negative reinforcement
+%         end
+%
+%         weight(i,3) = weight(i,1)+r;
+%     end
+%     weight(i,3) = weight(i,1)/edim;
+% end
+%
+% display('Calculating smallest and largest bounds for weights complted')
