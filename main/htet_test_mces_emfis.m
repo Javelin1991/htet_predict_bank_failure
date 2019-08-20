@@ -21,7 +21,7 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 Max_Missing_Cov_Failed = I1;
 
 %preprocess the data
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 2000);
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 10);
 
 
 warning('off');
@@ -54,6 +54,7 @@ colormap('jet'); % set the colorscheme
 
 [~,inx]=sort(ranking, 'descend');
 sorted_data_input = data_input(:,inx);
+sorted_labels = Labels(:, inx);
 RMSE = [];
 
 for itr = 1: size(ranking, 1)
@@ -98,7 +99,7 @@ for itr = 1: size(ranking, 1)
     % comp_result(m).num_rules = system.num_rules;
     disp('data input is now')
     disp(data_input)
-    
+
     disp('current RMSE is')
     disp(system.RMSE)
     RMSE = [RMSE system.RMSE]
@@ -106,3 +107,7 @@ end
 
 figure;
 plot(RMSE');
+set(gca, 'XTick', 1:10); % center x-axis ticks on bins
+set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
+title('RMSE produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
+colormap('jet'); % set the colorscheme
