@@ -1,4 +1,4 @@
-% clear everything
+clear everything
 clear;
 clc;
 
@@ -21,7 +21,7 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 Max_Missing_Cov_Failed = I1;
 
 %preprocess the data
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 0);
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 1000);
 
 
 warning('off');
@@ -32,7 +32,7 @@ data_input = Sample_Failed_Banks(:, 3:12);
 %correlation matrix
 %data_input_cov = cov(data_input);
 %[R_Failed, R_Failed_Sigma] = corrcov(data_input_cov);
-data_target = Sample_Failed_Banks(:, Max_Missing_Cov_Failed);
+data_target = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
 % parameter setup
 train_data = data_input
 train_output = data_target
@@ -57,7 +57,7 @@ sorted_data_input = data_input(:,inx);
 sorted_labels = Labels(:, inx);
 RMSE = [];
 
-for itr = 1: size(ranking, 1)
+for itr = 1: size(ranking,1)
     %%% failed bankss
     spec = 10;
     algo = 'emfis';
@@ -68,7 +68,7 @@ for itr = 1: size(ranking, 1)
     threshold_mf = 0.9999;
     min_rule_weight = 0.7;
     x = sorted_data_input(:, 1:itr);
-    y = Sample_Failed_Banks(:, Max_Missing_Cov_Failed);
+    y = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
     start_test = size(x, 1) * 0.8;
     inMF = zeros(size(spec, 2), size(data_input, 2));
     outMF = zeros(size(spec, 2), size(data_target, 2));
