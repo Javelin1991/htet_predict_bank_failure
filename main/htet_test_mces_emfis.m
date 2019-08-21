@@ -10,7 +10,6 @@ load Failed_Banks;
 All = AllBanks;
 Survived = Survived_Banks;
 Failed = Failed_Banks;
-Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 
 % calculate number of missing rows for failed banks for each feature/column
 % get the feature with maximum number of missing items
@@ -23,17 +22,34 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 Max_Missing_Cov_Failed = I1;
 
 %preprocess the data by random sampling and afterwards, sorted by sorted by bank and year
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 0);
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 2000);
 
 warning('off');
 
 
 % parameter setup
+col_to_remove = 10;
+
+% Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+
+if col_to_remove == 3
+  % When excluding CAPADE, index for CAPADE is 3
+  Labels = ["OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+elseif col_to_remove == 7
+  % When excluding PLAQLY, index for PLAQLY is 7
+  Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+else
+  % When excluding ROE, index for ROE is 10
+  Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "LIQUID", "GROWLA"];
+end
+
+
 data_input = Sample_Failed_Banks(:, 3:12);
+data_input(:,col_to_remove) = [];
 %correlation matrix
 %data_input_cov = cov(data_input);
 %[R_Failed, R_Failed_Sigma] = corrcov(data_input_cov);
-data_target = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
+data_target = Sample_Failed_Banks(:, col_to_remove);
 
 train_data = data_input
 train_output = data_target
@@ -72,7 +88,7 @@ for itr = 1: size(ranking, 1)
     threshold_mf = 0.9999;
     min_rule_weight = 0.7;
     x = sorted_data_input(:, 1:itr);
-    y = Sample_Failed_Banks(:, 2 + Max_Missing_Cov_Failed);
+    y = Sample_Failed_Banks(:, col_to_remove);
     start_test = size(x, 1) * 0.8;
 
     inMF = zeros(size(spec, 2), size(data_input, 2));
