@@ -30,7 +30,7 @@ warning('off');
 
 
 % parameter setup
-col_to_predict = 1;
+col_to_predict = 5;
 
 % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 
@@ -84,7 +84,7 @@ for itr = 1: size(ranking, 1)
     threshold_mf = 0.9999;
     min_rule_weight = 0.7;
     x = sorted_data_input(:, 1:itr);
-    y = Sample_Failed_Banks(:, col_to_remove);
+    y = Sample_Failed_Banks(:, col_to_predict);
     start_test = size(x, 1) * 0.8;
 
     inMF = zeros(size(spec, 2), size(data_input, 2));
