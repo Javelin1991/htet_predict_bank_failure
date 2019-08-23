@@ -1,4 +1,3 @@
-clear everything
 clear;
 clc;
 
@@ -22,44 +21,41 @@ Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_
 Max_Missing_Cov_Failed = I1;
 
 %preprocess the data by random sampling and afterwards, sorted by sorted by bank and year
-Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.34, 2000);
+% Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.1, 0);
+Sample_Failed_Banks = Failed(1:size(Failed, 1) * 0.1, :);
+Sample_Failed_Banks(any(isnan(Sample_Failed_Banks), 2), :) = [];
+Sample_Failed_Banks = Sample_Failed_Banks(:,3:12);
 
 warning('off');
 
 
 % parameter setup
-col_to_remove = 10;
+col_to_predict = 1;
 
 % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 
-if col_to_remove == 3
-  % When excluding CAPADE, index for CAPADE is 3
+if col_to_predict == 1
   Labels = ["OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
-elseif col_to_remove == 7
-  % When excluding PLAQLY, index for PLAQLY is 7
+elseif col_to_predict == 5
   Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 else
-  % When excluding ROE, index for ROE is 10
   Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "LIQUID", "GROWLA"];
 end
 
 
-data_input = Sample_Failed_Banks(:, 3:12);
-data_input(:,col_to_remove) = [];
-%correlation matrix
-%data_input_cov = cov(data_input);
-%[R_Failed, R_Failed_Sigma] = corrcov(data_input_cov);
-data_target = Sample_Failed_Banks(:, col_to_remove);
+data_input = Sample_Failed_Banks;
+data_input(:,col_to_predict) = [];
+data_target = Sample_Failed_Banks(:, col_to_predict);
 
-train_data = data_input
-train_output = data_target
-ite = 2
-induction = 'eMFIS'
+train_data = data_input;
+train_output = data_target;
+ite = 2;
+induction = 'eMFIS';
 
 % weight ranking of the features
 weight = evalsel(train_data,train_output,ite,induction);
 
-ranking = weight(:,2)
+ranking = weight(:,2);
 % plot bar graph for weight ranking
 figure;
 bar(ranking); % plot the matrix
@@ -98,8 +94,6 @@ for itr = 1: size(ranking, 1)
     ie_rules_no = 2;
     create_ie_rule = 0;
     system = mar_trainOnline(ie_rules_no ,create_ie_rule, x, y, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
-
-%    system = mar_trainOnline(data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
     system = ron_calcErrors(system, data_target(start_test : size(y, 1)));
     system.num_rules = mean(system.net.ruleCount(start_test : size(y, 1)));
 
@@ -118,12 +112,12 @@ for itr = 1: size(ranking, 1)
     % comp_result(m).rmse = system.RMSE;
     % comp_result(m).num_rules = system.num_rules;
 
-    disp('data input is now')
-    disp(x)
+    disp('data input is now');
+    disp(x);
 
-    disp('current RMSE is')
-    disp(system.RMSE)
-    RMSE = [RMSE system.RMSE]
+    disp('current RMSE is');
+    disp(system.RMSE);
+    RMSE = [RMSE system.RMSE];
 end
 
 figure;

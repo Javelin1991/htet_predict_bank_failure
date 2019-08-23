@@ -41,8 +41,38 @@ function [drift_detected, neuron] = mar_calculate_age2( neuron, data, threshold_
         return;
     end
 
-    if (second_diff_age(current_count - 2) > second_diff_age(current_count - 3) && max_mf_value < threshold_mf )
-        drift_detected = true;
+    disp('HN DEBUG starts ----------------------------------------')
+
+    disp('second_diff_age')
+    disp(second_diff_age)
+
+    disp('second_diff_age size')
+    disp(size(second_diff_age, 1))
+
+    disp('current_count')
+    disp(current_count)
+
+    disp('max_mf_value')
+    disp(max_mf_value)
+
+    disp('threshold_mf')
+    disp(threshold_mf)
+
+    is_valid_index = true;
+    v1 = current_count - 2;
+    v2 = current_count - 3;
+
+    if (v1 > size(second_diff_age, 1) || v2 > size(second_diff_age, 1))
+      is_valid_index = false;
+      disp('HN DEBUG is false ----------------------------------------')
+      disp('HN DEBUG is false ----------------------------------------')
+      disp('HN DEBUG is false ----------------------------------------')
     end
 
+    if (is_valid_index && second_diff_age(current_count - 2) > second_diff_age(current_count - 3) && max_mf_value < threshold_mf )
+        drift_detected = true;
+        disp('HN DEBUG drift_detected ----------------------------------------')
+    end
+
+    disp('HN DEBUG ends ----------------------------------------')
 end
