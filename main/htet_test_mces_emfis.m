@@ -10,27 +10,18 @@ All = AllBanks;
 Survived = Survived_Banks;
 Failed = Failed_Banks;
 
-% calculate number of missing rows for failed banks for each feature/column
-% get the feature with maximum number of missing items
-% use it as the target output
-Total_Failed_Banks = size(Failed, 1);
-NaN_Rows_Failed = isnan(Failed);
-NaN_Sum_Failed = sum(isnan(Failed(:,(3:12))));
-Nan_Sum_Percent_Failed  = htet_cal_nan_percent(NaN_Sum_Failed, 10, Total_Failed_Banks);
-[M1, I1] = max(Nan_Sum_Percent_Failed);
-Max_Missing_Cov_Failed = I1;
-
 %preprocess the data by random sampling and afterwards, sorted by sorted by bank and year
-% Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.1, 0);
-Sample_Failed_Banks = Failed(1:size(Failed, 1) * 0.1, :);
-Sample_Failed_Banks(any(isnan(Sample_Failed_Banks), 2), :) = [];
+Sample_Failed_Banks = htet_pre_process_bank_data(Failed, 0.1, 0);
+% Sample_Failed_Banks = Failed(1:size(Failed, 1) * 0.1, :);
+% Sample_Failed_Banks(any(isnan(Sample_Failed_Banks), 2), :) = [];
+
 Sample_Failed_Banks = Sample_Failed_Banks(:,3:12);
 
 warning('off');
 
 
 % parameter setup
-col_to_predict = 5;
+col_to_predict = 1;
 
 % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 
@@ -49,7 +40,7 @@ data_target = Sample_Failed_Banks(:, col_to_predict);
 
 train_data = data_input;
 train_output = data_target;
-ite = 2;
+ite = 3;
 induction = 'eMFIS';
 
 % weight ranking of the features
