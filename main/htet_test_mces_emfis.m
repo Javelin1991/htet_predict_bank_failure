@@ -78,9 +78,6 @@ for itr = 1: size(ranking, 1)
     y = Sample_Failed_Banks(:, col_to_predict);
     start_test = size(x, 1) * 0.8;
 
-    inMF = zeros(size(spec, 2), size(data_input, 2));
-    outMF = zeros(size(spec, 2), size(data_target, 2));
-
     disp(['Running algo : ', algo]);
     ie_rules_no = 2;
     create_ie_rule = 0;
