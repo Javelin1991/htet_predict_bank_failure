@@ -7,7 +7,7 @@
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function out = htet_get_emfis_network_result(cv, params, cv_num)
+function out = htet_get_emfis_network_result(cv, params)
 
       algo = params.algo;
       max_cluster = params.max_cluster;
@@ -17,6 +17,8 @@ function out = htet_get_emfis_network_result(cv, params, cv_num)
       spec = params.spec;
       ie_rules_no = params.ie_rules_no;
       create_ie_rule = params.create_ie_rule;
+      unclassified_count = 0;
+      eer_count = 0;
 
       D = cv;
       data_target = D(:,2);
@@ -35,31 +37,24 @@ function out = htet_get_emfis_network_result(cv, params, cv_num)
               after_threshold(x) = 1;
           elseif system.predicted(x) < 0.5
               after_threshold(x) = 0;
-          else
+          elseif system.predicted(x) == 0.5
               after_threshold(x) = 0.5;
+              eer_count = eer_count + 1;
+          else
+              unclassified_count = unclassified_count + 1;
           end
       end
 
-      figure;
-      str = [sprintf('Actual VS Predicted <-> '), num2str(max_cluster)];
-      title(str);
-
-      for l = 1:target_size
-          hold on;
-          plot(1:size(data_target,1),data_target(1:size(data_target,1)), 'b');
-          plot(1:size(system.predicted,1),system.predicted(1:size(data_target,1)), 'r');
-          % plot(1:size(after_threshold,1),after_threshold(1:size(data_target,1)), 'r');
-      end
-      legend('Actual','Prediction');
-
-      comp_result(cv_num).rmse = system.RMSE;
-      comp_result(cv_num).num_rules = system.num_rules;
-      comp_result(cv_num).R = system.R;
-      comp_result(cv_num).predicted = system.predicted;
-      comp_result(cv_num).after_threshold = after_threshold;
+      net_result.rmse = system.RMSE;
+      net_result.num_rules = system.num_rules;
+      net_result.R = system.R;
+      net_result.predicted = {system.predicted};
+      net_result.after_threshold = {after_threshold};
       correct_predictions = length(find(data_target(start_test : target_size) - after_threshold(start_test :target_size) == 0));
       test_examples = (target_size - start_test) + 1;
-      comp_result(cv_num).accuracy = (correct_predictions * 100)/test_examples;
+      net_result.accuracy = (correct_predictions * 100)/test_examples;
+      net_result.unclassified = (unclassified_count * 100)/test_examples;
+      net_result.EER = (eer_count * 100)/test_examples;
 
-      out = comp_result;
+      out = net_result;
 end
