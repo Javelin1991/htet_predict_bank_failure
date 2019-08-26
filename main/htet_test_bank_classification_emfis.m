@@ -61,3 +61,6 @@ set(gca, 'XTick', 1:3); % center x-axis ticks on bins
 set(gca, 'XTickLabel', Labels); % set x-axis labels
 title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
 colormap('jet'); % set the colorscheme
+
+load handel
+sound(y,Fs)
