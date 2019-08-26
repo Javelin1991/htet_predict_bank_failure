@@ -31,25 +31,6 @@ load CV3_Classification;
 %   end
 % end
 
-
-% algo = 'emfis';
-% max_cluster = 40;
-% half_life = inf;
-% threshold_mf = 0.9999;
-% min_rule_weight = 0.7;
-% spec = 10;
-
-% algo = 'emfis';
-% max_cluster = 13;
-% half_life = inf;
-% threshold_mf = 0.8;
-% min_rule_weight = 0.1;
-% spec = 6;
-% ie_rules_no = 2;
-% create_ie_rule =1;
-
-% total_accuracy = 0;
-
 params.algo = 'emfis';
 params.max_cluster = 40;
 params.half_life = inf;
@@ -59,10 +40,23 @@ params.spec = 10;
 params.ie_rules_no = 2;
 params.create_ie_rule = 0;
 
-for cv_num = 5:5
+total_accuracy_net_1 = 0;
+total_accuracy_net_2 = 0;
+total_accuracy_net_3 = 0;
+
+for cv_num = 1:5
   net_result_for_last_record = htet_get_emfis_network_result(CV1{cv_num}, params, cv_num);
+  total_accuracy_net_1 = total_accuracy_net_1 + net_result_for_last_record(cv_num).accuracy;
+
   net_result_for_one_year_prior = htet_get_emfis_network_result(CV2{cv_num}, params, cv_num);
+  total_accuracy_net_2 = total_accuracy_net_2 + net_result_for_one_year_prior(cv_num).accuracy;
+
   net_result_for_two_year_prior = htet_get_emfis_network_result(CV3{cv_num}, params, cv_num);
+  total_accuracy_net_3 = total_accuracy_net_2 + net_result_for_two_year_prior(cv_num).accuracy;
 end
+
+total_accuracy_net_1 = total_accuracy_net_1/5;
+total_accuracy_net_2 = total_accuracy_net_2/5;
+total_accuracy_net_3 = total_accuracy_net_3/5;
 
 % final_accuracy = total_accuracy/5;
