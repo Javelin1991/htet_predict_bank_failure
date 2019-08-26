@@ -59,4 +59,17 @@ total_accuracy_net_1 = total_accuracy_net_1/5;
 total_accuracy_net_2 = total_accuracy_net_2/5;
 total_accuracy_net_3 = total_accuracy_net_3/5;
 
+total_accuracy_net_1 = 1;
+total_accuracy_net_2 = 2;
+total_accuracy_net_3 = 3;
+
+Labels = ["Last Available", "One Year Prior", "Two Year Prior"];
+Acc = [total_accuracy_net_1; total_accuracy_net_2; total_accuracy_net_3];
+
+figure;
+bar(Acc); % plot the matrix
+set(gca, 'XTick', 1:3); % center x-axis ticks on bins
+set(gca, 'XTickLabel', Labels); % set x-axis labels
+title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
+colormap('jet'); % set the colorscheme
 % final_accuracy = total_accuracy/5;
