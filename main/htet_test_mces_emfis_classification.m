@@ -52,7 +52,7 @@ params.do_not_use_cv = true;
 
 %%% mces feature selection using five folds %%%
 total_weight = [];
-
+%%% WARNING: running the "for" loop below may take approximately about 45 min %%%
 for i = 1:5
   D = CV1{i};
 
@@ -94,49 +94,50 @@ ACC = [];
 
 %%% iterate through each feature starting from the higest rank to lowest rank %%%
 %%% using single fold %%%
-% sorted_data_input = data_input(:,inx);
-% for itr = 1: 10
-%   x = sorted_data_input(:, 1:itr);
-%   y = data_target;
-%   net_result_for_last_record(itr) = htet_get_emfis_network_result(CV1{5}, params, x, y);
-%   ACC = [ACC; net_result_for_last_record(itr).accuracy];
-% end
-% figure;
-% plot(ACC');
-% set(gca, 'XTick', 1:10); % center x-axis ticks on bins
-% set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
-% title('Accuracy produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
-% colormap('jet'); % set the colorscheme
-%%% using single fold %%%
-
-%%% iterate through each feature starting from the higest rank to lowest rank %%%
-%%% using multiple folds %%%
+sorted_data_input = data_input(:,inx);
 for itr = 1: 10
-  for i = 1:5
-    D = CV1{i};
-
-    if params.dummy_run
-      data_target = D(1:10,2);
-      data_input = D(1:10,3:12);
-    else
-      data_target = D(:,2);
-      data_input = D(:,3:12);
-    end
-
-    sorted_data_input = data_input(:,inx);
-    x = sorted_data_input(:, 1:itr);
-    y = data_target;
-    net_result_for_last_record(i) = htet_get_emfis_network_result(CV1{i}, params, x, y);
-  end
-  comp_result(itr)  = htet_find_average(net_result_for_last_record, 5);
-  ACC = [ACC; comp_result(itr).Accuracy];
+  x = sorted_data_input(:, 1:itr);
+  y = data_target;
+  net_result_for_last_record(itr) = htet_get_emfis_network_result(CV1{5}, params, x, y);
+  ACC = [ACC; net_result_for_last_record(itr).accuracy];
 end
-
 figure;
 plot(ACC');
 set(gca, 'XTick', 1:10); % center x-axis ticks on bins
 set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
 title('Accuracy produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
 colormap('jet'); % set the colorscheme
+%%% using single fold %%%
+
+%%% iterate through each feature starting from the higest rank to lowest rank %%%
+%%% using multiple folds %%%
+%%% WARNING: running the code below may take approximately about 5 hr %%%
+% for itr = 1: 10
+%   for i = 1:5
+%     D = CV1{i};
+%
+%     if params.dummy_run
+%       data_target = D(1:10,2);
+%       data_input = D(1:10,3:12);
+%     else
+%       data_target = D(:,2);
+%       data_input = D(:,3:12);
+%     end
+%
+%     sorted_data_input = data_input(:,inx);
+%     x = sorted_data_input(:, 1:itr);
+%     y = data_target;
+%     net_result_for_last_record(i) = htet_get_emfis_network_result(CV1{i}, params, x, y);
+%   end
+%   comp_result(itr)  = htet_find_average(net_result_for_last_record, 5);
+%   ACC = [ACC; comp_result(itr).Accuracy];
+% end
+%
+% figure;
+% plot(ACC');
+% set(gca, 'XTick', 1:10); % center x-axis ticks on bins
+% set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
+% title('Accuracy produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
+% colormap('jet'); % set the colorscheme
 
 %%% using multiple folds %%%

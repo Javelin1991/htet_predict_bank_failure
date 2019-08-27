@@ -40,33 +40,34 @@ params.threshold_mf = 0.9999;
 params.min_rule_weight = 0.7;
 params.spec = 10;
 params.ie_rules_no = 2;
-params.create_ie_rule = 1;
+params.create_ie_rule = 0;
 params.use_top_features = true;
 params.dummy_run = false;
+params.do_not_use_cv = false;
 
 % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 % xdatatemp = xdata(:,[77:83 86 end end:-1:end-5])
 % That is, of course, if you wanted columns 77 to 83, then 86, then the last column, then the last 5 columns counted backwards ;)
 
-for cv_num = 1:1
+for cv_num = 1:5
   net_result_for_last_record(cv_num) = htet_get_emfis_network_result(CV1{cv_num}, params);
   net_result_for_one_year_prior(cv_num) = htet_get_emfis_network_result(CV2{cv_num}, params);
   net_result_for_two_year_prior(cv_num) = htet_get_emfis_network_result(CV3{cv_num}, params);
 end
 
-% RESULT_0 = htet_find_average(net_result_for_last_record, 5);
-% RESULT_1 = htet_find_average(net_result_for_one_year_prior, 5);
-% RESULT_2 = htet_find_average(net_result_for_two_year_prior, 5);
-%
-% Labels = ["Last Available", "One Year Prior", "Two Year Prior"];
-% Acc = [RESULT_0.Accuracy; RESULT_1.Accuracy; RESULT_2.Accuracy];
-%
-% figure;
-% bar(Acc); % plot the matrix
-% set(gca, 'XTick', 1:3); % center x-axis ticks on bins
-% set(gca, 'XTickLabel', Labels); % set x-axis labels
-% title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
-% colormap('jet'); % set the colorscheme
+RESULT_0 = htet_find_average(net_result_for_last_record, 5);
+RESULT_1 = htet_find_average(net_result_for_one_year_prior, 5);
+RESULT_2 = htet_find_average(net_result_for_two_year_prior, 5);
+
+Labels = ["Last Available", "One Year Prior", "Two Year Prior"];
+Acc = [RESULT_0.Accuracy; RESULT_1.Accuracy; RESULT_2.Accuracy];
+
+figure;
+bar(Acc); % plot the matrix
+set(gca, 'XTick', 1:3); % center x-axis ticks on bins
+set(gca, 'XTickLabel', Labels); % set x-axis labels
+title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
+colormap('jet'); % set the colorscheme
 
 load handel
 sound(y,Fs)
