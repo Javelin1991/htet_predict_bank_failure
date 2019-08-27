@@ -19,11 +19,11 @@ function out = htet_find_average(net, size)
     F = F + net(i).unclassified;
   end
 
-  out.RMSE = A/5;
-  out.Rules = B/5;
-  out.R = C/5;
-  out.Accuracy = D/5;
-  out.EER = E/5;
-  out.Unclassified = F/5;
+  out.RMSE = A/size;
+  out.Rules = B/size;
+  out.R = C/size;
+  out.Accuracy = D/size;
+  out.EER = E/size;
+  out.Unclassified = F/size;
 
 end

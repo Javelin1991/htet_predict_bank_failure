@@ -21,31 +21,64 @@ params.use_top_features = false;
 
 params.dummy_run = false;
 
+% set do_not_use_cv to true for predicting using top features
 params.do_not_use_cv = true;
 
 % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 % xdatatemp = xdata(:,[77:83 86 end end:-1:end-5])
 % That is, of course, if you wanted columns 77 to 83, then 86, then the last column, then the last 5 columns counted backwards ;)
 
-D = CV1{5};
+%%% mces feature selection using single fold %%%
+% D = CV1{5};
+%
+% if params.dummy_run
+%   data_target = D(1:100,2);
+%   data_input = D(1:100,3:12);
+% else
+%   data_target = D(:,2);
+%   data_input = D(:,3:12);
+% end
+%
+% train_data = data_input;
+% train_output = data_target;
+% ite = 2;
+% induction = 'eMFIS_classification';
+%
+% % weight ranking of the features
+% weight = evalsel(train_data,train_output,ite,induction, params);
+%
+% ranking = weight(:,2);
+%%% mces feature selection for single fold %%%
 
-if params.dummy_run
-  data_target = D(1:100,2);
-  data_input = D(1:100,3:12);
-else
-  data_target = D(:,2);
-  data_input = D(:,3:12);
+%%% mces feature selection using five folds %%%
+total_weight = [];
+
+for i = 1:5
+  D = CV1{i};
+
+  if params.dummy_run
+    data_target = D(1:100,2);
+    data_input = D(1:100,3:12);
+  else
+    data_target = D(:,2);
+    data_input = D(:,3:12);
+  end
+
+  train_data = data_input;
+  train_output = data_target;
+  ite = 2;
+  induction = 'eMFIS_classification';
+
+  % weight ranking of the features
+  weight = evalsel(train_data,train_output,ite,induction, params);
+
+  total_weight = [total_weight weight(:,2)];
 end
 
-train_data = data_input;
-train_output = data_target;
-ite = 2;
-induction = 'eMFIS_classification';
+total_weight = total_weight';
+ranking = mean(total_weight);
+%%% mces feature selection using five folds %%%
 
-% weight ranking of the features
-weight = evalsel(train_data,train_output,ite,induction, params);
-
-ranking = weight(:,2);
 % plot bar graph for weight ranking
 figure;
 bar(ranking); % plot the matrix
@@ -56,16 +89,47 @@ colormap('jet'); % set the colorscheme
 
 
 [~,inx]=sort(ranking, 'descend');
-sorted_data_input = data_input(:,inx);
 sorted_labels = Labels(:, inx);
 ACC = [];
 
-% iterate through each feature starting from the higest rank to lowest rank
-for itr = 1: size(ranking, 1)
-  x = sorted_data_input(:, 1:itr);
-  y = train_output;
-  net_result_for_last_record(itr) = htet_get_emfis_network_result(CV1{5}, params, x, y);
-  ACC = [ACC; net_result_for_last_record(itr).accuracy];
+%%% iterate through each feature starting from the higest rank to lowest rank %%%
+%%% using single fold %%%
+% sorted_data_input = data_input(:,inx);
+% for itr = 1: 10
+%   x = sorted_data_input(:, 1:itr);
+%   y = data_target;
+%   net_result_for_last_record(itr) = htet_get_emfis_network_result(CV1{5}, params, x, y);
+%   ACC = [ACC; net_result_for_last_record(itr).accuracy];
+% end
+% figure;
+% plot(ACC');
+% set(gca, 'XTick', 1:10); % center x-axis ticks on bins
+% set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
+% title('Accuracy produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
+% colormap('jet'); % set the colorscheme
+%%% using single fold %%%
+
+%%% iterate through each feature starting from the higest rank to lowest rank %%%
+%%% using multiple folds %%%
+for itr = 1: 10
+  for i = 1:5
+    D = CV1{i};
+
+    if params.dummy_run
+      data_target = D(1:10,2);
+      data_input = D(1:10,3:12);
+    else
+      data_target = D(:,2);
+      data_input = D(:,3:12);
+    end
+
+    sorted_data_input = data_input(:,inx);
+    x = sorted_data_input(:, 1:itr);
+    y = data_target;
+    net_result_for_last_record(i) = htet_get_emfis_network_result(CV1{i}, params, x, y);
+  end
+  comp_result(itr)  = htet_find_average(net_result_for_last_record, 5);
+  ACC = [ACC; comp_result(itr).Accuracy];
 end
 
 figure;
@@ -74,3 +138,5 @@ set(gca, 'XTick', 1:10); % center x-axis ticks on bins
 set(gca, 'XTickLabel', sorted_labels); % set x-axis labels
 title('Accuracy produced by ranked features (highest-lowest)', 'FontSize', 14); % set title
 colormap('jet'); % set the colorscheme
+
+%%% using multiple folds %%%
