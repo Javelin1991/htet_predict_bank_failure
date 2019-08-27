@@ -7,7 +7,7 @@
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function out = htet_get_emfis_network_result(cv, params)
+function out = htet_get_emfis_network_result(cv, params, x, y)
 
       algo = params.algo;
       max_cluster = params.max_cluster;
@@ -21,8 +21,25 @@ function out = htet_get_emfis_network_result(cv, params)
       eer_count = 0;
 
       D = cv;
-      data_target = D(:,2);
-      data_input = D(:,3:12);
+
+      if params.dummy_run
+        data_target = D(1:10,2);
+        data_input = D(1:10,3:12);
+      else
+        data_target = D(:,2);
+        data_input = D(:,3:12);
+      end
+
+      if params.use_top_features
+        % 1 is CAPADE, 5 is PLAQLY, 8 is ROE
+        data_input = data_input(:,[1 5 8]);
+      end
+
+      if params.do_not_use_cv
+        data_input = x;
+        data_target = y;
+      end
+
       target_size = size(data_target, 1);
       start_test = (size(data_input, 1) * 0.2) + 1;
 
@@ -55,6 +72,8 @@ function out = htet_get_emfis_network_result(cv, params)
       net_result.accuracy = (correct_predictions * 100)/test_examples;
       net_result.unclassified = (unclassified_count * 100)/test_examples;
       net_result.EER = (eer_count * 100)/test_examples;
+      net_result.data_input = {data_input};
+      net_result.data_target = {data_target};
 
       out = net_result;
 end

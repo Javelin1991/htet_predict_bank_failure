@@ -1,6 +1,6 @@
 % Interface to train the actual learning model.
 % Supporting model: MLP, ANFIS
-function [net] = train_model(x,y,model)
+function [net] = train_model(x, y, model, params)
 
 if (strcmp(model, 'MLP'))
     % train an MLP
@@ -16,10 +16,8 @@ elseif (strcmp(model, 'eMFIS'))
     half_life = 10; %half_life = 10 works best
     threshold_mf = 0.9999;
     min_rule_weight = 0.7;
+
     data_input = x;
-    %correlation matrix
-    %data_input_cov = cov(data_input);
-    %[R_Failed, R_Failed_Sigma] = corrcov(data_input_cov);
     data_target = y;
     start_test = size(data_input, 1) * 0.8;
     inMF = zeros(size(spec, 2), size(data_input, 2));
@@ -29,11 +27,20 @@ elseif (strcmp(model, 'eMFIS'))
     ie_rules_no = 2;
     create_ie_rule = 0;
     system = mar_trainOnline(ie_rules_no ,create_ie_rule, data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
+    net = system;
+elseif strcmp(model, 'eMFIS_classification')
+    data_input = x;
+    data_target = y;
 
-%    system = mar_trainOnline(data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
-    system = ron_calcErrors(system, data_target(start_test : size(data_target, 1)));
-    system.num_rules = mean(system.net.ruleCount(start_test : size(data_target, 1)));
-
+    algo = params.algo;
+    max_cluster = params.max_cluster;
+    half_life = params.half_life;
+    threshold_mf = params.threshold_mf;
+    min_rule_weight = params.min_rule_weight;
+    spec = params.spec;
+    ie_rules_no = params.ie_rules_no;
+    create_ie_rule = params.create_ie_rule
+    system = mar_trainOnline(ie_rules_no ,create_ie_rule, data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
     net = system;
 else
     display(['Model ' model ' not supported!!!'])

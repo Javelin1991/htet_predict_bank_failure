@@ -102,8 +102,6 @@ function D = mar_trainOnline(ie_rules_no ,create_ie_rule,data_input, data_target
             continue;
         end
 
-        disp('HN DEBUG never comes here');
-
         net = system.net;
 
         % take the input data and train MF

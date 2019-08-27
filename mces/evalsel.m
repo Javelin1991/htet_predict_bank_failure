@@ -3,7 +3,7 @@
 % [returning weight vector of features] = evalsel(..
 %   .. input matrix, output matrix, number of learning epoch, underlying model)
 % function [weight] = evalsel(x,y,epoch,model,net)
-function [weight] = evalsel(x,y,epoch,model)
+function [weight] = evalsel(x,y,epoch,model, params)
 
 tol = 0;    % Tolerance of difference
 % epoch = 2;  % Number of epoch
@@ -19,7 +19,7 @@ idim = size(x,2);
 weight = zeros(idim, 3);
 
 % Train the underlying induction model first.
-net = train_model(x,y,model);
+net = train_model(x,y,model, params);
 
 % Action arrays, store all possible actions and information
 % Forward action, changing from 0->1 for a mask element.
