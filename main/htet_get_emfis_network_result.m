@@ -32,10 +32,10 @@ function out = htet_get_emfis_network_result(cv, params, x, y)
 
       if params.use_top_features
         % 1 is CAPADE, 5 is PLAQLY, 8 is ROE
-        % data_input = data_input(:,[1 5 8]);
+        data_input = data_input(:,[1 5 8]);
 
         % 1 is CAPADE, 2 is OLAQLY, 3 is PROBLO, 5 is PLAQLY, 7 is NINMAR
-        data_input = data_input(:,[1 2 3 5 7]);
+        % data_input = data_input(:,[1 2 3 5 7]);
       end
 
       if params.do_not_use_cv
