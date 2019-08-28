@@ -18,10 +18,10 @@ function out = htet_filter_bank_data_by_index(input, offset)
           record = A(idx, :);
           if sum(isnan(record)) == 0
               out1 = [out1; record];
-              out2 = [out2; record(1,1)]
           end
       end
+      out2 = [out2; {A}]
     end
     out.result = out1;
-    out.IDs = out2;
+    out.full_record = out2;
 end

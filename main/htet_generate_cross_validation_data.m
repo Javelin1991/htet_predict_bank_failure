@@ -14,7 +14,7 @@ function out = htet_generate_cross_validation_data(input1, input2, num_of_fold)
 
   CV = [];
 
-  for i = 1:1
+  for i = 1:5
       cv_sb_test = htet_get_cv_data(test(SB,i), input1);
       cv_fb_test = htet_get_cv_data(test(FB,i), input2);
 

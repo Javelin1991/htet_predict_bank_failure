@@ -24,15 +24,21 @@ function out = htet_get_emfis_network_result(cv, params, x, y)
 
       if params.dummy_run
         data_target = D(1:10,2);
-        data_input = D(1:10,3:12);
+        % data_input = D(1:10,3:12);
+
+        % already filter out
+        data_input = D(1:10,[3:5]);
       else
         data_target = D(:,2);
-        data_input = D(:,3:12);
+        % data_input = D(:,3:12);
+
+        % already filter out
+        data_input = D(:,[3:5]);
       end
 
       if params.use_top_features
         % 1 is CAPADE, 5 is PLAQLY, 8 is ROE
-        data_input = data_input(:,[1 5 8]);
+        % data_input = data_input(:,[1 5 8]);
 
         % 1 is CAPADE, 2 is OLAQLY, 3 is PROBLO, 5 is PLAQLY, 7 is NINMAR
         % data_input = data_input(:,[1 2 3 5 7]);
