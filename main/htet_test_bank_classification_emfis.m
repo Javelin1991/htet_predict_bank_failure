@@ -4,31 +4,33 @@ clc;
 % load CV1_Classification;
 % load CV2_Classification;
 % load CV3_Classification;
-load Survived_Banks;
-load Failed_Banks;
+% load Survived_Banks;
+% load Failed_Banks;
 
-for k = 1:3
-  backward_offset = k-1;
-  Failed_Banks_Group_By_Bank_ID = [];
-  Survived_Banks_Group_By_Bank_ID = [];
+load CV1_Classification;
 
-  output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
-  output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
-
-  Survived_Banks_Group_By_Bank_ID = output_1.result;
-  Failed_Banks_Group_By_Bank_ID = output_2.result;
-
-  Survived_Banks_Group_By_Bank_ID_Full_Records = output_1.full_record;
-  Failed_Banks_Group_By_Bank_ID_Full_Records = output_2.full_record;
-
-  if k == 1
-    CV1_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
-  elseif k == 2
-    CV2_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
-  else
-    CV3_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
-  end
-end
+% for k = 1:3
+%   backward_offset = k-1;
+%   Failed_Banks_Group_By_Bank_ID = [];
+%   Survived_Banks_Group_By_Bank_ID = [];
+%
+%   output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
+%   output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
+%
+%   Survived_Banks_Group_By_Bank_ID = output_1.result;
+%   Failed_Banks_Group_By_Bank_ID = output_2.result;
+%
+%   Survived_Banks_Group_By_Bank_ID_Full_Records = output_1.full_record;
+%   Failed_Banks_Group_By_Bank_ID_Full_Records = output_2.full_record;
+%
+%   if k == 1
+%     CV1_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
+%   elseif k == 2
+%     CV2_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
+%   else
+%     CV3_with_top_3_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5);
+%   end
+% end
 
 params.algo = 'emfis';
 params.max_cluster = 40;
