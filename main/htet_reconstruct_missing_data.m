@@ -26,7 +26,7 @@ D = input_without_NaN(:,3:12);
 data_to_train_system = D(:,[1 5]);
 
 % CAPADE = 1, PLAQLY = 5,  ROE = 8
-col_to_predict = 1;
+col_to_predict = 8;
 
 data_to_predict = D(:,col_to_predict);
 
@@ -38,11 +38,12 @@ else
     col_to_input = [1 5];
 end
 
-algo = 'emfis';
-
-
-switch algo
-    case 'emfis'
+% algo = 'emfis';
+%
+%
+% switch algo
+%     case 'emfis'
+        algo = 'emfis';
         spec = 10;
         max_cluster = 40;
         half_life = 10;
@@ -72,13 +73,17 @@ switch algo
 
         E = input_without_NaN(1:10, 3:12);
         x = E(:,col_to_input);
+        y = E(:,col_to_predict);
 
         for i = 1:length(x)
-            reconstructed_data(i,:) = htet_reconstruct_using_trained_emfis(trained_system, x(i), i);
+            reconstructed_data_1(i,:) = htet_reconstruct_using_trained_emfis(trained_system, x(i), i);
         end
 
-    case 'denfis'
+        emfis_system.predicted = reconstructed_data_1;
+        emfis_system.results = ron_calcErrors(emfis_system, y);
 
+    % case 'denfis'
+        algo = 'denfis'
         C.trainmode = 2;
 
         data_input = data_to_train_system;
@@ -87,18 +92,18 @@ switch algo
 
         trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
         tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
-        net = denfis(trnData, C);
-        tfis = denfiss(trnData, net);
-        cfis = denfiss(tstData, net);
+        trained_system_2 = denfis(trnData, C);
+        tfis = denfiss(trnData, trained_system_2);
+        cfis = denfiss(tstData, trained_system_2);
 
         train_predicted = tfis.Out';
         test_predicted = cfis.Out';
 
-        net.predicted = test_predicted;
-        net = ron_calcErrors(net, data_target(start_test : size(data_target, 1)));
-        r2(1, 1) = net.R2;
-        rmse(1, 1) = sqrt(net.MSE);
-        rules(1, 1) = net.num_rules;
+        trained_system_2.predicted = test_predicted;
+        trained_system_2 = ron_calcErrors(trained_system_2, data_target(start_test : size(data_target, 1)));
+        r2(1, 1) = trained_system_2.R2;
+        rmse(1, 1) = sqrt(trained_system_2.MSE);
+        rules(1, 1) = trained_system_2.num_rules;
 
         % E = input_with_NaN(5,3:12); % row 5 of failed banks with NaN
         % E = [E; input_with_NaN(10,3:12)]; % row 10 of failed banks with NaN
@@ -112,9 +117,13 @@ switch algo
         x = E(:,col_to_input);
         y = E(:,col_to_predict);
         x = [x y];
-        reconstructed_data = denfiss(x, net)';
-    case 'anfis'
+        net_struct = denfiss(x, trained_system_2);
+        reconstructed_data_2 = net_struct.Out';
+        denfis_system.predicted = reconstructed_data_2;
+        denfis_system.results = ron_calcErrors(denfis_system, y);
 
+    % case 'anfis'
+        algo = 'anfis';
         data_input = data_to_train_system;
         data_target = data_to_predict;
         start_test = size(data_input, 1) * 0.8;
@@ -125,16 +134,25 @@ switch algo
         % infis = genfis2(data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :), 0.3);
         % net = anfis(trnData, infis, epoch_n);
         opt = anfisOptions('InitialFIS',4,'EpochNumber',epoch_n);
-        net = anfis(trnData, opt);
-        train_predicted = evalfis(data_input(1 : start_test - 1, :)', net);
-        test_predicted = evalfis(data_input(start_test : size(data_target, 1), :)', net);
+        trained_system_3 = anfis(trnData, opt);
+        train_predicted = evalfis(data_input(1 : start_test - 1, :)', trained_system_3);
+        test_predicted = evalfis(data_input(start_test : size(data_target, 1), :)', trained_system_3);
 
-        system.predicted = test_predicted;
-        system.results = ron_calcErrors(system, data_target(start_test : size(data_target, 1)));
+        anfis_system.predicted = test_predicted;
+        anfis_system.results = ron_calcErrors(anfis_system, data_target(start_test : size(data_target, 1)));
 
         E = input_without_NaN(1:10, 3:12);
         x = E(:,col_to_input);
         y = E(:,col_to_predict);
         % x = [x y];
-        reconstructed_data = evalfis(x', net);
-end
+        reconstructed_data_3 = evalfis(x', trained_system_3);
+        anfis_system.predicted = reconstructed_data_3;
+        anfis_system.results = ron_calcErrors(anfis_system, y);
+% end
+
+        for i = 1:10
+            final_reconstructed_data(i,:) = (reconstructed_data_2(i) + reconstructed_data_3(i))/2;
+        end
+
+        ensemble_system.predicted = final_reconstructed_data;
+        ensemble_system.results = ron_calcErrors(ensemble_system, y);
