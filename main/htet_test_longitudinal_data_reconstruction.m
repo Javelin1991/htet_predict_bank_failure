@@ -29,7 +29,7 @@ for i=1:length(bank_type)
   input_without_NaN = input;
 
   D_train = input_without_NaN(:,extract_all_features); % 100 percent train data
-  D_test = htet_pre_process_bank_data(D_train, 0.24, 0); 24% randomly selected test data
+  D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
 
   % D_train = input_without_NaN(1:15,extract_all_features); % for dummy run
   % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % randomly selected test data
@@ -191,13 +191,15 @@ for i=1:length(bank_type)
   end
   disp('Storing the results...')
   clear D; clear input;
-  % Storing each feature prediction results, will have two rows, the first row is for Failed Failed_Banks
+  % Storing each feature prediction results, SYSTEMS will have two rows,
+  % the first row is for Failed Failed_Banks
   % the second row is for Survived_Banks
+
+
+  % final data structure for items in SYSTEMS
+  % col = eMFIS(I/E)  DENFIS  ANFIS ENSEMBLE_ANFIS_DENFIS_SIMPLE_AVERAGING  ENSEMBLE_ANFIS_DENFIS_BEST_SELECTION
+  % row_1 = Target_CAPADE
+  % row_2 = Target_PLAQLY
+  % row_3 = Target_ROE
   SYSTEMS(i,:) = {RESULTS};
 end
-
-% final data structure for SYSTEMS
-% col = eMFIS(I/E)  DENFIS  ANFIS ENSEMBLE_ANFIS_DENFIS_SIMPLE_AVERAGING  ENSEMBLE_ANFIS_DENFIS_BEST_SELECTION
-% row_1 = Target_CAPADE
-% row_2 = Target_PLAQLY
-% row_3 = Target_ROE
