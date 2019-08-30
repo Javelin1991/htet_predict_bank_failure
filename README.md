@@ -8,7 +8,7 @@ I have extensively further explored different ways to reconstruct missing data i
 With the new reconstructed data set, different benchmark experiments are also performed in order to prove its effectiveness in contribution to bank failure prediction. The rantionale to use eMFIS(I/E) to predict bank failure is that Mamdani-based FNNs have better interpretation capability as contrast to TSK-type FNNs. However, as for regression tasks, TSK-type FNNs are popular for achieving great accuracy, but compromising their interpretability. Hence, "ANFIS" and "DENFIS" are used to implement the simple-averaging parallel ensemble learning in order to reconstruct missing data and the experimental results 
 are indeed promising.
 
-(Note: The FYP is still In progress and expected to be completed in October 21st, 2019)
+(Note: The FYP is still in progress and expected to be completed in October 21st, 2019)
 
 ## Project Details (to be continued) 
 
