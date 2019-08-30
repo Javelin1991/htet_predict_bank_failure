@@ -13,24 +13,12 @@ clear;
 load Failed_Banks;
 load Survived_Banks;
 
-
-output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), 0);
-output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), 0);
-
-Survived_Banks_Group_By_Bank_ID_Full_Records = output_1.full_record;
-Failed_Banks_Group_By_Bank_ID_Full_Records = output_2.full_record;
-
-CV_3_fold = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 3, false);
-
-
 bank_type = [{Failed_Banks}; {Survived_Banks}];
-bank_type_name = {'Failed_Banks'; 'Survived_Banks'};
+bank_type_name = {'Failed_Banks'; 'Survived_Bans'};
 algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
-predictor_features = [[5 8]; [1 8]; [1 5]];
 extract_all_features = [3:12];
-training_set_percent = 0.7;
 
 for i=1:length(bank_type)
   disp(['Processing Bank Type : ', bank_type_name(i)]);
@@ -39,20 +27,35 @@ for i=1:length(bank_type)
   input_with_NaN = input(any(isnan(input), 2), :)
   input(any(isnan(input), 2), :) = [];
   input_without_NaN = input;
-  D = input_without_NaN(:,extract_all_features);
-  % D = input_without_NaN(1:10,extract_all_features); % for dummy run
+
+  D_train = input_without_NaN(:,extract_all_features); % 100 percent train data
+  D_test = htet_pre_process_bank_data(D_train, 0.24, 0); 24% randomly selected test data
+
+  % D_train = input_without_NaN(1:15,extract_all_features); % for dummy run
+  % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % randomly selected test data
+
+  D = vertcat(D_train, D_test);
 
   for j=1:length(target_feature_col_no)
 
     disp('Feature prediction starts...')
     feature_name = target_feature_name{j};
+    y = target_feature_col_no(j);
+    if y == 1
+      x1 = 5; x2 = 8;
+    elseif y == 5
+      x1 = 1; x2 = 8;
+    else
+      x1 = 1; x2 = 5;
+    end
+
+    data_input = D(:,[x1 x2]);
+    data_target = D(:,y);
 
     for k=1:length(algo_type)
 
-      data_input = D(:,predictor_features(j));
-      data_target = D(:,target_feature_col_no(j));
-
       algo = algo_type{k};
+      disp(' ');
 
       switch algo
           case 'emfis'
@@ -69,7 +72,7 @@ for i=1:length(bank_type)
               tstData = data_target;
               ie_rules_no = 2;
               create_ie_rule = 0;
-              start_test = size(trnData, 1) * training_set_percent + 1;
+              start_test = size(D_train, 1) + 1;
 
               emfis_system = mar_trainOnline(ie_rules_no ,create_ie_rule, trnData, tstData, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
               emfis_system = ron_calcErrors(emfis_system, data_target(start_test : size(data_target, 1)));
@@ -86,7 +89,7 @@ for i=1:length(bank_type)
               % parameter setup
               algo = 'denfis';
               C.trainmode = 2; % activating offline learning , first order
-              start_test = size(data_input, 1) * training_set_percent + 1;
+              start_test = size(D_train, 1) + 1;
               trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
               tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
 
@@ -108,7 +111,7 @@ for i=1:length(bank_type)
 
               % parameter setup
               algo = 'anfis';
-              start_test = size(data_input, 1) * training_set_percent + 1;
+              start_test = size(D_train, 1) + 1;
 
               trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
               epoch_n = 100;
@@ -130,7 +133,7 @@ for i=1:length(bank_type)
                disp('Processing ENSEMBLE LEARNING.....')
 
                % parameter setup
-              start_test = size(data_input, 1) * training_set_percent + 1;
+              start_test = size(D_train, 1) + 1;
 
               anfis_rules_generated = anfis_system.num_rules;
               denfis_rules_generated = denfis_system.num_rules;
@@ -149,12 +152,6 @@ for i=1:length(bank_type)
                 y3 = ensemble_system_sa.predicted(z);
 
                 y = data_target(z);
-
-                % if (abs(y2-y) <= abs(y1-y)) % y2 is nearer than y1 to true solution, y
-                %   ensemble_system_bs.predicted(z,:) = y2;
-                % else
-                %   ensemble_system_bs.predicted(z,:) = y1;
-                % end
 
                 switch min([abs(y3-y), abs(y2-y), abs(y1-y)])
                   case abs(y1-y)
@@ -187,15 +184,13 @@ for i=1:length(bank_type)
     end
 
     disp('Feature prediction has ended...')
-
     RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
-    clear data_input;
-    clear data_target;
+
+    clear data_input; clear data_target;
     clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
   end
-  clear D;
-  clear input;
   disp('Storing the results...')
+  clear D; clear input;
   % Storing each feature prediction results, will have two rows, the first row is for Failed Failed_Banks
   % the second row is for Survived_Banks
   SYSTEMS(i,:) = {RESULTS};
