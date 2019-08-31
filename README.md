@@ -7,7 +7,7 @@ I have learnt how a Fuzzy Neural Network (FNN) works as well as how aritifical n
 With the new reconstructed data set, different benchmark experiments are also performed in order to prove its effectiveness in contribution to bank failure prediction. The rantionale to use eMFIS(I/E) to predict bank failure is that Mamdani-based FNNs have better interpretation capability as contrast to TSK-type FNNs. However, as for regression tasks, TSK-type FNNs are popular for achieving great accuracy, but compromising their interpretability. Hence, "ANFIS" and "DENFIS" are used to implement the simple-averaging parallel ensemble learning in order to reconstruct missing data and the experimental results 
 are indeed promising.
 
-To find out more details about:
+To find out more details about: <br/>
 eMFIS(FRI/E): https://repository.ntu.edu.sg/handle/10356/61931 <br/>
 DENFIS: https://ieeexplore.ieee.org/document/995117 <br/>
 ANFIS:  https://ieeexplore.ieee.org/document/256541 <br/>
