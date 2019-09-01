@@ -51,11 +51,9 @@ for i=1:size(FB_Full_Records,1)
   % single feature lateral reconstruction intra-bank
   FB_after_step1 = do_lateral_prediction(A, SYSTEMS, 1);
   C = FB_after_step1;
-  S1 = [S1; FB_after_step1];
 
   % single feature longitudinal reconstruction intra-bank
   FB_after_step2 = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 1);
-  S2 = [S2; FB_after_step2];
 
   % find mean value of lateral and longitudinal reconstruction
   % mean ll stands for mean longitudinal and lateral
@@ -67,9 +65,9 @@ for k=1:length(RESULTS)
 end
 % mean ll stands for mean longitudinal and lateral
 % MEAN_LL = find_mean(RESULTS)
-Test_step1 = test(S1);
-Test_step2 = test(S2);
 TEST = test(MEAN_LL);
+
+% alarm sound to alert that the program has ended
 load handel;
 sound(y,Fs);
 
@@ -310,11 +308,7 @@ function out = test(B)
   out_no_miss = [];
 
   for i=1:length(B)
-    if isa(B(i),'cell')
-      A = cell2mat(B(i));
-    else
-      A = B;
-    end
+    A = cell2mat(B(i));
     for d=1:size(A,1)
       record = A(d,:);
       if sum(isnan(record)) == 1
