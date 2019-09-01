@@ -4,44 +4,49 @@ clc;
 load Failed_Banks;
 load Survived_Banks;
 
+% longitudinal data includes full data for last three records, for CAPADE, PLAQLY and ROE respectively
 [longitudinal_data_failed_banks, lateral_data_failed_banks] = htet_prepare_data_for_longitudinal_construction(Failed_Banks);
 [longitudinal_data_survived_banks, lateral_data_survived_banks] = htet_prepare_data_for_longitudinal_construction(Survived_Banks);
 
 bank_type = [{longitudinal_data_failed_banks}; {longitudinal_data_survived_banks}];
 
 LONGITUDINAL_SYSTEMS = {};
-RESULTS = [];
 
-for i=1:1
+for i=1:2
   banks = bank_type(i);
   Data = banks{1};
+  RESULTS = [];
 
-  for j=3:3
-      switch j
-        case 1
-            data_input_f = [Data.input_forward_CAPADE, Data.target_forward_CAPADE(:,2)];
-            data_input_b = [Data.input_backward_CAPADE, Data.target_backward_CAPADE(:,2)];
+    for j=1:3
+          switch j
+                case 1
+                    data_input_f = [Data.input_forward_CAPADE, Data.target_forward_CAPADE(:,2)];
+                    data_input_b = [Data.input_backward_CAPADE, Data.target_backward_CAPADE(:,2)];
 
-            RESULTS.pretrained_forward_CAPADE = get_prediction_results(data_input_f);
-            RESULTS.pretrained_backward_CAPADE = get_prediction_results(data_input_b);
+                    RESULTS.pretrained_forward_CAPADE = get_prediction_results(data_input_f);
+                    RESULTS.pretrained_backward_CAPADE = get_prediction_results(data_input_b);
 
-        case 2
-            data_input_f = [Data.input_forward_PLAQLY, Data.target_forward_PLAQLY(:,2)];
-            data_input_b = [Data.input_backward_PLAQLY, Data.target_backward_PLAQLY(:,2)];
+                case 2
+                    data_input_f = [Data.input_forward_PLAQLY, Data.target_forward_PLAQLY(:,2)];
+                    data_input_b = [Data.input_backward_PLAQLY, Data.target_backward_PLAQLY(:,2)];
 
-            RESULTS.pretrained_forward_PLAQLY = get_prediction_results(data_input_f);
-            RESULTS.pretrained_backward_PLAQLY = get_prediction_results(data_input_b);
+                    RESULTS.pretrained_forward_PLAQLY = get_prediction_results(data_input_f);
+                    RESULTS.pretrained_backward_PLAQLY = get_prediction_results(data_input_b);
 
-        case 3
-            data_input_f = [Data.input_forward_ROE, Data.target_forward_ROE(:,2)];
-            data_input_b = [Data.input_backward_ROE, Data.target_backward_ROE(:,2)];
+                case 3
+                    data_input_f = [Data.input_forward_ROE, Data.target_forward_ROE(:,2)];
+                    data_input_b = [Data.input_backward_ROE, Data.target_backward_ROE(:,2)];
 
-            RESULTS.pretrained_forward_ROE = get_prediction_results(data_input_f);
-            RESULTS.pretrained_backward_ROE = get_prediction_results(data_input_b);
-      end
+                    RESULTS.pretrained_forward_ROE = get_prediction_results(data_input_f);
+                    RESULTS.pretrained_backward_ROE = get_prediction_results(data_input_b);
+         end
     end
     LONGITUDINAL_SYSTEMS = [LONGITUDINAL_SYSTEMS; {RESULTS}];
+    clear RESULTS;
 end
+
+load handel
+sound(y,Fs);
 
 
 function out = get_prediction_results(D_train)
