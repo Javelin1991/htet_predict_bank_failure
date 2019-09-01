@@ -1,17 +1,22 @@
 clc;
 clear;
+%
+% load Failed_Banks;
+% load Survived_Banks;
 
-load Failed_Banks;
-load Survived_Banks;
+load Output_LL_S;
+load Output_LL_F;
+warning('off','all');
+warning;
 
 % lateral is x-direction and longitudinal is y-direction
 % get full data records that are grouped by the bank ID
-backward_offset = 0;
-SB_Full_Records = [];
-FB_Full_Records = [];
-
-output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
-output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
+% backward_offset = 0;
+% SB_Full_Records = [];
+% FB_Full_Records = [];
+%
+% output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
+% output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
 
 SB_IDs = output_1.id;
 FB_IDs = output_2.id;
@@ -43,7 +48,6 @@ RESULTS = [];
 MEAN_LL = [];
 S1 = [];
 S2 = [];
-% A = cell2mat(FB_Full_Records(i));
 Data = FB_Full_Records;
 
 for i=1:size(FB_Full_Records,1)
@@ -54,7 +58,6 @@ for i=1:size(FB_Full_Records,1)
 
   % single feature longitudinal reconstruction intra-bank
   FB_after_step2 = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 1);
-
   % find mean value of lateral and longitudinal reconstruction
   % mean ll stands for mean longitudinal and lateral
   RESULTS = [RESULTS; {[FB_after_step1, FB_after_step2]}];
@@ -63,8 +66,8 @@ end
 for k=1:length(RESULTS)
   MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
 end
+
 % mean ll stands for mean longitudinal and lateral
-% MEAN_LL = find_mean(RESULTS)
 TEST = test(MEAN_LL);
 
 % alarm sound to alert that the program has ended
@@ -83,17 +86,7 @@ function out = find_mean(cell)
     for j=1:5
       d1 = D(i, j);
       d2 = D(i, j+5);
-
-      if (isnan(d1))
-        avg = NaN;
-      elseif (isnan(d2) && ~isnan(d1))
-        avg = d1;
-      elseif (~isnan(d2) && isnan(d1))
-        avg = d2;
-      else
-        avg = (d1 + d2)/2;
-      end
-      record(1,j) = avg;
+      record(1,j) = handle_isnan(d1, d2);
     end
     T = [T; record];
   end
@@ -166,6 +159,22 @@ function out = check_suitable_reconstruction_method(start_idx, curr_idx, last_id
   end
 end
 
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX handle_isnan XXXXXXXXXXXXXXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+function out = handle_isnan(x, y)
+  if (isnan(x) && ~isnan(y))
+    out = y;
+  elseif (~(isnan(x)) && isnan(y))
+    out = x;
+  elseif (isnan(x) && isnan(y))
+    out = x;
+  else
+    out = (y + x)/2;
+  end
+end
+
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX do_longitudinal_prediction XXXXXXXXXXXXXXXXXXXXXXX
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -207,20 +216,14 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
       case 'Z'
         replace_zero = 0;
     end
-    disp('HN DEBUG size'); disp(size(A,1));
-    disp('HN DEBUG curr_idx'); disp(d);
-    disp('HN DEBUG xf_1'); disp(xf_1);
-    disp('HN DEBUG xb_1'); disp(xb_1);
-    disp('HN DEBUG xf_2'); disp(xf_2);
-    disp('HN DEBUG xb_2'); disp(xb_2);
-
     % if it has one missing feature
-    if sum(isnan(record)) == 1
+    if sum(isnan(record)) ~= 0
         % CAPADE is missing
         if (isnan(record(:,3)))
           % could use reconstructed data from step 1
           % check if the data can be reconstructed by using forward or backward or both
           method = check_suitable_reconstruction_method(1, d, size(A,1));
+
           switch (method)
             case  'FB'
               input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
@@ -228,21 +231,24 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
 
               predicted_value_f = evalfis(input_f', anfis_long_fb_capade_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_fb_capade_backward_regressor);
-              predicted_value = (predicted_value_f + predicted_value_b)/2;
+
+              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+
             case  'F'
               input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
               predicted_value = evalfis(input_f', anfis_long_fb_capade_forward_regressor);
             case 'B'
               input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
               predicted_value = evalfis(input_b', anfis_long_fb_capade_backward_regressor);
+
             case 'Z'
               predicted_value = record_after_step_1(d,3);
           end
           % use the reconstructed value
           record(1,3) = predicted_value;
-
+        end
         % PLAQLY is missing
-        elseif (isnan(record(:,4)))
+        if (isnan(record(:,4)))
 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
@@ -252,7 +258,7 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
 
               predicted_value_f = evalfis(input_f', anfis_long_fb_plaqly_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_fb_plaqly_backward_regressor);
-              predicted_value = (predicted_value_f + predicted_value_b)/2;
+              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
             case  'F'
               input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
               predicted_value = evalfis(input_f', anfis_long_fb_plaqly_forward_regressor);
@@ -264,9 +270,9 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
           end
           % use the reconstructed value
           record(1,4) = predicted_value;
-
+        end
         % ROE is missing
-        else
+        if (isnan(record(:,5)))
 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
@@ -276,7 +282,7 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
 
               predicted_value_f = evalfis(input_f', anfis_long_fb_roe_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_fb_roe_backward_regressor);
-              predicted_value = (predicted_value_f + predicted_value_b)/2;
+              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
             case  'F'
               input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
               predicted_value = evalfis(input_f', anfis_long_fb_roe_forward_regressor);
@@ -285,13 +291,14 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
               predicted_value = evalfis(input_b', anfis_long_fb_roe_backward_regressor);
             case 'Z'
               predicted_value = record_after_step_1(d,5);
-          end
+            end
           % use the reconstructed value
           record(1,5) = predicted_value;
         end
     end
     B = [B; record];
   end
+
   result = B;
 end
 
