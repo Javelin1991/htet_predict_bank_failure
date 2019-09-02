@@ -1,8 +1,8 @@
 % clc;
 % clear;
 %
-% load Failed_Banks;
-% load Survived_Banks;
+load Failed_Banks;
+load Survived_Banks;
 
 load Output_LL_S;
 load Output_LL_F;
@@ -22,64 +22,88 @@ SB_IDs = output_1.id;
 FB_IDs = output_2.id;
 SB_Full_Records = output_1.full_record;
 FB_Full_Records = output_2.full_record;
+RECONSTRUCTED_DATA = [];
+TRC = [];
+bank_type = [{FB_Full_Records}; {SB_Full_Records}];
 
-% step 1 is lateral single feature reconstruction
-FB_after_step1 = [];
-% step 2 is longitudinal single feature reconstruction
-FB_after_step2 = [];
-% step 3 is longitudinal single feature reconstruction
-% repeat the process again until no more missing feature left
-FB_after_step3 = [];
+for n=1:2
+  banks = bank_type(n);
+  BANK = banks{1};
 
-RESULTS = [];
-MEAN_LL = [];
-Data = [];
-H = [];
+  % step 1 is lateral single feature reconstruction
+  state_after_step1 = [];
+  % step 2 is longitudinal single feature reconstruction
+  state_after_step2 = [];
+  % step 3 is longitudinal single feature reconstruction
+  % repeat the process again until no more missing feature left
 
-% pre-filtering data for corner cases where reconstruction could not take place
-for i=1:length(FB_Full_Records)
-  t = filter(FB_Full_Records(i));
-  H = [H; t];
+  RESULTS = [];
+  MEAN_LL = [];
+  Data = [];
+  H = [];
+  total_lat_construct = 0;
+  total_long_construct = 0;
+  % pre-filtering data for corner cases where reconstruction could not take place
+  for i=1:length(BANK)
+    t = filter(BANK(i));
+    H = [H; t];
+  end
+
+  Data = H;
+
+  not_done_yet = true;
+  counter = 0;
+
+  is_reconst_complete = test(Data);
+
+  % repeat the process again until no more missing feature left
+  while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
+
+      disp('Performing reconstruction process.....');
+
+      for i=1:size(Data,1)
+        A = cell2mat(Data(i));
+
+        % lateral reconstruction intra-bank
+        [state_after_step1, rc1] = do_lateral_prediction(A, SYSTEMS, n);
+        C = state_after_step1;
+        total_lat_construct = total_lat_construct + rc1;
+
+        % longitudinal reconstruction intra-bank
+        [state_after_step2, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, n);
+        total_long_construct = total_long_construct + rc2;
+
+        RESULTS = [RESULTS; {[state_after_step1, state_after_step2]}];
+      end
+
+      for k=1:length(RESULTS)
+        % find mean value of lateral and longitudinal reconstruction
+        % mean ll stands for mean longitudinal and lateral
+        MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
+      end
+
+      % check if the reconstruction completed
+      is_reconst_complete = test(MEAN_LL);
+
+      if ~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3)
+        Data = MEAN_LL;
+        MEAN_LL = [];
+        RESULTS = [];
+        state_after_step1 = [];
+        state_after_step2 = [];
+      end
+  end
+
+  D = [];
+  for m=1:length(MEAN_LL)
+    mat = cell2mat(MEAN_LL(m));
+    D = [D; mat];
+  end
+  RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
+  trc.total_lat_construct = total_lat_construct;
+  trc.total_long_construct = total_long_construct;
+  TRC = [TRC; {trc}];
 end
-
-Data = H;
-
-not_done_yet = true;
-counter = 0;
-
-is_reconst_complete = test(Data);
-
-% repeat the process again until no more missing feature left
-while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
-    for i=1:size(Data,1)
-      A = cell2mat(Data(i));
-
-      % lateral reconstruction intra-bank
-      FB_after_step1 = do_lateral_prediction(A, SYSTEMS, 1);
-      C = FB_after_step1;
-
-      % longitudinal reconstruction intra-bank
-      FB_after_step2 = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 1);
-      T = test({FB_after_step2});
-      RESULTS = [RESULTS; {[FB_after_step1, FB_after_step2]}];
-    end
-
-    for k=1:length(RESULTS)
-      % find mean value of lateral and longitudinal reconstruction
-      % mean ll stands for mean longitudinal and lateral
-      MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
-    end
-
-    % check if the reconstruction completed
-    is_reconst_complete = test(MEAN_LL);
-    Data = MEAN_LL;
-    MEAN_LL = [];
-    RESULTS = [];
-    FB_after_step1 = [];
-    FB_after_step2 = [];
-end
-
-RECONSTRUCTED_DATA = MEAN_LL;
 
 % alarm sound to alert that the program has ended
 load handel;
@@ -108,7 +132,7 @@ end
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function result = do_lateral_prediction(A, SYSTEMS, bank_type)
+function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
 
 
   % for Pre_trained_Systems_Lateral_Prediction
@@ -116,12 +140,13 @@ function result = do_lateral_prediction(A, SYSTEMS, bank_type)
   % if the missing data is CAPADE, use {1,3};
   % if the missing data is PLAQLY, use {2,3};
   % if the missing data is ROE, use {3,3};
-  anfis_lat_fb_capade_regressor = SYSTEMS{bank_type, 1}{1, 3}.net;
-  anfis_lat_fb_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 3}.net;
-  anfis_lat_fb_roe_regressor = SYSTEMS{bank_type, 1}{3, 3}.net;
+  anfis_lat_capade_regressor = SYSTEMS{bank_type, 1}{1, 3}.net;
+  anfis_lat_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 3}.net;
+  anfis_lat_roe_regressor = SYSTEMS{bank_type, 1}{3, 3}.net;
 
   result = [];
   B = [];
+  rc_count = 0;
 
   for d=1:size(A,1)
     % lateral reconstruction
@@ -129,25 +154,31 @@ function result = do_lateral_prediction(A, SYSTEMS, bank_type)
 
     % if there is one missing value
     if sum(isnan(record)) == 1
-        if (isnan(record(:,3)))
-          predicted_value = evalfis(record(:,[4 5])', anfis_lat_fb_capade_regressor);
 
+        disp('Performing Lateral Reconstruction process.....');
+
+        if (isnan(record(:,3)))
+          predicted_value = evalfis(record(:,[4 5])', anfis_lat_capade_regressor);
           record(1,3) = predicted_value;
+          rc_count = rc_count + 1;
+
         elseif (isnan(record(:,4)))
-          predicted_value = evalfis(record(:,[3 5])', anfis_lat_fb_plaqly_regressor);
+          predicted_value = evalfis(record(:,[3 5])', anfis_lat_plaqly_regressor);
           record(1,4) = predicted_value;
+          rc_count = rc_count + 1;
+
         else
-          predicted_value = evalfis(record(:,[3 4])', anfis_lat_fb_roe_regressor);
+          predicted_value = evalfis(record(:,[3 4])', anfis_lat_roe_regressor);
           record(1,5) = predicted_value;
+          rc_count = rc_count + 1;
+
         end
     end
-    % if there is two missing value
-
-    % if there is three missing value
 
     B = [B; record];
   end
   result = B;
+  rc1 = rc_count;
 end
 
 
@@ -166,10 +197,9 @@ function out = check_suitable_reconstruction_method(start_idx, curr_idx, last_id
   elseif (diff_2 >= 2)
     out = 'B';
   elseif (last_idx <= 2)
-    disp('Replace using the value from step 1, if the number of records is less than three for longitudinal prediction');
+    % Replace using the value from step 1, if the number of records is less than three for longitudinal prediction;
     out = 'Z';
   else
-    disp('ERROR =====>>> Invalid length');
     disp('curr_idx'); disp(curr_idx);
     disp('last_idx'); disp(last_idx);
     out = 'Z';
@@ -230,15 +260,17 @@ end
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_type)
+function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_type)
 
-  anfis_long_fb_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{3, 1}.net;
-  anfis_long_fb_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{3, 1}.net;
-  anfis_long_fb_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{3, 1}.net;
+  rc_count = 0;
 
-  anfis_long_fb_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{3, 1}.net;
-  anfis_long_fb_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{3, 1}.net;
-  anfis_long_fb_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{3, 1}.net;
+  anfis_long_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{3, 1}.net;
+  anfis_long_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{3, 1}.net;
+  anfis_long_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{3, 1}.net;
+
+  anfis_long_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{3, 1}.net;
+  anfis_long_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{3, 1}.net;
+  anfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{3, 1}.net;
 
   result = [];
   record_after_step_1 = C;
@@ -269,6 +301,8 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
     end
     % if it has one missing feature
     if sum(isnan(record)) ~= 0
+        disp('Performing Longitudinal Reconstruction process.....');
+
         % CAPADE is missing
         if (isnan(record(:,3)))
           % could use reconstructed data from step 1
@@ -280,17 +314,21 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
               input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
               input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
 
-              predicted_value_f = evalfis(input_f', anfis_long_fb_capade_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_fb_capade_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_capade_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_capade_backward_regressor);
 
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              rc_count = rc_count + 1;
 
             case  'F'
               input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
-              predicted_value = evalfis(input_f', anfis_long_fb_capade_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_capade_forward_regressor);
+              rc_count = rc_count + 1;
+
             case 'B'
               input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
-              predicted_value = evalfis(input_b', anfis_long_fb_capade_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_capade_backward_regressor);
+              rc_count = rc_count + 1;
 
             case 'Z'
               predicted_value = record_after_step_1(d,3);
@@ -307,15 +345,21 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
               input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
               input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
 
-              predicted_value_f = evalfis(input_f', anfis_long_fb_plaqly_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_fb_plaqly_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_plaqly_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_plaqly_backward_regressor);
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              rc_count = rc_count + 1;
+
             case  'F'
               input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
-              predicted_value = evalfis(input_f', anfis_long_fb_plaqly_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_plaqly_forward_regressor);
+              rc_count = rc_count + 1;
+
             case 'B'
               input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
-              predicted_value = evalfis(input_b', anfis_long_fb_plaqly_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_plaqly_backward_regressor);
+              rc_count = rc_count + 1;
+
             case 'Z'
                 predicted_value = record_after_step_1(d,4);
           end
@@ -331,15 +375,21 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
               input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
               input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
 
-              predicted_value_f = evalfis(input_f', anfis_long_fb_roe_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_fb_roe_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_roe_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_roe_backward_regressor);
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              rc_count = rc_count + 1;
+
             case  'F'
               input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
-              predicted_value = evalfis(input_f', anfis_long_fb_roe_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_roe_forward_regressor);
+              rc_count = rc_count + 1;
+
             case 'B'
               input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
-              predicted_value = evalfis(input_b', anfis_long_fb_roe_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_roe_backward_regressor);
+              rc_count = rc_count + 1;
+
             case 'Z'
               predicted_value = record_after_step_1(d,5);
             end
@@ -351,6 +401,7 @@ function result = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, bank_ty
   end
 
   result = B;
+  rc2 = rc_count;
 end
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX test XXXXXXXXXXXXXXXXXXXXXXX
