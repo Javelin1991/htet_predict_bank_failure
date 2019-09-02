@@ -1,8 +1,12 @@
-% clc;
-% clear;
-%
+clc;
+clear;
+
 load Failed_Banks;
 load Survived_Banks;
+
+load Pre_trained_Systems_Lateral_Prediction;
+load Pre_trained_Systems_Longitudinal_Prediction;
+
 
 load Output_LL_S;
 load Output_LL_F;
@@ -18,6 +22,8 @@ warning;
 % output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
 % output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
 
+Failed_Banks_top_3 = Failed_Banks(:,[1:3 7 10]);
+
 SB_IDs = output_1.id;
 FB_IDs = output_2.id;
 SB_Full_Records = output_1.full_record;
@@ -27,82 +33,83 @@ TRC = [];
 bank_type = [{FB_Full_Records}; {SB_Full_Records}];
 
 for n=1:2
-  banks = bank_type(n);
-  BANK = banks{1};
+    banks = bank_type(n);
+    BANK = banks{1};
 
-  % step 1 is lateral single feature reconstruction
-  state_after_step1 = [];
-  % step 2 is longitudinal single feature reconstruction
-  state_after_step2 = [];
-  % step 3 is longitudinal single feature reconstruction
-  % repeat the process again until no more missing feature left
+    % step 1 is lateral single feature reconstruction
+    state_after_step1 = [];
+    % step 2 is longitudinal single feature reconstruction
+    state_after_step2 = [];
+    % step 3 is longitudinal single feature reconstruction
+    % repeat the process again until no more missing feature left
 
-  RESULTS = [];
-  MEAN_LL = [];
-  Data = [];
-  H = [];
-  total_lat_construct = 0;
-  total_long_construct = 0;
-  % pre-filtering data for corner cases where reconstruction could not take place
-  for i=1:length(BANK)
-    t = filter(BANK(i));
-    H = [H; t];
-  end
+    RESULTS = [];
+    MEAN_LL = [];
+    Data = [];
+    H = [];
+    total_lat_construct = 0;
+    total_long_construct = 0;
+    % pre-filtering data for corner cases where reconstruction could not take place
+    for i=1:length(BANK)
+      t = filter(BANK(i));
+      H = [H; t];
+    end
 
-  Data = H;
+    Data = H;
 
-  not_done_yet = true;
-  counter = 0;
+    not_done_yet = true;
+    counter = 0;
 
-  is_reconst_complete = test(Data);
+    is_reconst_complete = test(Data);
 
-  % repeat the process again until no more missing feature left
-  while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
+    % repeat the process again until no more missing feature left
+    while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
 
-      disp('Performing reconstruction process.....');
+        disp('Performing reconstruction process.....');
 
-      for i=1:size(Data,1)
-        A = cell2mat(Data(i));
+        for i=1:size(Data,1)
+          A = cell2mat(Data(i));
 
-        % lateral reconstruction intra-bank
-        [state_after_step1, rc1] = do_lateral_prediction(A, SYSTEMS, n);
-        C = state_after_step1;
-        total_lat_construct = total_lat_construct + rc1;
+          % lateral reconstruction intra-bank
+          [state_after_step1, rc1] = do_lateral_prediction(A, SYSTEMS, n);
+          C = state_after_step1;
+          total_lat_construct = total_lat_construct + rc1;
 
-        % longitudinal reconstruction intra-bank
-        [state_after_step2, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, n);
-        total_long_construct = total_long_construct + rc2;
+          % longitudinal reconstruction intra-bank
+          [state_after_step2, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, n);
+          total_long_construct = total_long_construct + rc2;
 
-        RESULTS = [RESULTS; {[state_after_step1, state_after_step2]}];
-      end
+          % RESULTS = [RESULTS; {[state_after_step1, state_after_step2]}];
+          MEAN_LL = [MEAN_LL; find_mean({[state_after_step1, state_after_step2]})];
+        end
 
-      for k=1:length(RESULTS)
-        % find mean value of lateral and longitudinal reconstruction
-        % mean ll stands for mean longitudinal and lateral
-        MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
-      end
+        % for k=1:length(RESULTS)
+        %   % find mean value of lateral and longitudinal reconstruction
+        %   % mean ll stands for mean longitudinal and lateral
+        %   MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
+        % end
 
-      % check if the reconstruction completed
-      is_reconst_complete = test(MEAN_LL);
+        % check if the reconstruction completed
+        is_reconst_complete = test(MEAN_LL);
 
-      if ~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3)
-        Data = MEAN_LL;
-        MEAN_LL = [];
-        RESULTS = [];
-        state_after_step1 = [];
-        state_after_step2 = [];
-      end
-  end
+        if ~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3)
+          Data = MEAN_LL;
+          MEAN_LL = [];
+          RESULTS = [];
+          state_after_step1 = [];
+          state_after_step2 = [];
+        end
+    end
 
-  D = [];
-  for m=1:length(MEAN_LL)
-    mat = cell2mat(MEAN_LL(m));
-    D = [D; mat];
-  end
-  RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
-  trc.total_lat_construct = total_lat_construct;
-  trc.total_long_construct = total_long_construct;
-  TRC = [TRC; {trc}];
+    D = [];
+    for m=1:length(MEAN_LL)
+      mat = cell2mat(MEAN_LL(m));
+      D = [D; mat];
+    end
+    RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
+    trc.total_lat_construct = total_lat_construct;
+    trc.total_long_construct = total_long_construct;
+    TRC = [TRC; {trc}];
 end
 
 % alarm sound to alert that the program has ended
