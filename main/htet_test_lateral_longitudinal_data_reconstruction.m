@@ -1,5 +1,5 @@
-clc;
-clear;
+% clc;
+% clear;
 %
 % load Failed_Banks;
 % load Survived_Banks;
@@ -23,52 +23,63 @@ FB_IDs = output_2.id;
 SB_Full_Records = output_1.full_record;
 FB_Full_Records = output_2.full_record;
 
-
-% for Pre_trained_Systems_Lateral_Prediction
-% to retreat the best pretrained system which is ANFIS
-% if the missing data is CAPADE, use (1,3);
-% if the missing data is PLAQLY, use (2,3);
-% if the missing data is ROE, use (3,3);
-
-load Pre_trained_Systems_Lateral_Prediction;
-load Pre_trained_Systems_Longitudinal_Prediction;
-
 % step 1 is lateral single feature reconstruction
 FB_after_step1 = [];
 % step 2 is longitudinal single feature reconstruction
 FB_after_step2 = [];
 % step 3 is longitudinal single feature reconstruction
-FB_after_step3 = [];
-% after step 1 and 2, we have eradicated the problem of single feature missing
-% hence, the problem of two missing features has been reduced to one missing feature missing now
-% dynamic_programming_inspired
 % repeat the process again until no more missing feature left
+FB_after_step3 = [];
 
 RESULTS = [];
 MEAN_LL = [];
-S1 = [];
-S2 = [];
-Data = FB_Full_Records;
+Data = [];
+H = [];
 
-for i=1:size(FB_Full_Records,1)
-  A = cell2mat(Data(i));
-  % single feature lateral reconstruction intra-bank
-  FB_after_step1 = do_lateral_prediction(A, SYSTEMS, 1);
-  C = FB_after_step1;
-
-  % single feature longitudinal reconstruction intra-bank
-  FB_after_step2 = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 1);
-  % find mean value of lateral and longitudinal reconstruction
-  % mean ll stands for mean longitudinal and lateral
-  RESULTS = [RESULTS; {[FB_after_step1, FB_after_step2]}];
+% pre-filtering data for corner cases where reconstruction could not take place
+for i=1:length(FB_Full_Records)
+  t = filter(FB_Full_Records(i));
+  H = [H; t];
 end
 
-for k=1:length(RESULTS)
-  MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
+Data = H;
+
+not_done_yet = true;
+counter = 0;
+
+is_reconst_complete = test(Data);
+
+% repeat the process again until no more missing feature left
+while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
+    for i=1:size(Data,1)
+      A = cell2mat(Data(i));
+
+      % lateral reconstruction intra-bank
+      FB_after_step1 = do_lateral_prediction(A, SYSTEMS, 1);
+      C = FB_after_step1;
+
+      % longitudinal reconstruction intra-bank
+      FB_after_step2 = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 1);
+      T = test({FB_after_step2});
+      RESULTS = [RESULTS; {[FB_after_step1, FB_after_step2]}];
+    end
+
+    for k=1:length(RESULTS)
+      % find mean value of lateral and longitudinal reconstruction
+      % mean ll stands for mean longitudinal and lateral
+      MEAN_LL = [MEAN_LL; find_mean(RESULTS(k))];
+    end
+
+    % check if the reconstruction completed
+    is_reconst_complete = test(MEAN_LL);
+    Data = MEAN_LL;
+    MEAN_LL = [];
+    RESULTS = [];
+    FB_after_step1 = [];
+    FB_after_step2 = [];
 end
 
-% mean ll stands for mean longitudinal and lateral
-TEST = test(MEAN_LL);
+RECONSTRUCTED_DATA = MEAN_LL;
 
 % alarm sound to alert that the program has ended
 load handel;
@@ -99,6 +110,12 @@ end
 
 function result = do_lateral_prediction(A, SYSTEMS, bank_type)
 
+
+  % for Pre_trained_Systems_Lateral_Prediction
+  % to retreat the best pretrained system which is ANFIS
+  % if the missing data is CAPADE, use {1,3};
+  % if the missing data is PLAQLY, use {2,3};
+  % if the missing data is ROE, use {3,3};
   anfis_lat_fb_capade_regressor = SYSTEMS{bank_type, 1}{1, 3}.net;
   anfis_lat_fb_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 3}.net;
   anfis_lat_fb_roe_regressor = SYSTEMS{bank_type, 1}{3, 3}.net;
@@ -157,6 +174,40 @@ function out = check_suitable_reconstruction_method(start_idx, curr_idx, last_id
     disp('last_idx'); disp(last_idx);
     out = 'Z';
   end
+end
+
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX handle_isnan XXXXXXXXXXXXXXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+function out = filter(D)
+  C = D;
+  count = 0;
+  Z = [];
+  for i=1:size(D,1)
+    A = cell2mat(D(i));
+    TMP = A;
+    A = A(:,3:5);
+
+    for j=1:size(A,1)
+      count = count + sum(isnan(A(j,:)));
+    end
+
+    dm = size(A,1) * size(A,2)
+    diff = dm - count;
+
+    % if all data are missing in the given bank
+    if count == dm
+      C(i,:) = [];
+    end
+
+    % the difference between no.of missing records and no.total records in the given bank is only 3 or below
+    if  diff <= 3 && diff > 0
+      C(i,:) = {TMP(size(TMP,1),:)};
+    end
+    count = 0;
+  end
+  out = C;
 end
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX handle_isnan XXXXXXXXXXXXXXXXXXXXXXX
