@@ -13,9 +13,12 @@ clear;
 load Failed_Banks;
 load Survived_Banks;
 
-bank_type = [{Failed_Banks}; {Survived_Banks}];
+% bank_type = [{Failed_Banks}; {Survived_Banks}];
+bank_type = [{Failed_Banks}];
+
 bank_type_name = {'Failed_Banks'; 'Survived_Bans'};
-algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+% algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+algo_type = {'emfis'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
 extract_all_features = [3:12];
@@ -65,16 +68,21 @@ for i=1:length(bank_type)
               algo = 'emfis';
               spec = 10;
               max_cluster = 40;
-              half_life = 10;
-              threshold_mf = 0.9999;
-              min_rule_weight = 0.7;
+              half_life = Inf;
+              threshold_mf = 0.5;
+              min_rule_weight = 0.6;
+              % 
+              % half_life = 10;
+              % threshold_mf = 0.9999;
+              % min_rule_weight = 0.7;
+
               trnData = data_input;
               tstData = data_target;
               ie_rules_no = 2;
               create_ie_rule = 0;
               start_test = size(D_train, 1) + 1;
 
-              emfis_system = mar_trainOnline(ie_rules_no ,create_ie_rule, trnData, tstData, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
+              emfis_system = mar_trainOnline(trnData, tstData, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
               emfis_system = ron_calcErrors(emfis_system, data_target(start_test : size(data_target, 1)));
 
               emfis_system.num_rules = mean(emfis_system.net.ruleCount(start_test : size(data_target, 1)));
@@ -184,7 +192,8 @@ for i=1:length(bank_type)
     end
 
     disp('Feature prediction has ended...')
-    RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    % RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    RESULTS(j,:) = [{emfis_system}];
 
     clear data_input; clear data_target;
     clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
