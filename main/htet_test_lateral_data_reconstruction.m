@@ -13,31 +13,35 @@ clear;
 load Failed_Banks;
 load Survived_Banks;
 
-% bank_type = [{Failed_Banks}; {Survived_Banks}];
-bank_type = [{Failed_Banks}];
+load FAILED_BANK_DATA_HORIZONTAL;
+load SURVIVED_BANK_DATA_HORIZONTAL;
+
+load FAILED_BANK_DATA_VERTICAL;
+load SURVIVED_BANK_DATA_VERTICAL;
+
+bank_type = [{Failed_Banks}; {Survived_Banks}];
+% bank_type = [{Failed_Banks}];
 
 bank_type_name = {'Failed_Banks'; 'Survived_Bans'};
-% algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
-algo_type = {'emfis'};
+algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
 extract_all_features = [3:12];
 
 for i=1:length(bank_type)
   disp(['Processing Bank Type : ', bank_type_name(i)]);
-  % input data setup
-  input = cell2mat(bank_type(i));
-  input_with_NaN = input(any(isnan(input), 2), :)
-  input(any(isnan(input), 2), :) = [];
-  input_without_NaN = input;
-
-  D_train = input_without_NaN(:,extract_all_features); % 100 percent train data
-  D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
+  % % input data setup
+  % input = cell2mat(bank_type(i));
+  % input_with_NaN = input(any(isnan(input), 2), :)
+  % input(any(isnan(input), 2), :) = [];
+  % input_without_NaN = input;
+  %
+  % D_train = input_without_NaN(:,extract_all_features); % 100 percent train data
+  % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
 
   % D_train = input_without_NaN(1:15,extract_all_features); % for dummy run
   % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % randomly selected test data
-
-  D = vertcat(D_train, D_test);
+  D = [];
 
   for j=1:length(target_feature_col_no)
 
@@ -45,15 +49,44 @@ for i=1:length(bank_type)
     feature_name = target_feature_name{j};
     y = target_feature_col_no(j);
     if y == 1
-      x1 = 5; x2 = 8;
+
+      if i == 1
+        D_train = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_CAPADE;
+        D_test = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_CAPADE;
+      else
+        D_train = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_CAPADE;
+        D_test = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_CAPADE;
+      end
+
     elseif y == 5
-      x1 = 1; x2 = 8;
+
+      if i == 1
+        D_train = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_PLAQLY;
+        D_test = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_PLAQLY;
+      else
+        D_train = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_PLAQLY;
+        D_test = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_PLAQLY;
+      end
+
     else
-      x1 = 1; x2 = 5;
+
+      if i == 1
+        D_train = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_ROE;
+        D_test = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE;
+      else
+        D_train = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TRAIN_DATA_TO_PREDICT_ROE;
+        D_test = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE;
+      end
     end
 
-    data_input = D(:,[x1 x2]);
-    data_target = D(:,y);
+    % % for dummy run
+    % D_train = D_train(1:50, :);
+    % D_test = D_train(1:50, :);
+
+    D = vertcat(D_train, D_test);
+
+    data_input = D(:,[2 3]);
+    data_target = D(:,4);
 
     for k=1:length(algo_type)
 
@@ -82,9 +115,8 @@ for i=1:length(bank_type)
               create_ie_rule = 0;
               start_test = size(D_train, 1) + 1;
 
-              emfis_system = mar_trainOnline(trnData, tstData, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
+              emfis_system = mar_trainOnline(ie_rules_no, create_ie_rule, trnData, tstData, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
               emfis_system = ron_calcErrors(emfis_system, data_target(start_test : size(data_target, 1)));
-
               emfis_system.num_rules = mean(emfis_system.net.ruleCount(start_test : size(data_target, 1)));
               emfis_system.input = data_input;
               emfis_system.target = data_target;
@@ -153,6 +185,9 @@ for i=1:length(bank_type)
               ensemble_system_sa = ron_calcErrors(ensemble_system_sa, data_target(start_test : size(data_target, 1)));
 
               ensemble_system_bs.predicted = [];
+              a_c = 0;
+              d_c = 0;
+              sa_c = 0;
               % Best Selection
               for z=1:length(anfis_system.predicted)
                 y1 = anfis_system.predicted(z);
@@ -163,13 +198,13 @@ for i=1:length(bank_type)
 
                 switch min([abs(y3-y), abs(y2-y), abs(y1-y)])
                   case abs(y1-y)
-                    ensemble_system_bs.predicted(z,:) = y1;
+                    ensemble_system_bs.predicted(z,:) = y1; a_c = a_c + 1;
 
                   case abs(y2-y)
-                    ensemble_system_bs.predicted(z,:) = y2;
+                    ensemble_system_bs.predicted(z,:) = y2; d_c = d_c + 1;
 
                   case abs(y3-y)
-                    ensemble_system_bs.predicted(z,:) = y3;
+                    ensemble_system_bs.predicted(z,:) = y3; sa_c = sa_c + 1;
                 end
               end
 
@@ -187,13 +222,15 @@ for i=1:length(bank_type)
               ensemble_system_bs.target = data_target;
               ensemble_system_bs.target_feature_name = feature_name;
               ensemble_system_bs.name = 'BS';
+              ensemble_system_bs.a_count = a_c;
+              ensemble_system_bs.d_count = d_c;
+              ensemble_system_bs.sa_count = sa_c;
       end
       disp('Processing of the algorithm completed.....')
     end
 
     disp('Feature prediction has ended...')
-    % RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
-    RESULTS(j,:) = [{emfis_system}];
+    RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
 
     clear data_input; clear data_target;
     clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
