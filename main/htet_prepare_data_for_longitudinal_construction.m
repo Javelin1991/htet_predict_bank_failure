@@ -78,18 +78,51 @@ function [Data_longitudinal, Data_lateral] = htet_prepare_data_for_longitudinal_
       end
     end
 
-    Data_longitudinal.input_forward_CAPADE = input_forward_CAPADE;
-    Data_longitudinal.input_backward_CAPADE = input_backward_CAPADE;
-    Data_longitudinal.target_forward_CAPADE = target_forward_CAPADE;
-    Data_longitudinal.target_backward_CAPADE = target_backward_CAPADE;
+    % Data_longitudinalinput_forward_CAPADE = input_forward_CAPADE;
+    % Data_longitudinalinput_backward_CAPADE = input_backward_CAPADE;
+    % Data_longitudinaltarget_forward_CAPADE = target_forward_CAPADE;
+    % Data_longitudinaltarget_backward_CAPADE = target_backward_CAPADE;
 
-    Data_longitudinal.input_forward_PLAQLY = input_forward_PLAQLY;
-    Data_longitudinal.input_backward_PLAQLY = input_backward_PLAQLY;
-    Data_longitudinal.target_forward_PLAQLY= target_forward_PLAQLY;
-    Data_longitudinal.target_backward_PLAQLY = target_backward_PLAQLY;
+    [train, test] = get_train_and_test_set([input_forward_CAPADE, target_forward_CAPADE(:,2)]);
+    Data_longitudinal.train_data_forward_CAPADE = train;
+    Data_longitudinal.test_data_forward_CAPADE = test;
 
-    Data_longitudinal.input_forward_ROE = input_forward_ROE;
-    Data_longitudinal.input_backward_ROE = input_backward_ROE;
-    Data_longitudinal.target_forward_ROE= target_forward_ROE;
-    Data_longitudinal.target_backward_ROE= target_backward_ROE;
+    [train, test] = get_train_and_test_set([input_backward_CAPADE, target_backward_CAPADE(:,2)]);
+    Data_longitudinal.train_data_backward_CAPADE = train;
+    Data_longitudinal.test_data_backward_CAPADE = test;
+
+    % Data_longitudinal.input_forward_PLAQLY = input_forward_PLAQLY;
+    % Data_longitudinal.input_backward_PLAQLY = input_backward_PLAQLY;
+    % Data_longitudinal.target_forward_PLAQLY= target_forward_PLAQLY;
+    % Data_longitudinal.target_backward_PLAQLY = target_backward_PLAQLY;
+
+    [train, test] = get_train_and_test_set([input_forward_PLAQLY, target_forward_PLAQLY(:,2)]);
+    Data_longitudinal.train_data_forward_PLAQLY = train;
+    Data_longitudinal.test_data_forward_PLAQLY = test;
+
+    [train, test] = get_train_and_test_set([input_backward_PLAQLY, target_backward_PLAQLY(:,2)]);
+    Data_longitudinal.train_data_backward_PLAQLY = train;
+    Data_longitudinal.test_data_backward_PLAQLY = test;
+    %
+    % Data_longitudinal.input_forward_ROE = input_forward_ROE;
+    % Data_longitudinal.input_backward_ROE = input_backward_ROE;
+    % Data_longitudinal.target_forward_ROE= target_forward_ROE;
+    % Data_longitudinal.target_backward_ROE= target_backward_ROE;
+
+    [train, test] = get_train_and_test_set([input_forward_ROE, target_forward_ROE(:,2)]);
+    Data_longitudinal.train_data_forward_ROE = train;
+    Data_longitudinal.test_data_forward_ROE = test;
+
+    [train, test] = get_train_and_test_set([input_backward_ROE, target_backward_ROE(:,2)]);
+    Data_longitudinal_train_data_backward_ROE = train;
+    Data_longitudinal.test_data_backward_ROE = test;
+end
+
+function [train, test] = get_train_and_test_set(input)
+  [m,n] = size(input);
+  % get 20% of random data, and reserve for testing for all types of reconstruction
+  idx = randperm(m, round(m*0.2)); %random permutation,   sampling without replacement
+  test = input(idx,:);
+  input(idx,:) = [];
+  train = input;
 end

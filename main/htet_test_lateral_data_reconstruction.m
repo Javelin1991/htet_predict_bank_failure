@@ -71,7 +71,7 @@ for i=1:length(bank_type)
               half_life = Inf;
               threshold_mf = 0.5;
               min_rule_weight = 0.6;
-              % 
+              %
               % half_life = 10;
               % threshold_mf = 0.9999;
               % min_rule_weight = 0.7;
