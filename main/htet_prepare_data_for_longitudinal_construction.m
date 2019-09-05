@@ -114,7 +114,7 @@ function [Data_longitudinal, Data_lateral] = htet_prepare_data_for_longitudinal_
     Data_longitudinal.test_data_forward_ROE = test;
 
     [train, test] = get_train_and_test_set([input_backward_ROE, target_backward_ROE(:,2)]);
-    Data_longitudinal_train_data_backward_ROE = train;
+    Data_longitudinal.train_data_backward_ROE = train;
     Data_longitudinal.test_data_backward_ROE = test;
 end
 

@@ -18,7 +18,7 @@ The format is:
 column1: Bank ID    column2: Fail/Survived    column3: x1    column4: x2    column5: x3
 
 
-For column2: 1 means Failed and 0 means Survived
+For column 2: 1 means Failed and 0 means Survived
 Use column 3, column 4 and column 5 as input data. 
 Use column 2 as the target data. 
 
