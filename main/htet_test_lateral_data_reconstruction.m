@@ -16,9 +16,6 @@ load Survived_Banks;
 load FAILED_BANK_DATA_HORIZONTAL;
 load SURVIVED_BANK_DATA_HORIZONTAL;
 
-load FAILED_BANK_DATA_VERTICAL;
-load SURVIVED_BANK_DATA_VERTICAL;
-
 bank_type = [{Failed_Banks}; {Survived_Banks}];
 % bank_type = [{Failed_Banks}];
 
@@ -249,3 +246,7 @@ for i=1:length(bank_type)
   % row_3 = Target_ROE
   SYSTEMS(i,:) = {RESULTS};
 end
+
+% row_1 = Failed Banks
+% row_2 = Survived Banks
+TABULATED_SYSTEMS = htet_tabulate_lateral_result(SYSTEMS);

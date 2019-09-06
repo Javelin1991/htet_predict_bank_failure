@@ -1,60 +1,74 @@
 clear;
 clc;
 
-load Failed_Banks;
-load Survived_Banks;
+load FAILED_BANK_DATA_VERTICAL;
+load SURVIVED_BANK_DATA_VERTICAL;
 
-% longitudinal data includes full data for last three records, for CAPADE, PLAQLY and ROE respectively
-[longitudinal_data_failed_banks, lateral_data_failed_banks] = htet_prepare_data_for_longitudinal_construction(Failed_Banks);
-[longitudinal_data_survived_banks, lateral_data_survived_banks] = htet_prepare_data_for_longitudinal_construction(Survived_Banks);
+% % longitudinal data includes full data for last three records, for CAPADE, PLAQLY and ROE respectively
+% [longitudinal_data_failed_banks, lateral_data_failed_banks] = htet_prepare_data_for_longitudinal_construction(Failed_Banks);
+% [longitudinal_data_survived_banks, lateral_data_survived_banks] = htet_prepare_data_for_longitudinal_construction(Survived_Banks);
 
-bank_type = [{longitudinal_data_failed_banks}; {longitudinal_data_survived_banks}];
+bank_type = [{FAILED_BANK_DATA_VERTICAL}; {SURVIVED_BANK_DATA_VERTICAL}];
 
 LONGITUDINAL_SYSTEMS = {};
 
 for i=1:2
-  banks = bank_type(i);
-  Data = banks{1};
+  if i == 1
+    BANK = FAILED_BANK_DATA_VERTICAL{1, 1};
+  else
+    BANK = SURVIVED_BANK_DATA_VERTICAL{1, 1};
+  end
   RESULTS = [];
 
     for j=1:3
           switch j
                 case 1
-                    data_input_f = [Data.input_forward_CAPADE, Data.target_forward_CAPADE(:,2)];
-                    data_input_b = [Data.input_backward_CAPADE, Data.target_backward_CAPADE(:,2)];
+                    train_f = BANK.train_data_forward_CAPADE;
+                    test_f = BANK.test_data_forward_CAPADE;
 
-                    RESULTS.pretrained_forward_CAPADE = get_prediction_results(data_input_f);
-                    RESULTS.pretrained_backward_CAPADE = get_prediction_results(data_input_b);
+                    train_b = BANK.train_data_backward_CAPADE;
+                    test_b = BANK.test_data_backward_CAPADE;
+
+                    RESULTS.pretrained_forward_CAPADE = get_prediction_results(train_f, test_f);
+                    RESULTS.pretrained_backward_CAPADE = get_prediction_results(train_b, test_b);
 
                 case 2
-                    data_input_f = [Data.input_forward_PLAQLY, Data.target_forward_PLAQLY(:,2)];
-                    data_input_b = [Data.input_backward_PLAQLY, Data.target_backward_PLAQLY(:,2)];
+                    train_f = BANK.train_data_forward_PLAQLY;
+                    test_f = BANK.test_data_forward_PLAQLY;
 
-                    RESULTS.pretrained_forward_PLAQLY = get_prediction_results(data_input_f);
-                    RESULTS.pretrained_backward_PLAQLY = get_prediction_results(data_input_b);
+                    train_b = BANK.train_data_backward_PLAQLY;
+                    test_b = BANK.test_data_backward_PLAQLY;
+
+                    RESULTS.pretrained_forward_PLAQLY = get_prediction_results(train_f, test_f);
+                    RESULTS.pretrained_backward_PLAQLY = get_prediction_results(train_b, test_b);
 
                 case 3
-                    data_input_f = [Data.input_forward_ROE, Data.target_forward_ROE(:,2)];
-                    data_input_b = [Data.input_backward_ROE, Data.target_backward_ROE(:,2)];
+                    train_f = BANK.train_data_forward_ROE;
+                    test_f = BANK.test_data_forward_ROE;
 
-                    RESULTS.pretrained_forward_ROE = get_prediction_results(data_input_f);
-                    RESULTS.pretrained_backward_ROE = get_prediction_results(data_input_b);
+                    train_b = BANK.train_data_backward_ROE;
+                    test_b = BANK.test_data_backward_ROE;
+
+                    RESULTS.pretrained_forward_ROE = get_prediction_results(train_f, test_f);
+                    RESULTS.pretrained_backward_ROE = get_prediction_results(train_b, test_b);
          end
     end
     LONGITUDINAL_SYSTEMS = [LONGITUDINAL_SYSTEMS; {RESULTS}];
     clear RESULTS;
 end
+TABULATED_SYSTEMS = htet_tabulate_longitudinal_result(LONGITUDINAL_SYSTEMS);
 
 load handel
 sound(y,Fs);
 
-
-function out = get_prediction_results(D_train)
+function out = get_prediction_results(D_train, D_test)
     algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
-    % D_train = D_train(1:15,:); % dummy_run
+    % % for dummy run
+%     D_train = D_train(1:50, :);
+%     D_test = D_train(1:50, :);
 
     % input data setup
-    D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
+    % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
 
     % D_train = input_without_NaN(1:15,extract_all_features); % for dummy run
     % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % randomly selected test data
@@ -74,11 +88,18 @@ function out = get_prediction_results(D_train)
 
                 % parameter setup
                 algo = 'emfis';
+                % spec = 10;
+                % max_cluster = 40;
+                % half_life = 10;
+                % threshold_mf = 0.9999;
+                % min_rule_weight = 0.7;
+
                 spec = 10;
                 max_cluster = 40;
-                half_life = 10;
-                threshold_mf = 0.9999;
-                min_rule_weight = 0.7;
+                half_life = Inf;
+                threshold_mf = 0.5;
+                min_rule_weight = 0.6;
+
                 trnData = data_input;
                 tstData = data_target;
                 ie_rules_no = 2;
