@@ -1,36 +1,39 @@
 clc;
 clear;
 
-load Failed_Banks;
-load Survived_Banks;
-
 load Pre_trained_Systems_Lateral_Prediction;
 load Pre_trained_Systems_Longitudinal_Prediction;
 
+load Prepared_data_for_reconstruction;
 
-load Output_LL_S;
-load Output_LL_F;
+load FAILED_BANK_DATA_HORIZONTAL;
+load SURVIVED_BANK_DATA_HORIZONTAL;
+
+
 warning('off','all');
 warning;
 
-% lateral is x-direction and longitudinal is y-direction
-% get full data records that are grouped by the bank ID
-% backward_offset = 0;
-% SB_Full_Records = [];
-% FB_Full_Records = [];
+
+FB_Full_Records = PREPARED_DATA{1, 2};
+SB_Full_Records = PREPARED_DATA{2, 2};
+
+Failed_IDs = PREPARED_DATA{1, 4};
+Survived_IDs = PREPARED_DATA{2, 4};
+
+FB_Original_Full_Records = PREPARED_DATA{1, 5};
+SB_Original_Full_Records = PREPARED_DATA{2, 5};
+
 %
-% output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), backward_offset);
-% output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10]), backward_offset);
+% SB_Full_Records = output_1.full_record;
+% FB_Full_Records = output_2.full_record;
 
-Failed_Banks_top_3 = Failed_Banks(:,[1:3 7 10]);
-
-SB_IDs = output_1.id;
-FB_IDs = output_2.id;
-SB_Full_Records = output_1.full_record;
-FB_Full_Records = output_2.full_record;
 RECONSTRUCTED_DATA = [];
 TRC = [];
+% bank_type = [{output_1.full_records}; {SB_Records}];
 bank_type = [{FB_Full_Records}; {SB_Full_Records}];
+
+unseen_testData_1 = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
+unseen_testData_2 = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
 
 for n=1:2
     banks = bank_type(n);
@@ -61,10 +64,8 @@ for n=1:2
     counter = 0;
 
     is_reconst_complete = test(Data);
-
     % repeat the process again until no more missing feature left
-    while (~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3))
-
+    while (has_missing_items(is_reconst_complete))
         disp('Performing reconstruction process.....');
 
         for i=1:size(Data,1)
@@ -92,7 +93,7 @@ for n=1:2
         % check if the reconstruction completed
         is_reconst_complete = test(MEAN_LL);
 
-        if ~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3)
+        if has_missing_items(is_reconst_complete)
           Data = MEAN_LL;
           MEAN_LL = [];
           RESULTS = [];
@@ -102,19 +103,40 @@ for n=1:2
     end
 
     D = [];
-    for m=1:length(MEAN_LL)
-      mat = cell2mat(MEAN_LL(m));
-      D = [D; mat];
-    end
-    RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
+    % for m=1:length(MEAN_LL)
+    %   mat = cell2mat(MEAN_LL(m));
+    %   % D = [D; mat]; % to display consecutively in rows
+    % end
+    RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {MEAN_LL}];
     trc.total_lat_construct = total_lat_construct;
     trc.total_long_construct = total_long_construct;
     TRC = [TRC; {trc}];
 end
 
+A1 = PREPARED_DATA{1, 1};
+A2 = PREPARED_DATA{2, 1};
+
+B1 = RECONSTRUCTED_DATA{1, 1};
+B2 = RECONSTRUCTED_DATA{2, 1};
+
+Z1 = htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
+Z1_Results = htet_calculate_errors(Z1(:,1), Z1(:,2));
+Z2 = htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
+Z2_Results = htet_calculate_errors(Z2(:,1), Z2(:,2));
+
 % alarm sound to alert that the program has ended
 load handel;
 sound(y,Fs);
+
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX has_missing_items XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+function out = has_missing_items(is_reconst_complete)
+  has_one_missing_items = ~isempty(is_reconst_complete.out3_C) || ~isempty(is_reconst_complete.out3_P) || ~isempty(is_reconst_complete.out3_R);
+  has_two_or_three_missing_items = ~isempty(is_reconst_complete.out_miss_2) || ~isempty(is_reconst_complete.out_miss_3);
+  out = has_one_missing_items || has_two_or_three_missing_items;
+end
 
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX find_mean XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
