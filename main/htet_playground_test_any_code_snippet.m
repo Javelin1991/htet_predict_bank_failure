@@ -1,52 +1,55 @@
 clc;
 clear;
 
-load Lateral_Systems;
-load Longitudinal_Systems;
+load Failed_Banks;
+load Survived_Banks;
 
-T1 = htet_tabulate_lateral_result(SYSTEMS);
-T2 = htet_tabulate_longitudinal_result(LONGITUDINAL_SYSTEMS);
+load FAILED_BANK_DATA_HORIZONTAL;
+load SURVIVED_BANK_DATA_HORIZONTAL;
 
-filename = 'lateral_prediction_result.xlsx';
-filename_2 = 'longitudinal_prediction_result.xlsx';
 
-for j=1:2
-  for i=1:3
-      T = T1{j, 1}{i, 1};
-      switch i
-          case 1
-              writetable(T,filename,'Sheet',j,'Range','A1','WriteRowNames',true)
+Failed_Banks_Group_By_Bank_ID = [];
+Survived_Banks_Group_By_Bank_ID = [];
 
-          case 2
-              writetable(T,filename,'Sheet',j,'Range','A7','WriteRowNames',true)
+unseen_testData = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
 
-          case 3
-              writetable(T,filename,'Sheet',j,'Range','A13','WriteRowNames',true)
-      end
-  end
+% Survived_Banks = htet_pre_process_bank_data(Survived_Banks, 1, 0);
+Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
+
+% output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1:3 7 10]), 0);
+output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1:3 7 10 13]), 0);
+
+% Survived_Banks_Group_By_Bank_ID = output_1.result;
+Failed_Banks_Group_By_Bank_ID = output_2.result;
+
+% Survived_Banks_Group_By_Bank_ID_Full_Records = output_1.id_full_record;
+Failed_Banks_Group_By_Bank_ID_Full_Records = output_2.full_record;
+
+Failed_IDs = output_2.id;
+unseen_testData = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
+
+A = [];
+B = Failed_Banks_Group_By_Bank_ID_Full_Records;
+
+for i=1:length(unseen_testData)
+    record = unseen_testData(i,:);
+    ran_num = randi(3) + 1;
+    val_at_ran_num = unseen_testData(i,ran_num);
+    record(1, ran_num) = NaN;
+    A = [A; [record, ran_num, val_at_ran_num]];
 end
 
-for j=1:2
-  for i=1:6
-      T = T2{j, 1}{i, 1};
-      switch i
-          case 1
-              writetable(T,filename_2,'Sheet',j,'Range','A1','WriteRowNames',true)
-
-          case 2
-              writetable(T,filename_2,'Sheet',j,'Range','A19','WriteRowNames',true)
-
-          case 3
-              writetable(T,filename_2,'Sheet',j,'Range','A7','WriteRowNames',true)
-
-          case 4
-              writetable(T,filename_2,'Sheet',j,'Range','A25','WriteRowNames',true)
-
-          case 5
-              writetable(T,filename_2,'Sheet',j,'Range','A13','WriteRowNames',true)
-
-          case 6
-              writetable(T,filename_2,'Sheet',j,'Range','A31','WriteRowNames',true)
-      end
-  end
+for i = 1:length(unseen_testData)
+    bID = unseen_testData(i,1);
+    idx = find(bID == Failed_IDs);
+    t = B(idx,:);
+    d = t{1,1};
+    for j = 1:size(d,1)
+        sum = d(j,[1 3 4 5]);
+        sum1 = unseen_testData(i,:);
+        if sum == sum1
+            d(j, 3:5) = A(i, 2:4)
+            B(idx,:) = {d};
+        end
+    end
 end
