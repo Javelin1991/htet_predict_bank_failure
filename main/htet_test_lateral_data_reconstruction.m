@@ -10,34 +10,17 @@
 clc;
 clear;
 
-load Failed_Banks;
-load Survived_Banks;
-
 load FAILED_BANK_DATA_HORIZONTAL;
 load SURVIVED_BANK_DATA_HORIZONTAL;
 
-bank_type = [{Failed_Banks}; {Survived_Banks}];
-% bank_type = [{Failed_Banks}];
-
+bank_type = [{FAILED_BANK_DATA_HORIZONTAL}; {SURVIVED_BANK_DATA_HORIZONTAL}];
 bank_type_name = {'Failed_Banks'; 'Survived_Bans'};
 algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
-extract_all_features = [3:12];
 
 for i=1:length(bank_type)
   disp(['Processing Bank Type : ', bank_type_name(i)]);
-  % % input data setup
-  % input = cell2mat(bank_type(i));
-  % input_with_NaN = input(any(isnan(input), 2), :)
-  % input(any(isnan(input), 2), :) = [];
-  % input_without_NaN = input;
-  %
-  % D_train = input_without_NaN(:,extract_all_features); % 100 percent train data
-  % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % 24% randomly selected test data
-
-  % D_train = input_without_NaN(1:15,extract_all_features); % for dummy run
-  % D_test = htet_pre_process_bank_data(D_train, 0.24, 0); % randomly selected test data
   D = [];
 
   for j=1:length(target_feature_col_no)
@@ -238,7 +221,6 @@ for i=1:length(bank_type)
   % the first row is for Failed Failed_Banks
   % the second row is for Survived_Banks
 
-
   % final data structure for items in SYSTEMS
   % col = eMFIS(I/E)  DENFIS  ANFIS ENSEMBLE_ANFIS_DENFIS_SIMPLE_AVERAGING  ENSEMBLE_ANFIS_DENFIS_BEST_SELECTION
   % row_1 = Target_CAPADE
@@ -247,6 +229,4 @@ for i=1:length(bank_type)
   SYSTEMS(i,:) = {RESULTS};
 end
 
-% row_1 = Failed Banks
-% row_2 = Survived Banks
-TABULATED_SYSTEMS = htet_tabulate_lateral_result(SYSTEMS);
+htet_export_results_to_excel_files(SYSTEMS, true);

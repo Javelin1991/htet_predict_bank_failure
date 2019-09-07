@@ -56,7 +56,8 @@ for i=1:2
     LONGITUDINAL_SYSTEMS = [LONGITUDINAL_SYSTEMS; {RESULTS}];
     clear RESULTS;
 end
-TABULATED_SYSTEMS = htet_tabulate_longitudinal_result(LONGITUDINAL_SYSTEMS);
+
+htet_export_results_to_excel_files(LONGITUDINAL_SYSTEMS, false);
 
 load handel
 sound(y,Fs);
