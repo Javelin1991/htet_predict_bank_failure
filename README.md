@@ -1,5 +1,4 @@
-# Final Year Project (FYP) : Application of different Fuzzy Neural Networks (FNNs) for bank failure prediction and missing data reconstruction
-
+# Final Year Project (FYP) : Neuro-Fuzzy approach to missing data imputation with application in bank failure prediction
 ## Learning Outcome
 I have learnt how a Fuzzy Neural Network (FNN) works as well as how aritifical neural networks and fuzzy logic systems complement each other in FNNs. In this FYP, I have applied a Mamdani-type FNN, namely "eMFIS(FRI/E)", to bank failure prediction. To further improve its prediction accuracy, I have further explored extensively different ways to reconstruct missing data in the data set. I have successfully reconstructed missing data with relatively low mean absolute error (MAE) by implementing the "simple-averaging" ensemble learning approach that is based on two popular TSK-Neuro-Fuzzy systems, that are "DENFIS" and "ANFIS". 
 <br/>
