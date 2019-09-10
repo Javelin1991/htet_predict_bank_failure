@@ -15,8 +15,8 @@
 
 function D = htet_calculate_errors(predicted, data_target)
 
-    a = predicted;
-    b = data_target;
+    a = data_target;
+    b = predicted;
 
     system.MAE = ron_mae(a, b);
     system.MSE = ron_mse(a, b);

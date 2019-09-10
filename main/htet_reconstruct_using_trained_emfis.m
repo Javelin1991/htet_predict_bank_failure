@@ -9,7 +9,9 @@
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function output = htet_reconstruct_using_trained_emfis(net, input, current_count)
+function output = htet_reconstruct_using_trained_emfis(input, net)
+
+    current_count = 1; % hardcoded to 1, can be any num
 
     system = net;
     % predict result of each component network individually
@@ -22,8 +24,5 @@ function output = htet_reconstruct_using_trained_emfis(net, input, current_count
         % system prediction is weighted average of individual prediction
         system.predicted(current_count, :) =  system.net.predicted(current_count, :);
     end
-    disp('HN DEBUG predicted value');
-    disp('HN DEBUG current_count value'); disp(current_count);
     output = system.predicted(current_count, :);
-    disp(output);
 end

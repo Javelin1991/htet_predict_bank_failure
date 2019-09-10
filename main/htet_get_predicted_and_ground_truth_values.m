@@ -11,7 +11,6 @@ function Z = get_predicted_and_ground_truth_values(unseen_testData, A, B, C, IDs
 
       idx = find(bID == IDs);
       % C has the original full records
-      disp('HN DEBUG idx'); disp(idx)
       t = C(idx,:);
       d = t{1,1};
 
@@ -23,15 +22,11 @@ function Z = get_predicted_and_ground_truth_values(unseen_testData, A, B, C, IDs
       for j = 1:size(d,1)
           sum = d(j,[1 3 4 5]);
           sum1 = unseen_testData(i,:);
-          disp('HN DEBUG sum'); disp(sum)
-          disp('HN DEBUG sum1'); disp(sum1)
 
           if sum == sum1
-              val = d1(j, ran);
-              disp('HN DEBUG val'); disp(val)
-
-              Z = [Z; [val, target]];
-              disp('HN DEBUG Z'); disp(Z)
+              ran_offset = ran + 1;
+              val = d1(j, ran_offset);
+              Z = [Z; [bID, val, target]];
           end
       end
   end
