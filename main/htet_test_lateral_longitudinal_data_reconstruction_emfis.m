@@ -120,9 +120,9 @@ B1 = RECONSTRUCTED_DATA{1, 1};
 B2 = RECONSTRUCTED_DATA{2, 1};
 
 Z1 = htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
-Z1_Results = htet_calculate_errors(Z1(:,1), Z1(:,2));
+Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3));
 Z2 = htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
-Z2_Results = htet_calculate_errors(Z2(:,1), Z2(:,2));
+Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3));
 
 % alarm sound to alert that the program has ended
 load handel;
@@ -285,6 +285,24 @@ function out = handle_isnan(x, y)
   end
 end
 
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX look_up_from_prev_state_if_nan_present XXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+function [v1, v2] = look_up_from_prev_state_if_nan_present(a, b, a_prev, b_prev)
+
+  if isnan(a)
+    v1 = a_prev;
+  else
+    v1 = a;
+  end
+
+  if isnan(b)
+    v2 = b_prev;
+  else
+    v2 = b;
+  end
+end
+
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX do_longitudinal_prediction XXXXXXXXXXXXXXXXXXXXXXX
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -302,7 +320,6 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
   anfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{3, 1}.net;
 
   result = [];
-  record_after_step_1 = C;
   B = [];
 
   for d=1:size(A,1)
@@ -313,21 +330,12 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
     method = check_suitable_reconstruction_method(1, d, size(A,1));
     xf_1 = 0; xf_2 = 0; xb_1 = 0; xb_2 = 0;
 
-    switch (method)
-      case  'FB'
-        xf_1 = d-2;
-        xf_2 = d-1;
-        xb_1 = d+2;
-        xb_2 = d+1;
-      case  'F'
-        xf_1 = d-2;
-        xf_2 = d-1;
-      case  'B'
-        xb_1 = d+2;
-        xb_2 = d+1;
-      case 'Z'
-        replace_zero = 0;
-    end
+
+    xf_1 = d-2;
+    xf_2 = d-1;
+    xb_1 = d+2;
+    xb_2 = d+1;
+
     % if it has one missing feature
     if sum(isnan(record)) ~= 0
         disp('Performing Longitudinal Reconstruction process.....');
@@ -340,8 +348,14 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
-              input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+              w = A(xb_1,3); x = A(xb_2,3); y = C(xb_1,3); z = C(xb_2,3);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+
+              input_f = [f1, f2];
+              input_b = [b1, b2];
 
               predicted_value_f = evalfis(input_f', anfis_long_capade_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_capade_backward_regressor);
@@ -350,11 +364,21 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2];
+
               predicted_value = evalfis(input_f', anfis_long_capade_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
+
+              w = A(xb_1,3); x = A(xb_2,3); y = C(xb_1,3); z = C(xb_2,3);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2];
+
               input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
               predicted_value = evalfis(input_b', anfis_long_capade_backward_regressor);
               rc_count = rc_count + 1;
@@ -371,8 +395,14 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
-              input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+              w = A(xb_1,4); x = A(xb_2,4); y = C(xb_1,4); z = C(xb_2,4);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+
+              input_f = [f1, f2];
+              input_b = [b1, b2];
 
               predicted_value_f = evalfis(input_f', anfis_long_plaqly_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_plaqly_backward_regressor);
@@ -380,12 +410,19 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2];
+
               predicted_value = evalfis(input_f', anfis_long_plaqly_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
-              input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
+              w = A(xb_1,4); x = A(xb_2,4); y = C(xb_1,4); z = C(xb_2,4);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2];
               predicted_value = evalfis(input_b', anfis_long_plaqly_backward_regressor);
               rc_count = rc_count + 1;
 
@@ -401,8 +438,14 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
-              input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+              w = A(xb_1,5); x = A(xb_2,5); y = C(xb_1,5); z = C(xb_2,5);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+
+              input_f = [f1, f2];
+              input_b = [b1, b2];
 
               predicted_value_f = evalfis(input_f', anfis_long_roe_forward_regressor);
               predicted_value_b = evalfis(input_b', anfis_long_roe_backward_regressor);
@@ -410,12 +453,18 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2];
               predicted_value = evalfis(input_f', anfis_long_roe_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
-              input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
+              w = A(xb_1,5); x = A(xb_2,5); y = C(xb_1,5); z = C(xb_2,5);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2];
               predicted_value = evalfis(input_b', anfis_long_roe_backward_regressor);
               rc_count = rc_count + 1;
 

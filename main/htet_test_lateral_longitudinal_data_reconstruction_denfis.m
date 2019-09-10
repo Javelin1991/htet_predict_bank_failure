@@ -120,9 +120,9 @@ B1 = RECONSTRUCTED_DATA{1, 1};
 B2 = RECONSTRUCTED_DATA{2, 1};
 
 Z1 = htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
-Z1_Results = htet_calculate_errors(Z1(:,1), Z1(:,2));
+Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3));
 Z2 = htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
-Z2_Results = htet_calculate_errors(Z2(:,1), Z2(:,2));
+Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3));
 
 % alarm sound to alert that the program has ended
 load handel;
@@ -169,9 +169,9 @@ function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
   % if the missing data is CAPADE, use {1,3};
   % if the missing data is PLAQLY, use {2,3};
   % if the missing data is ROE, use {3,3};
-  anfis_lat_capade_regressor = SYSTEMS{bank_type, 1}{1, 3}.net;
-  anfis_lat_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 3}.net;
-  anfis_lat_roe_regressor = SYSTEMS{bank_type, 1}{3, 3}.net;
+  denfis_lat_capade_regressor = SYSTEMS{bank_type, 1}{1, 2}.net;
+  denfis_lat_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 2}.net;
+  denfis_lat_roe_regressor = SYSTEMS{bank_type, 1}{3, 2}.net;
 
   result = [];
   B = [];
@@ -187,18 +187,18 @@ function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
         disp('Performing Lateral Reconstruction process.....');
 
         if (isnan(record(:,3)))
-          predicted_value = evalfis(record(:,[4 5])', anfis_lat_capade_regressor);
-          record(1,3) = predicted_value;
+          predicted_value = denfiss(record(:,[4 5 3]), denfis_lat_capade_regressor);
+          record(1,3) = predicted_value.Out';
           rc_count = rc_count + 1;
 
         elseif (isnan(record(:,4)))
-          predicted_value = evalfis(record(:,[3 5])', anfis_lat_plaqly_regressor);
-          record(1,4) = predicted_value;
+          predicted_value = denfiss(record(:,[3 5 4]), denfis_lat_plaqly_regressor);
+          record(1,4) = predicted_value.Out';
           rc_count = rc_count + 1;
 
         else
-          predicted_value = evalfis(record(:,[3 4])', anfis_lat_roe_regressor);
-          record(1,5) = predicted_value;
+          predicted_value = denfiss(record(:,[3 4 5]), denfis_lat_roe_regressor);
+          record(1,5) = predicted_value.Out';
           rc_count = rc_count + 1;
 
         end
@@ -285,6 +285,24 @@ function out = handle_isnan(x, y)
   end
 end
 
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX look_up_from_prev_state_if_nan_present XXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+function [v1, v2] = look_up_from_prev_state_if_nan_present(a, b, a_prev, b_prev)
+
+  if isnan(a)
+    v1 = a_prev;
+  else
+    v1 = a;
+  end
+
+  if isnan(b)
+    v2 = b_prev;
+  else
+    v2 = b;
+  end
+end
+
 % XXXXXXXXXXXXXXXXXXXXXXXXXXX do_longitudinal_prediction XXXXXXXXXXXXXXXXXXXXXXX
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -293,16 +311,15 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
   rc_count = 0;
 
-  anfis_long_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{3, 1}.net;
-  anfis_long_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{3, 1}.net;
-  anfis_long_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{3, 1}.net;
+  denfis_long_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{2, 1}.net;
+  denfis_long_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{2, 1}.net;
+  denfis_long_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{2, 1}.net;
 
-  anfis_long_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{3, 1}.net;
-  anfis_long_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{3, 1}.net;
-  anfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{3, 1}.net;
+  denfis_long_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{2, 1}.net;
+  denfis_long_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{2, 1}.net;
+  denfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{2, 1}.net;
 
   result = [];
-  record_after_step_1 = C;
   B = [];
 
   for d=1:size(A,1)
@@ -313,21 +330,12 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
     method = check_suitable_reconstruction_method(1, d, size(A,1));
     xf_1 = 0; xf_2 = 0; xb_1 = 0; xb_2 = 0;
 
-    switch (method)
-      case  'FB'
-        xf_1 = d-2;
-        xf_2 = d-1;
-        xb_1 = d+2;
-        xb_2 = d+1;
-      case  'F'
-        xf_1 = d-2;
-        xf_2 = d-1;
-      case  'B'
-        xb_1 = d+2;
-        xb_2 = d+1;
-      case 'Z'
-        replace_zero = 0;
-    end
+
+    xf_1 = d-2;
+    xf_2 = d-1;
+    xb_1 = d+2;
+    xb_2 = d+1;
+
     % if it has one missing feature
     if sum(isnan(record)) ~= 0
         disp('Performing Longitudinal Reconstruction process.....');
@@ -340,27 +348,44 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
-              input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+              w = A(xb_1,3); x = A(xb_2,3); y = C(xb_1,3); z = C(xb_2,3);
 
-              predicted_value_f = evalfis(input_f', anfis_long_capade_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_capade_backward_regressor);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
 
-              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              input_f = [f1, f2, record(:,3)];
+              input_b = [b1, b2, record(:,3)];
+
+              predicted_value_f = denfiss(input_f, denfis_long_capade_forward_regressor);
+              predicted_value_b = denfiss(input_b, denfis_long_capade_backward_regressor);
+
+              predicted_value = handle_isnan(predicted_value_f.Out', predicted_value_b.Out');
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,3), record_after_step_1(xf_2,3)];
-              predicted_value = evalfis(input_f', anfis_long_capade_forward_regressor);
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2, record(:,3)];
+
+              pv = denfiss(input_f, denfis_long_capade_forward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'B'
-              input_b = [record_after_step_1(xb_1,3), record_after_step_1(xb_2,3)];
-              predicted_value = evalfis(input_b', anfis_long_capade_backward_regressor);
+
+              w = A(xb_1,3); x = A(xb_2,3); y = C(xb_1,3); z = C(xb_2,3);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2, record(:,3)];
+
+              pv = denfiss(input_b, denfis_long_capade_backward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'Z'
-              predicted_value = record_after_step_1(d,3);
+              predicted_value = C(d,3);
           end
           % use the reconstructed value
           record(1,3) = predicted_value;
@@ -371,26 +396,42 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
-              input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+              w = A(xb_1,4); x = A(xb_2,4); y = C(xb_1,4); z = C(xb_2,4);
 
-              predicted_value_f = evalfis(input_f', anfis_long_plaqly_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_plaqly_backward_regressor);
-              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+
+              input_f = [f1, f2, record(:,4)];
+              input_b = [b1, b2, record(:,4)];
+
+              predicted_value_f = denfiss(input_f, denfis_long_plaqly_forward_regressor);
+              predicted_value_b = denfiss(input_b, denfis_long_plaqly_backward_regressor);
+              predicted_value = handle_isnan(predicted_value_f.Out', predicted_value_b.Out');
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,4), record_after_step_1(xf_2,4)];
-              predicted_value = evalfis(input_f', anfis_long_plaqly_forward_regressor);
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2, record(:,4)];
+
+              pv = denfiss(input_f, denfis_long_plaqly_forward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'B'
-              input_b = [record_after_step_1(xb_1,4), record_after_step_1(xb_2,4)];
-              predicted_value = evalfis(input_b', anfis_long_plaqly_backward_regressor);
+              w = A(xb_1,4); x = A(xb_2,4); y = C(xb_1,4); z = C(xb_2,4);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2, record(:,4)];
+
+              pv = denfiss(input_b, denfis_long_plaqly_backward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'Z'
-                predicted_value = record_after_step_1(d,4);
+                predicted_value = C(d,4);
           end
           % use the reconstructed value
           record(1,4) = predicted_value;
@@ -401,26 +442,40 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
-              input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+              w = A(xb_1,5); x = A(xb_2,5); y = C(xb_1,5); z = C(xb_2,5);
 
-              predicted_value_f = evalfis(input_f', anfis_long_roe_forward_regressor);
-              predicted_value_b = evalfis(input_b', anfis_long_roe_backward_regressor);
-              predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+
+              input_f = [f1, f2, record(:,5)];
+              input_b = [b1, b2, record(:,5)];
+
+              predicted_value_f = denfiss(input_f, denfis_long_roe_forward_regressor);
+              predicted_value_b = denfiss(input_b, denfis_long_roe_backward_regressor);
+              predicted_value = handle_isnan(predicted_value_f.Out', predicted_value_b.Out');
               rc_count = rc_count + 1;
 
             case  'F'
-              input_f = [record_after_step_1(xf_1,5), record_after_step_1(xf_2,5)];
-              predicted_value = evalfis(input_f', anfis_long_roe_forward_regressor);
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              input_f = [f1, f2, record(:,5)];
+              pv = denfiss(input_f, denfis_long_roe_forward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'B'
-              input_b = [record_after_step_1(xb_1,5), record_after_step_1(xb_2,5)];
-              predicted_value = evalfis(input_b', anfis_long_roe_backward_regressor);
+              w = A(xb_1,5); x = A(xb_2,5); y = C(xb_1,5); z = C(xb_2,5);
+
+              [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
+              input_b = [b1, b2, record(:,5)];
+              pv = denfiss(input_b, denfis_long_roe_backward_regressor);
+              predicted_value = pv.Out';
               rc_count = rc_count + 1;
 
             case 'Z'
-              predicted_value = record_after_step_1(d,5);
+              predicted_value = C(d,5);
             end
           % use the reconstructed value
           record(1,5) = predicted_value;
