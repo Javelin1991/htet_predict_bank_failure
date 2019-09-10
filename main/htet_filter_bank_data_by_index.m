@@ -13,6 +13,8 @@ function out = htet_filter_bank_data_by_index(input, offset)
     out3 = [];
     out4 = [];
 
+    is_nan_count = 0;
+
     [v,ic,id]=unique(input(:,1))
     for i=1:length(v)
       A = input(id==i,:);
@@ -21,6 +23,8 @@ function out = htet_filter_bank_data_by_index(input, offset)
           record = A(idx, :);
           if sum(isnan(record)) == 0
               out1 = [out1; record];
+          else
+              is_nan_count = is_nan_count + 1;
           end
       end
       out2 = [out2; {A}]
@@ -31,4 +35,5 @@ function out = htet_filter_bank_data_by_index(input, offset)
     out.full_record = out2;
     out.id = out3;
     out.id_full_record = out4;
+    out.is_nan_count = is_nan_count;
 end
