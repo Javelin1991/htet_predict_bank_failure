@@ -46,7 +46,7 @@ for itr = 1:2
     % B is randomly populated with NaN and ready to use for testing
     B = populate_random_NaN_in_full_records(unseen_testData, A, Failed_Banks_Group_By_Bank_ID_Full_Records, Failed_IDs);
     % Z is to retrieve reconstructed values and measure performance
-    Z = htet_htet_get_predicted_and_ground_truth_values(unseen_testData, A, B, Failed_Banks_Group_By_Bank_ID_Full_Records, Failed_IDs);
+    Z = htet_get_predicted_and_ground_truth_values(unseen_testData, A, B, Failed_Banks_Group_By_Bank_ID_Full_Records, Failed_IDs);
     IDs = Failed_IDs;
     Original = Failed_Banks_Group_By_Bank_ID_Full_Records;
   else
@@ -55,7 +55,7 @@ for itr = 1:2
     % B is randomly populated with NaN and ready to use for testing
     B = populate_random_NaN_in_full_records(unseen_testData, A, Survived_Banks_Group_By_Bank_ID_Full_Records, Survived_IDs);
     % Z is to retrieve reconstructed values and measure performance
-    Z = htet_htet_get_predicted_and_ground_truth_values(unseen_testData, A, B, Survived_Banks_Group_By_Bank_ID_Full_Records, Survived_IDs);
+    Z = htet_get_predicted_and_ground_truth_values(unseen_testData, A, B, Survived_Banks_Group_By_Bank_ID_Full_Records, Survived_IDs);
     IDs = Survived_IDs;
     Original = Survived_Banks_Group_By_Bank_ID_Full_Records;
   end
