@@ -1,11 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_generate_cross_validation_data XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
+% Date      :   Sep 11, 2019
+% Function  :   generate 5-fold cross validation data that consist of failed banks and survived banks
+% Syntax    :   htet_generate_cross_validation_data(input1, input2, num_of_fold, train_20_percent)
+% input1 - either failed/survived bank data
+% input2 - either failed/survived bank data
+% num_of_fold - the number of fold for cross validation
+% train_20_percent - flag to determine whether to use 20% to train and 80% to test , or 80% to train and 20% to test
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_generate_cross_validation_data(input1, input2, num_of_fold, train_20_percent)
 

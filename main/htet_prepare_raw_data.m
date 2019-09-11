@@ -1,11 +1,10 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_prepare_raw_data XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
+% Date      :   Sep 11, 2019
+% Function  :   used to read raw data files for all banks, and count total number of banks  in the raw data
 % Syntax    :
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 % bank_data = readtable('/Users/htetnaing/Development/htet_mces_bank_data/emfis/data/raw_data/Tv2emd_001.xls','Range','H:AF');
 % s1 = '/Users/htetnaing/Development/htet_mces_bank_data/emfis/data/raw_data/Tv2emd_001.xls'

@@ -1,3 +1,10 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_mces_emfis_classification XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   used to select important features using MCES and eMFIS(FRIE) for bank failure classification
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clear;
 clc;
 

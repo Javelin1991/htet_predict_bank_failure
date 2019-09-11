@@ -1,13 +1,12 @@
-
-
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX HTET_TEST_EMFIS XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_reconstruct_using_trained_emfis XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
-% Author    :
-% Date      :
-% Function  :
-% Syntax    :
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   used to predict using pre-trained eMFIS(FRIE)
+% Syntax    :   htet_reconstruct_using_trained_emfis(input, net)
+% input - input data
+% net - pre-trained eMFIS(FRIE) network
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function output = htet_reconstruct_using_trained_emfis(input, net)
 

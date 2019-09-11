@@ -1,17 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX RON_CALCERRORS XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_calculate_errors XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
-% Author    :   Ron TD
-% Date      :   Feb 09 2010
+% Author    :   Ron TD, Htet
+% Date      :   Feb 09 2010, Sep 11, 2019
 % Function  :   calculates prediction errors
-% Syntax    :   ron_calcErrors(system, data_target, start_test)
+% Syntax    :   htet_calculate_errors(predicted, data_target)
 %
-% system - FIS system struct
-% data_target - target data, can have multiple columns (outputs) but one row
-% start_test - tuple to start calcuating errors (from start_test to total)
+% predicted - predicted value
+% data_target - actual value (ground truth value)
 %
-% Algorithm -
-% 1) Runs all loss functions formulae
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function D = htet_calculate_errors(predicted, data_target)
 

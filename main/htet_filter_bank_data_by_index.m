@@ -1,11 +1,16 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_filter_bank_data_by_index XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
+% Date      :   Sep 11, 2019
+% Function  :   filter records based on the selected year
+% Syntax    :   htet_filter_bank_data_by_index(input, offset)
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% input - input matrix that contains all bank records
+% offset - when set to 0 - the function will retrieve the last record (e.g. t = 1998)
+% when set to 1 - the function will retrieve the record from one prior year (e.g. t-1 = 1997)
+% when set to 2 - the function will retrieve the record from two prior year (e.g. t-2 = 1996)
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_filter_bank_data_by_index(input, offset)
     out1 = [];

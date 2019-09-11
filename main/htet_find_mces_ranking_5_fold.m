@@ -1,3 +1,12 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_find_mces_ranking_5_fold XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   to find the weight ranking for each feature using MCES (Monte Carolo Evaluative Selection algorithm)
+% WARNING   :   running the code below may take very long since the weight ranking is calculated based on the 5-fold CV
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clear;
 clc;
 

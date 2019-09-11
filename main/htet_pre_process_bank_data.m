@@ -1,11 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_pre_process_bank_data XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :   Mar 3 2019
-% Function  :
-% Syntax    :   pre_process_bank_data(input, data_percent, total)
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Date      :   Sep 11, 2019
+% Function  :   pre process data by shuffling without replacement
+% Syntax    :   htet_pre_process_bank_data(input, data_percent, fixed_size)
+% input - any data set
+% data_percent - determine how many percentage of the given data to be selected,
+%                when set to 1, it will return all data with shuffled order
+% fixed_size - when the fixed size is specified, the function will return
+%              specified number of records that are randomly selected
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function sample = htet_pre_process_bank_data(input, data_percent, fixed_size)
   input(any(isnan(input), 2), :) = [];

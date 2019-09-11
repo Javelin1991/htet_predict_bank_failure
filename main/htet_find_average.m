@@ -1,11 +1,14 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_find_average XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
+% Date      :   Sep 11, 2019
+% Function  :   find average for experiment results, (used to calculate results for cross validation group)
+% Syntax    :   htet_find_average(net, size)
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% net - a prediction system/model
+% size - the size of the cross validation group (e.g. if it's 5-fold CV, then the size is 5)
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_find_average(net, size)
   A = 0; B = 0; C = 0; D = 0; E = 0; F = 0;

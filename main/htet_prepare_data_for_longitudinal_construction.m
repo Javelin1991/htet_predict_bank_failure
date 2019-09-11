@@ -1,11 +1,12 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_prepare_data_for_longitudinal_construction XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Date      :   Sep 11, 2019
+% Function  :   used to generate train and test data for longitudinal reconstruction
+% Syntax    :   htet_prepare_data_for_longitudinal_construction(input)
+% input - any given data
+% This file is used to generate train data and test data that are prepared to experiment longitudinal reconstruction
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function [Data_longitudinal, Data_lateral] = htet_prepare_data_for_longitudinal_construction(input)
     input(any(isnan(input), 2), :) = [];

@@ -1,11 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_get_emfis_network_result XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
+% Date      :   Sep 11, 2019
+% Function  :   get classification results using "eMFIS(FRIE)"
+% Syntax    :   htet_get_emfis_network_result(cv, params, x, y)
+% cv - data set
+% params - parameters required for the induction algorithm, which is in this case, "eMFIS(FRIE)"
+% x - input data
+% y - target label
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_get_emfis_network_result(cv, params, x, y)
 
@@ -58,13 +62,13 @@ function out = htet_get_emfis_network_result(cv, params, x, y)
       system.num_rules = mean(system.net.ruleCount(start_test : target_size));
 
       after_threshold = zeros(target_size,1);
-      for x=1: size(data_target, 1)
-          if system.predicted(x) > 0.5
-              after_threshold(x) = 1;
-          elseif system.predicted(x) < 0.5
-              after_threshold(x) = 0;
-          elseif system.predicted(x) == 0.5
-              after_threshold(x) = 0.5;
+      for i=1: size(data_target, 1)
+          if system.predicted(i) > 0.5
+              after_threshold(i) = 1;
+          elseif system.predicted(i) < 0.5
+              after_threshold(i) = 0;
+          elseif system.predicted(i) == 0.5
+              after_threshold(i) = 0.5;
               eer_count = eer_count + 1;
           else
               unclassified_count = unclassified_count + 1;

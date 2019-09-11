@@ -1,11 +1,11 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_cal_nan_percent XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :   Mar 3 2019
-% Function  :
+% Date      :   Sep 11, 2019
+% Function  :   to calculate percentage of missing data in one feature(column)
 % Syntax    :   htet_cal_nan_percent(input, len, total)
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function result = htet_cal_nan_percent(input, len, total)
   result = [];

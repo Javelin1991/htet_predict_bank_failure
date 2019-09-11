@@ -1,11 +1,12 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_tabulate_longitudinal_result XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Date      :   Sep 11, 2019
+% Function  :   used to tabulate results for Longitudinal systems
+% Syntax    :   htet_tabulate_longitudinal_result(SYSTEMS)
+% SYSTEMS - already processed Longitudinal Systems
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 function result = htet_tabulate_longitudinal_result(SYSTEMS)
   result = [];
 

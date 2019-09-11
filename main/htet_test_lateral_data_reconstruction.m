@@ -1,11 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_lateral_data_reconstruction XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :   Mar 3 2019
-% Function  :
-% Syntax    :   pre_process_bank_data(input, data_percent, total)
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Date      :   Sep 11, 2019
+% Function  :   used to test reconstruction performance for lateral reconstruction
+% five different types of algorithms are tested
+% 1) eMFIS(IRE)
+% 2) DENFIS
+% 3) ANFIS
+% 4) SA - Simple Averaging Ensemble Learning using ANFIS and DENFIS
+% 5) BS - Best Selection between ANFIS, DENFIS, and SA
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;
 clear;

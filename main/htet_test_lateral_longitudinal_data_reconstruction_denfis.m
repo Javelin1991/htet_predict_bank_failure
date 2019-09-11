@@ -1,3 +1,26 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_lateral_longitudinal_data_reconstruction_denfis XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   performs missing data imputation using lateral and longitudinal predictions
+%
+% Reconstruction process is done separately for failed banks and survived banks
+% since they share different properties during financial distress
+% Algorithm -
+% 1) Filter out corner cases such as bank records that has all missing values
+%    and those that has only one available record, reconstruction can't be performed on those banks
+% 2) Perform lateral reconstruction
+% 3) Perform longitudinal reconstruction
+% 4) Calculate the mean values between predicted results from Step 2 and  predicted results from Step 3
+%    (when calculating mean values, need to handle NaN cases, refer to the FYP for more details)
+% 5) Check if there is still any missing data in the data set
+% 6) If there is still missing data, update the current data set with the partially reconstructed data set from Step 4
+%    Then, go back to Step 2 to continue the reconstruction process
+% 7) Algorithm will terminate when there is no more missing data left
+%
+% The postfix "_denfis" in the filename indicates the pretrained systems that are used for reconstruction is of DENFIS
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clc;
 clear;
 
@@ -119,9 +142,9 @@ A2 = PREPARED_DATA{2, 1};
 B1 = RECONSTRUCTED_DATA{1, 1};
 B2 = RECONSTRUCTED_DATA{2, 1};
 
-Z1 = htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
+Z1 = htet_htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
 Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3));
-Z2 = htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
+Z2 = htet_htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
 Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3));
 
 % alarm sound to alert that the program has ended

@@ -1,4 +1,14 @@
-
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_export_results_to_excel_files XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   export prediction results to excel files
+% Syntax    :   htet_export_results_to_excel_files(SYSTEMS, isLateral)
+%
+% SYSTEMS - can be either lateral systems or longitudinal systems
+% isLateral - flag to determine whether the system is lateral or longitudinal
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function htet_export_results_to_excel_files(SYSTEMS, isLateral)
   if isLateral

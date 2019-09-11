@@ -1,3 +1,12 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_calculate_bank_data_correlation_matrix XXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   to generate correlation matrix for 10 features
+% Syntax    :
+%
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 % data pre-processing
 load BankSet;
 load Survived_Banks;

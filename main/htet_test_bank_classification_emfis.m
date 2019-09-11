@@ -1,3 +1,14 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_emfis XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   used to test bank failure prediction/classification using eMFIS(FRIE)
+% CV refers to cross validation and 5-fold CV is used below for:
+% last year (t) prediction
+% one year prior (t-1) prediction
+% two year prior (t-2) prediction
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clear;
 clc;
 

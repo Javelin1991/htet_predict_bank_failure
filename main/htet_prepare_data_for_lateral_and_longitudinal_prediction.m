@@ -1,3 +1,15 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_prepare_data_for_lateral_and_longitudinal_prediction XXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   prepare data for lateral reconstruction, and longitudinal reconstruction
+% Syntax    :
+% This file is used to generate train data and test data that are prepared to experiment lateral reconstruction
+% as well as longitudinal reconstruction
+% train data will include 80% of the full data set, i.e. no NaN / missing values
+% test data will include 20% of the full data set, i.e. no NaN / missing values
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clc;
 clear;
 

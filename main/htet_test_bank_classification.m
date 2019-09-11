@@ -1,3 +1,10 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   used to test bank failure prediction/classification using denfis or anfis 
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 % clear;
 % clc;
 

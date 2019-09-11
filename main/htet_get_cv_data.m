@@ -1,13 +1,15 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX sus_scale XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_get_cv_data XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
-% Date      :
-% Function  :
-% Syntax    :
+% Date      :   Sep 11, 2019
+% Function  :   retrieve records that are flagged as "1" and get the relevant record from the reference group
+% Syntax    :   htet_get_cv_data(input, ref_group)
+% input - matlab cvpartition produces 1 and 0 to indicate whether to include a record in the data set or not
+% ref_group - reference group to retrieve data
 %
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function out = htet_generate_cross_validation_data(input, ref_group)
+function out = htet_get_cv_data(input, ref_group)
   out = [];
   for j = 1:length(input)
       if input(j,:) == 1
