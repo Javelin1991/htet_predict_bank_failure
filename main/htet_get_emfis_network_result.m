@@ -80,6 +80,17 @@ function out = htet_get_emfis_network_result(cv, params, x, y)
       net_result.R = system.R;
       net_result.predicted = {system.predicted};
       net_result.after_threshold = {after_threshold};
+
+      target = data_target(start_test: target_size, :);
+      pv = after_threshold(start_test: target_size, :);
+
+      cp = 0;
+      for j=1:length(target)
+          if (target(j,:) == pv(j,:))
+            cp = cp + 1;
+          end
+      end
+      net_result.ac2 = (cp * 100)/length(target);
       correct_predictions = length(find(data_target(start_test : target_size) - after_threshold(start_test :target_size) == 0));
       test_examples = (target_size - start_test) + 1;
       net_result.accuracy = (correct_predictions * 100)/test_examples;
