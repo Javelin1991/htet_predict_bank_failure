@@ -371,10 +371,10 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
           switch (method)
             case  'FB'
-              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); e = C(xf_2,3);
               w = A(xb_1,3); x = A(xb_2,3); y = C(xb_1,3); z = C(xb_2,3);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
 
               input_f = [f1, f2, record(:,3)];
@@ -387,9 +387,9 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); d = C(xf_2,3);
+              a = A(xf_1,3); b = A(xf_2,3); c = C(xf_1,3); e = C(xf_2,3);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2, record(:,3)];
 
               pv = denfiss(input_f, denfis_long_capade_forward_regressor);
@@ -419,10 +419,10 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); e = C(xf_2,4);
               w = A(xb_1,4); x = A(xb_2,4); y = C(xb_1,4); z = C(xb_2,4);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
 
               input_f = [f1, f2, record(:,4)];
@@ -434,9 +434,9 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); d = C(xf_2,4);
+              a = A(xf_1,4); b = A(xf_2,4); c = C(xf_1,4); e = C(xf_2,4);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2, record(:,4)];
 
               pv = denfiss(input_f, denfis_long_plaqly_forward_regressor);
@@ -465,10 +465,10 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
           method = check_suitable_reconstruction_method(1, d, size(A,1));
           switch (method)
             case  'FB'
-              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); e = C(xf_2,5);
               w = A(xb_1,5); x = A(xb_2,5); y = C(xb_1,5); z = C(xb_2,5);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
 
               input_f = [f1, f2, record(:,5)];
@@ -480,9 +480,9 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               rc_count = rc_count + 1;
 
             case  'F'
-              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); d = C(xf_2,5);
+              a = A(xf_1,5); b = A(xf_2,5); c = C(xf_1,5); e = C(xf_2,5);
 
-              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, d);
+              [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2, record(:,5)];
               pv = denfiss(input_f, denfis_long_roe_forward_regressor);
               predicted_value = pv.Out';

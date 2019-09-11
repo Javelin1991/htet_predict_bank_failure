@@ -1,39 +1,23 @@
+% It takes 3 min and 13 sec to run this file
+
 clc;
 clear;
 
-load Lateral_Systems;
-load Longitudinal_Systems;
-
-load Prepared_data_for_reconstruction;
-
-load FAILED_BANK_DATA_HORIZONTAL;
-load SURVIVED_BANK_DATA_HORIZONTAL;
-
+load Pre_trained_Systems_Lateral_Prediction;
+load Pre_trained_systems_Longitudinal_Prediction;
 
 warning('off','all');
 warning;
 
+load Output_LL_S;
+load Output_LL_F;
 
-FB_Full_Records = PREPARED_DATA{1, 2};
-SB_Full_Records = PREPARED_DATA{2, 2};
-
-Failed_IDs = PREPARED_DATA{1, 4};
-Survived_IDs = PREPARED_DATA{2, 4};
-
-FB_Original_Full_Records = PREPARED_DATA{1, 5};
-SB_Original_Full_Records = PREPARED_DATA{2, 5};
-
-%
-% SB_Full_Records = output_1.full_record;
-% FB_Full_Records = output_2.full_record;
+SB_Full_Records = output_1.full_record;
+FB_Full_Records = output_2.full_record;
 
 RECONSTRUCTED_DATA = [];
 TRC = [];
-% bank_type = [{output_1.full_records}; {SB_Records}];
 bank_type = [{FB_Full_Records}; {SB_Full_Records}];
-
-unseen_testData_1 = FAILED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
-unseen_testData_2 = SURVIVED_BANK_DATA_HORIZONTAL{1, 1}.TEST_DATA_TO_PREDICT_ROE
 
 for n=1:2
     banks = bank_type(n);
@@ -103,26 +87,15 @@ for n=1:2
     end
 
     D = [];
-    % for m=1:length(MEAN_LL)
-    %   mat = cell2mat(MEAN_LL(m));
-    %   % D = [D; mat]; % to display consecutively in rows
-    % end
-    RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {MEAN_LL}];
+    for m=1:length(MEAN_LL)
+      mat = cell2mat(MEAN_LL(m));
+      D = [D; mat]; % to display consecutively in rows
+    end
+    RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
     trc.total_lat_construct = total_lat_construct;
     trc.total_long_construct = total_long_construct;
     TRC = [TRC; {trc}];
 end
-
-A1 = PREPARED_DATA{1, 1};
-A2 = PREPARED_DATA{2, 1};
-
-B1 = RECONSTRUCTED_DATA{1, 1};
-B2 = RECONSTRUCTED_DATA{2, 1};
-
-Z1 = htet_htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
-Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3));
-Z2 = htet_htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
-Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3));
 
 % alarm sound to alert that the program has ended
 load handel;
@@ -169,9 +142,9 @@ function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
   % if the missing data is CAPADE, use {1,3};
   % if the missing data is PLAQLY, use {2,3};
   % if the missing data is ROE, use {3,3};
-  emfis_lat_capade_regressor = SYSTEMS{bank_type, 1}{1, 1}.net;
-  emfis_lat_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 1}.net;
-  emfis_lat_roe_regressor = SYSTEMS{bank_type, 1}{3, 1}.net;
+  anfis_lat_capade_regressor = SYSTEMS{bank_type, 1}{1, 3}.net;
+  anfis_lat_plaqly_regressor = SYSTEMS{bank_type, 1}{2, 3}.net;
+  anfis_lat_roe_regressor = SYSTEMS{bank_type, 1}{3, 3}.net;
 
   result = [];
   B = [];
@@ -187,17 +160,17 @@ function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
         disp('Performing Lateral Reconstruction process.....');
 
         if (isnan(record(:,3)))
-          predicted_value = htet_reconstruct_using_trained_emfis(record(:,[4 5]), emfis_lat_capade_regressor);
+          predicted_value = evalfis(record(:,[4 5])', anfis_lat_capade_regressor);
           record(1,3) = predicted_value;
           rc_count = rc_count + 1;
 
         elseif (isnan(record(:,4)))
-          predicted_value = htet_reconstruct_using_trained_emfis(record(:,[3 5]), emfis_lat_plaqly_regressor);
+          predicted_value = evalfis(record(:,[3 5])', anfis_lat_plaqly_regressor);
           record(1,4) = predicted_value;
           rc_count = rc_count + 1;
 
         else
-          predicted_value = htet_reconstruct_using_trained_emfis(record(:,[3 4]), emfis_lat_roe_regressor);
+          predicted_value = evalfis(record(:,[3 4])', anfis_lat_roe_regressor);
           record(1,5) = predicted_value;
           rc_count = rc_count + 1;
 
@@ -311,13 +284,13 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
   rc_count = 0;
 
-  emfis_long_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{1, 1}.net;
-  emfis_long_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{1, 1}.net;
-  emfis_long_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{1, 1}.net;
+  anfis_long_capade_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_CAPADE{3, 1}.net;
+  anfis_long_plaqly_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_PLAQLY{3, 1}.net;
+  anfis_long_roe_forward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_forward_ROE{3, 1}.net;
 
-  emfis_long_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{1, 1}.net;
-  emfis_long_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{1, 1}.net;
-  emfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{1, 1}.net;
+  anfis_long_capade_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_CAPADE{3, 1}.net;
+  anfis_long_plaqly_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_PLAQLY{3, 1}.net;
+  anfis_long_roe_backward_regressor = LONGITUDINAL_SYSTEMS{bank_type, 1}.pretrained_backward_ROE{3, 1}.net;
 
   result = [];
   B = [];
@@ -357,8 +330,8 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               input_f = [f1, f2];
               input_b = [b1, b2];
 
-              predicted_value_f = htet_reconstruct_using_trained_emfis(input_f, emfis_long_capade_forward_regressor);
-              predicted_value_b = htet_reconstruct_using_trained_emfis(input_b, emfis_long_capade_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_capade_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_capade_backward_regressor);
 
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
               rc_count = rc_count + 1;
@@ -369,7 +342,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2];
 
-              predicted_value = htet_reconstruct_using_trained_emfis(input_f, emfis_long_capade_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_capade_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
@@ -380,7 +353,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               input_b = [b1, b2];
 
               input_b = [C(xb_1,3), C(xb_2,3)];
-              predicted_value = htet_reconstruct_using_trained_emfis(input_b, emfis_long_capade_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_capade_backward_regressor);
               rc_count = rc_count + 1;
 
             case 'Z'
@@ -404,8 +377,8 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               input_f = [f1, f2];
               input_b = [b1, b2];
 
-              predicted_value_f = htet_reconstruct_using_trained_emfis(input_f, emfis_long_plaqly_forward_regressor);
-              predicted_value_b = htet_reconstruct_using_trained_emfis(input_b, emfis_long_plaqly_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_plaqly_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_plaqly_backward_regressor);
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
               rc_count = rc_count + 1;
 
@@ -415,7 +388,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2];
 
-              predicted_value = htet_reconstruct_using_trained_emfis(input_f, emfis_long_plaqly_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_plaqly_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
@@ -423,7 +396,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
               [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
               input_b = [b1, b2];
-              predicted_value = htet_reconstruct_using_trained_emfis(input_b, emfis_long_plaqly_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_plaqly_backward_regressor);
               rc_count = rc_count + 1;
 
             case 'Z'
@@ -447,8 +420,8 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
               input_f = [f1, f2];
               input_b = [b1, b2];
 
-              predicted_value_f = htet_reconstruct_using_trained_emfis(input_f, emfis_long_roe_forward_regressor);
-              predicted_value_b = htet_reconstruct_using_trained_emfis(input_b, emfis_long_roe_backward_regressor);
+              predicted_value_f = evalfis(input_f', anfis_long_roe_forward_regressor);
+              predicted_value_b = evalfis(input_b', anfis_long_roe_backward_regressor);
               predicted_value = handle_isnan(predicted_value_f, predicted_value_b);
               rc_count = rc_count + 1;
 
@@ -457,7 +430,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
               [f1,f2] = look_up_from_prev_state_if_nan_present(a, b, c, e);
               input_f = [f1, f2];
-              predicted_value = htet_reconstruct_using_trained_emfis(input_f, emfis_long_roe_forward_regressor);
+              predicted_value = evalfis(input_f', anfis_long_roe_forward_regressor);
               rc_count = rc_count + 1;
 
             case 'B'
@@ -465,7 +438,7 @@ function [result, rc2] = do_longitudinal_prediction(A, C, LONGITUDINAL_SYSTEMS, 
 
               [b1,b2] = look_up_from_prev_state_if_nan_present(w, x, y, z);
               input_b = [b1, b2];
-              predicted_value = htet_reconstruct_using_trained_emfis(input_b, emfis_long_roe_backward_regressor);
+              predicted_value = evalfis(input_b', anfis_long_roe_backward_regressor);
               rc_count = rc_count + 1;
 
             case 'Z'
