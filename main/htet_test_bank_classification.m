@@ -2,7 +2,7 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   used to test bank failure prediction/classification using denfis or anfis 
+% Function  :   used to test bank failure prediction/classification using denfis or anfis
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 % clear;
@@ -42,13 +42,20 @@
 % % That is, of course, if you wanted columns 77 to 83, then 86, then the last column, then the last 5 columns counted backwards ;)
 %
 %
-Data = CV1_with_top_3_features(1);
+
+load CV1_Classification;
+
+D = CV1{1,1};
+data_target = D(:,2);
+D = D(:,[1 2 3 7 10]);
+
+% Data = CV1_with_top_3_features(1);
 
 
-data_input = Data{1};
-X = randi(length(data_input)) % returns a pseudorandom scalar integer between 1 and imax.
+data_input = D;
+% X = randi(length(data_input)) % returns a pseudorandom scalar integer between 1 and imax.
 
-data_input(X,:) = [];
+% data_input(X,:) = [];
 
 data_target = data_input(:,2);
 data_input = data_input(:,3:5);
@@ -62,7 +69,7 @@ for cv_num = 1:1
         algo = 'denfis';
         C.trainmode = 2; % activating offline learning , first order
         start_test = (size(data_input, 1) * 0.2) + 1;
-        last_idx = start_test;
+        last_idx = start_test - 1;
         trnData = [data_input(1 : last_idx, :), data_target(1 : last_idx, :)];
         tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
 

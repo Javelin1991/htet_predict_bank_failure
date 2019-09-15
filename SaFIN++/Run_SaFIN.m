@@ -1,4 +1,4 @@
-function net_out = Run_SaFIN(TrainData,TestData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,varargin)
+function [net_out, structure] = Run_SaFIN(TrainData,TestData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,varargin)
 
 %IND = size(TrainData_IN,2); OUTD = size(TrainData_OUT,2);
 %TrainData = [TrainData_IN TrainData_OUT];
@@ -18,11 +18,18 @@ global abc def ru rmse_gui mse_gui r_gui no_in no_out runningmode
 
 [no_InTerms,InTerms,no_OutTerms,OutTerms,Rules,Rules_semantic] = SaFIN_train(TrainData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,numSamples);  % SAFIN_train is called
 
-
+structure.no_InTerms = no_InTerms;
+structure.InTerms = InTerms;
+structure.no_OutTerms = no_OutTerms;
+structure.OutTerms = OutTerms;
+structure.Rules = Rules;
+structure.Rules_semantic = Rules_semantic;
 
 
 [net_out,rule_importance] = SaFIN_test(TestData,IND,OUTD,no_InTerms,InTerms,no_OutTerms,OutTerms,Rules);   % SAFIN_test is called
 
+
+structure.rule_importance = rule_importance;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -127,16 +134,16 @@ no_out = OUTD;
 
 
 
-
-for i = 1:OUTD
-   figure;
-   hold;
-   str = [sprintf('Actual VS Predicted',i)];
-   title(str);
-   plot(1:1:size(TestData,1),TestData(:,i+IND),'b');
-   plot(1:1:size(net_out,1),net_out(:,i),'r');
-   legend('Actual','Predicted');
-end
+% figure plotting
+% for i = 1:OUTD
+%    figure;
+%    hold;
+%    str = [sprintf('Actual VS Predicted',i)];
+%    title(str);
+%    plot(1:1:size(TestData,1),TestData(:,i+IND),'b');
+%    plot(1:1:size(net_out,1),net_out(:,i),'r');
+%    legend('Actual','Predicted');
+% end
 
 MSE = 0;
 for i = 1:size(TestData,1)
