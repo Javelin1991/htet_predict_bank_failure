@@ -4,11 +4,18 @@
 % Date      :   Sep 11, 2019
 % Function  :   dummy file that is used to test any code snippet in matlab
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-clc;
-clear;
 
-A = [4.61; 2.05; 1.18; 1.14; 1.05; 1.00; 0.77];
-B = [3.68; 10.47; 18.29; 18.87; 20.52; 21.45; 28.18];
+x = linspace(0,10,50);
+y1 = sin(x);
+plot(x,y1)
+title('Combine Plots')
 
-Sum = A+B;
-[M,I] = min(Sum);
+hold on
+
+y2 = sin(x/2);
+plot(x,y2)
+
+y3 = 2*sin(x);
+scatter(x,y3) 
+
+hold off
