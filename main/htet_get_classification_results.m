@@ -1,13 +1,14 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_get_classification_results XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_get_classification_results XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
 % Function  :   to calculate equal error rate or false positive rate or false negative rate
 % Syntax    :
-%
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% Copyright and credit goes to : Jason Joseph Rebello (see the link below for more details)
+% https://www.mathworks.com/matlabcentral/fileexchange/47364-true-positives-false-positives-true-negatives-false-negatives-from-2-matrices
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function [TP, FP, TN, FN, FNR, FPR, Acc, Min_Weighted_Sum, Optimal_Class_Cost_Ratio] = htet_get_classification_results(trueMat, predictedMat)
+function [TP, FP, TN, FN, FNR, FPR, Acc] = htet_get_classification_results(trueMat, predictedMat)
 % This function calculates True Positives, False Positives, True Negatives
 % and False Negatives for two matrices of equal size assuming they are
 % populated by 1's and 0's.
@@ -29,21 +30,4 @@ function [TP, FP, TN, FN, FNR, FPR, Acc, Min_Weighted_Sum, Optimal_Class_Cost_Ra
 
   FNR_raw = (FN/(TP + FN));
   FPR_raw = (FP/(TN + FP));
-
-  FNR_Cost = 1
-  FPR_Cost = 1
-  COST = [];
-
-  % for i=1:30
-  %   FNR_Cost = FNR_Cost * i * FNR_raw;
-  %   FPR_Cost = FPR_Cost * FPR_raw;
-  %   tc = FNR_Cost + FPR_Cost;
-  %   COST = [COST, tc]
-  % end
-  % [M, I] = min(COST);
-  % Min_Weighted_Sum = M;
-  % Optimal_Class_Cost_Ratio = I;
-
-  Min_Weighted_Sum = 1; % hardcoded temporarily
-  Optimal_Class_Cost_Ratio = 1; % hardcoded temporarily
 end

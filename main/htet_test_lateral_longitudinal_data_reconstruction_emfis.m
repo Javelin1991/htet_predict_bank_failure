@@ -1,3 +1,26 @@
+% XXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_lateral_longitudinal_data_reconstruction_denfis XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+%
+% Author    :   Htet
+% Date      :   Sep 11, 2019
+% Function  :   performs missing data imputation using lateral and longitudinal predictions
+%
+% Reconstruction process is done separately for failed banks and survived banks
+% since they share different properties during financial distress
+% Algorithm -
+% 1) Filter out corner cases such as bank records that has all missing values
+%    and those that has only one available record, reconstruction can't be performed on those banks
+% 2) Perform lateral reconstruction
+% 3) Perform longitudinal reconstruction
+% 4) Calculate the mean values between predicted results from Step 2 and  predicted results from Step 3
+%    (when calculating mean values, need to handle NaN cases, refer to the FYP for more details)
+% 5) Check if there is still any missing data in the data set
+% 6) If there is still missing data, update the current data set with the partially reconstructed data set from Step 4
+%    Then, go back to Step 2 to continue the reconstruction process
+% 7) Algorithm will terminate when there is no more missing data left
+%
+% The postfix "_emfis" in the filename indicates the pretrained systems that are used for reconstruction is of eMFIS(FRIE)
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 clc;
 clear;
 
