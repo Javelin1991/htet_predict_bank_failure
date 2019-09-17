@@ -9,7 +9,7 @@
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
-function output = htet_find_optimal_cut_off(testData, net_out)
+function output = htet_find_optimal_cut_off(testData, net_out, threshold)
 
     unclassified_count = 0;
     after_threshold = zeros(length(testData),1);
@@ -35,6 +35,34 @@ function output = htet_find_optimal_cut_off(testData, net_out)
     Bisector = [];
     for k=0:99
       Bisector = [Bisector, k];
+    end
+
+    if threshold ~= 0
+
+      for i=1: length(testData)
+          if net_out(i) > threshold
+              after_threshold(i) = 1;
+          elseif net_out(i) < threshold
+              after_threshold(i) = 0;
+          elseif net_out(i) == threshold
+              after_threshold(i) = threshold;
+              eer_count = eer_count + 1;
+          else
+              unclassified_count = unclassified_count + 1;
+          end
+      end
+      net_result.predicted = {net_out};
+      net_result.after_threshold = {after_threshold};
+      net_result.unclassified = (unclassified_count * 100)/length(testData);
+
+      [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData, after_threshold(:,1))
+
+
+      output.MIN_EER = (fpr + fnr)/2;
+      output.MIN_CUT_OFF = threshold;
+      output.MIN_FPR = fpr;
+      output.MIN_FNR = fnr;
+      return;
     end
 
     %%%%%%%%%%%%%% to find out the best cut-off point or EER value %%%%%%%%%%%%%%%%%
