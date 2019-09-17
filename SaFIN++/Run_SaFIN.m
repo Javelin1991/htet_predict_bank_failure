@@ -18,6 +18,8 @@ global abc def ru rmse_gui mse_gui r_gui no_in no_out runningmode
 
 [no_InTerms,InTerms,no_OutTerms,OutTerms,Rules,Rules_semantic] = SaFIN_train(TrainData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,numSamples);  % SAFIN_train is called
 
+structure.IND = IND;
+structure.OUTD = OUTD;
 structure.no_InTerms = no_InTerms;
 structure.InTerms = InTerms;
 structure.no_OutTerms = no_OutTerms;
@@ -25,9 +27,7 @@ structure.OutTerms = OutTerms;
 structure.Rules = Rules;
 structure.Rules_semantic = Rules_semantic;
 
-
-[net_out,rule_importance] = SaFIN_test(TestData,IND,OUTD,no_InTerms,InTerms,no_OutTerms,OutTerms,Rules);   % SAFIN_test is called
-
+[net_out,rule_importance] = SaFIN_test(TestData,structure);   % SAFIN_test is called
 
 structure.rule_importance = rule_importance;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

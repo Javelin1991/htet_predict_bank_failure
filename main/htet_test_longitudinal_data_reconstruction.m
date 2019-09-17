@@ -9,6 +9,7 @@
 % 3) ANFIS
 % 4) SA - Simple Averaging Ensemble Learning using ANFIS and DENFIS
 % 5) BS - Best Selection between ANFIS, DENFIS, and SA
+% 6) SaFIN++ - offline model
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clear;
@@ -76,7 +77,8 @@ load handel
 sound(y,Fs);
 
 function out = get_prediction_results(D_train, D_test)
-    algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+    % algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+    algo_type = {'safin++'};
     % % for dummy run
 %     D_train = D_train(1:50, :);
 %     D_test = D_train(1:50, :);
@@ -220,7 +222,34 @@ function out = get_prediction_results(D_train, D_test)
                 ensemble_system_bs.input = data_input;
                 ensemble_system_bs.target = data_target;
                 ensemble_system_bs.name = 'BS';
+
+            case 'safin++'
+                disp('Processing SaFIN++.....')
+
+                start_test = size(D_train, 1) + 1;
+                trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
+                tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
+
+                IND = 2;
+                OUTD = 1;
+                Alpha = 0.25;
+                Beta = 0.65;
+                Eta = 0.05;
+                Forgetfactor = 0.99;
+                Epochs = 300;
+
+                % network prediction
+                [net_out, net_structure] = Run_SaFIN(trnData,tstData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor);
+
+                safin_pp_system = htet_calculate_errors(net_out, data_target(start_test : size(data_target, 1)));
+                safin_pp_system.input = data_input;
+                safin_pp_system.target = data_target;
+                safin_pp_system.name = algo;
+                safin_pp_system.net = net_structure;
+                safin_pp_system.predicted = net_out;
+                safin_pp_system.num_rules = length(net_structure.Rules);
         end
     end
-    out = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    % out = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    out = [{safin_pp_system}];
 end

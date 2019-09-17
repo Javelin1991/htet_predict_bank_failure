@@ -40,23 +40,23 @@ load CV1_Classification;
 % end
 
 params.algo = 'emfis';
-params.max_cluster = 40;
+params.max_cluster = 13;
 params.half_life = inf;
-params.threshold_mf = 0.9999;
-params.min_rule_weight = 0.7;
+params.threshold_mf = 0.8;
+params.min_rule_weight = 0.1;
 params.spec = 10;
 params.ie_rules_no = 2;
 params.create_ie_rule = 0;
 params.use_top_features = false;
 params.dummy_run = false;
 params.do_not_use_cv = false;
-%
+
 % % Labels = ["CAPADE", "OLAQLY", "PROBLO", "ADQLLP", "PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
 % % xdatatemp = xdata(:,[77:83 86 end end:-1:end-5])
 % % That is, of course, if you wanted columns 77 to 83, then 86, then the last column, then the last 5 columns counted backwards ;)
 %
 for cv_num = 1:1
-  net_result_for_last_record(cv_num) = htet_get_emfis_network_result(CV1_with_top_3_features{cv_num}, params);
+  net_result_for_last_record(cv_num) = htet_get_emfis_network_result(CV1{cv_num,1}, params);
   % net_result_for_one_year_prior(cv_num) = htet_get_emfis_network_result(CV2_with_top_3_features{cv_num}, params);
   % net_result_for_two_year_prior(cv_num) = htet_get_emfis_network_result(CV3_with_top_3_features{cv_num}, params);
 end

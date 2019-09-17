@@ -21,7 +21,7 @@ function htet_export_results_to_excel_files(SYSTEMS, isLateral)
 end
 
 function export_cv_lat(T1)
-  filename = 'lateral_prediction_result_1.xlsx';
+  filename = 'lateral_prediction_result_2.xlsx';
   for j=1:2
     for i=1:3
         T = T1{j, 1}{i, 1};
@@ -41,10 +41,12 @@ end
 
 function export_cv_long(T2)
 
-  filename_2 = 'longitudinal_prediction_result_1.xlsx';
+  filename_2 = 'longitudinal_prediction_result_2.xlsx';
 
   for j=1:2
-    for i=1:6
+    % 7 and 8 for safin++
+    for i=7:8
+    % for i=1:6
         T = T2{j, 1}{i, 1};
         switch i
             case 1
@@ -64,6 +66,12 @@ function export_cv_long(T2)
 
             case 6
                 writetable(T,filename_2,'Sheet',j,'Range','A31','WriteRowNames',true)
+
+            case 7
+                writetable(T,filename_2,'Sheet',j,'Range','A1','WriteRowNames',true)
+
+            case 8
+                writetable(T,filename_2,'Sheet',j,'Range','A7','WriteRowNames',true)
         end
     end
   end

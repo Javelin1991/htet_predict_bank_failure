@@ -9,6 +9,7 @@
 % 3) ANFIS
 % 4) SA - Simple Averaging Ensemble Learning using ANFIS and DENFIS
 % 5) BS - Best Selection between ANFIS, DENFIS, and SA
+% 6) SaFIN++ - offline model
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;
@@ -18,8 +19,9 @@ load FAILED_BANK_DATA_HORIZONTAL;
 load SURVIVED_BANK_DATA_HORIZONTAL;
 
 bank_type = [{FAILED_BANK_DATA_HORIZONTAL}; {SURVIVED_BANK_DATA_HORIZONTAL}];
-bank_type_name = {'Failed_Banks'; 'Survived_Bans'};
-algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+bank_type_name = {'Failed_Banks'; 'Survived_Banks'};
+% algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+algo_type = {'safin++'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
 
@@ -63,9 +65,9 @@ for i=1:length(bank_type)
       end
     end
 
-    % % for dummy run
-    % D_train = D_train(1:50, :);
-    % D_test = D_train(1:50, :);
+    % for dummy run
+    D_train = D_train(1:50, :);
+    D_test = D_train(1:50, :);
 
     D = vertcat(D_train, D_test);
 
@@ -209,15 +211,46 @@ for i=1:length(bank_type)
               ensemble_system_bs.a_count = a_c;
               ensemble_system_bs.d_count = d_c;
               ensemble_system_bs.sa_count = sa_c;
+          case 'safin++'
+              disp('Processing SaFIN++.....')
+
+              start_test = size(D_train, 1) + 1;
+              trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
+              tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
+
+              IND = 2;
+              OUTD = 1;
+              Alpha = 0.25;
+              Beta = 0.65;
+              Eta = 0.05;
+              Forgetfactor = 0.99;
+              Epochs = 300;
+
+              % network prediction
+              [net_out, net_structure] = Run_SaFIN(trnData,tstData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor);
+
+              safin_pp_system = htet_calculate_errors(net_out, data_target(start_test : size(data_target, 1)));
+              safin_pp_system.input = data_input;
+              safin_pp_system.target = data_target;
+              safin_pp_system.target_feature_name = feature_name;
+              safin_pp_system.name = algo;
+              safin_pp_system.net = net_structure;
+              safin_pp_system.predicted = net_out;
+              safin_pp_system.num_rules = length(net_structure.Rules);
+
       end
       disp('Processing of the algorithm completed.....')
     end
 
     disp('Feature prediction has ended...')
-    RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    % RESULTS(j,:) = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
+    %
+    % clear data_input; clear data_target;
+    % clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
 
+    RESULTS(j,:) = [{safin_pp_system}];
     clear data_input; clear data_target;
-    clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
+    clear safin_pp_system;
   end
   disp('Storing the results...')
   clear D; clear input;
@@ -233,4 +266,4 @@ for i=1:length(bank_type)
   SYSTEMS(i,:) = {RESULTS};
 end
 
-htet_export_results_to_excel_files(SYSTEMS, true);
+% htet_export_results_to_excel_files(SYSTEMS, true);

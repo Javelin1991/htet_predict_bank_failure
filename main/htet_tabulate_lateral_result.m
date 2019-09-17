@@ -13,13 +13,15 @@ function result = htet_tabulate_lateral_result(SYSTEMS)
   for sys = 1:2
     TABLE = [];
     for j = 1:3
-      for i = 1:5
+      for i = 1:6
           feat = SYSTEMS{sys, 1}{j, i}.target_feature_name;
           name = SYSTEMS{sys, 1}{j, i}.name;
           r = SYSTEMS{sys, 1}{j, i}.R;
           mae = SYSTEMS{sys, 1}{j, i}.MAE;
           rmse = SYSTEMS{sys, 1}{j, i}.RMSE;
 
+          % skip to safin++
+          i = 6; 
         switch (i)
           case 1
             eMFIS_FRIE = [r;mae;rmse;{feat}];
@@ -34,6 +36,9 @@ function result = htet_tabulate_lateral_result(SYSTEMS)
             ANFIS_DENFIS_SA = [r;mae;rmse;{feat}];
 
           case 5
+            BEST_SELECT = [r;mae;rmse;{feat}];
+
+          case 6
             BEST_SELECT = [r;mae;rmse;{feat}];
         end
       end
