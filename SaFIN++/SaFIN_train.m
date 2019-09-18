@@ -1,14 +1,18 @@
 function [no_InTerms,InTerms,no_OutTerms,OutTerms,Rules,Rules_semantic] = SaFIN_train(TrainData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,numSamples)
 
 
-
-
-
+disp('Rule generation begins.......')
 
 [no_InTerms,InTerms,no_OutTerms,OutTerms,Rules,Rules_semantic] = RuleGen(TrainData(:,1:IND),TrainData(:,IND+1:IND+OUTD),Alpha,Beta,Forgetfactor,numSamples); % just passing training data input, training data output, alpha, beta
 
 
 
+
+disp('Rule generation has ended.......')
+disp('Result after rule generation');
+
+disp('InTerms'); disp(InTerms);
+disp('OutTerms'); disp(OutTerms);
 
 
 for i = 1:IND
@@ -17,6 +21,7 @@ for i = 1:IND
     hold;
     str = [sprintf('Input %d',i)];
     title(str);
+
     for j = 1:no_InTerms(i)
         color = colorArray(mod(j,7)+1);
         x = [min(TrainData(:,i)):0.05:max(TrainData(:,i))];
@@ -41,12 +46,12 @@ end
 
 
 
-
+disp('Epoch training has started')
 
 for no_epoch = 1:Epochs
     for i = 1:size(TrainData,1)
-   % Forward propagation: CRI    
-       
+   % Forward propagation: CRI
+
         % Initialize
         in_mf = zeros(IND,max(no_InTerms));
         act_rules = zeros(size(Rules,1),1);
@@ -59,6 +64,7 @@ for no_epoch = 1:Epochs
                 in_mf(j,k) = exp( -(TrainData(i,j)-InTerms(j,2*k-1))^2 / (InTerms(j,2*k)^2) );
             end
         end
+        disp('Input membership functions'); disp(in_mf)
         % Layer 3
         for j = 1:size(Rules,1)
             tmp = zeros(IND,1);
@@ -68,6 +74,8 @@ for no_epoch = 1:Epochs
             act_rules(j) = min(tmp);
             clear tmp;
         end
+        disp('Activated Rules'); disp(act_rules)
+
         % Layer 4
         for j = 1:size(Rules,1)
             for k = 1:OUTD
@@ -77,30 +85,40 @@ for no_epoch = 1:Epochs
                 check(k,Rules(j,IND+k)) = 1;
             end
         end
+        disp('inferred Rules'); disp(inferred)
+
         % Layer 5
         for j = 1:OUTD
             top = 0; bottom = 0;
             for k = 1:no_OutTerms(j)
                 if check(j,k) == 1
+
+                     disp('inferred'); disp(inferred(j,k))
+                     disp('Outerm c'); disp(OutTerms(j,2*k-1))
+                     disp('Outerm w'); disp(OutTerms(j,2*k))
+                     disp('curr_product'); disp(inferred(j,k)*OutTerms(j,2*k-1)*OutTerms(j,2*k))
+                     disp('bottom_curr_product'); disp(inferred(j,k)*OutTerms(j,2*k))
+
                     top = top + inferred(j,k)*OutTerms(j,2*k-1)*OutTerms(j,2*k);
                     bottom = bottom + inferred(j,k)*OutTerms(j,2*k);
                 end
             end
+            disp('COA');disp(top/bottom);
             net_out(j) = top/bottom;
         end
-        
-      
-     
-       
-       
+
+
+        disp('Backtracking has started, with gradient descent.....')
+
         % Initialize
-        delta_5 = zeros(OUTD,1); 
+        delta_5 = zeros(OUTD,1);
         delta_4 = zeros(OUTD,max(no_OutTerms));
         delta_3 = zeros(size(Rules,1),1);
         delta_2 = zeros(IND,max(no_InTerms));
         % Layer 5
         for j = 1:OUTD
             delta_5(j) = TrainData(i,IND+j)-net_out(j);
+            disp('delta_5'); disp(delta_5(j))
         end
         % Layer 4
         for j = 1:OUTD
@@ -114,6 +132,7 @@ for no_epoch = 1:Epochs
             for k = 1:no_OutTerms(j)
                 if check(j,k) == 1
                     delta_4(j,k) = delta_5(j)*OutTerms(j,2*k)*(D_m*OutTerms(j,2*k-1)-N_m)/(D_m^2);
+                    disp('delta_4(j,k)'); disp(delta_4(j,k))
                     new_c = OutTerms(j,2*k-1) + Eta*delta_5(j)*OutTerms(j,2*k)*inferred(j,k)/D_m;
                     new_sigma = OutTerms(j,2*k) + Eta*delta_5(j)*inferred(j,k)*(D_m*OutTerms(j,2*k-1)-N_m)/(D_m^2);
                     OutTerms(j,2*k-1) = new_c;
@@ -125,17 +144,19 @@ for no_epoch = 1:Epochs
         for j = 1:size(Rules,1)
             for k = 1:OUTD
                 if act_rules(j) == inferred(k,Rules(j,IND+k))
+                    disp('delta_3(j)'); disp(delta_3(j))
                     delta_3(j) = delta_3(j) + delta_4(k,Rules(j,IND+k));
                 end
             end
         end
         clear check;
-        check = zeros(IND,max(no_InTerms));        
+        check = zeros(IND,max(no_InTerms));
         % Layer 2
         for j = 1:size(Rules,1)
             for k = 1:IND
                 check(k,Rules(j,k)) = 1;
                 if act_rules(j) == in_mf(k,Rules(j,k))
+                    disp('delta_2(k,Rules(j,k))'); disp(delta_2(k,Rules(j,k)))
                     delta_2(k,Rules(j,k)) = delta_2(k,Rules(j,k)) + delta_3(j);
                 end
             end
@@ -145,13 +166,15 @@ for no_epoch = 1:Epochs
                 if check(j,k) == 1
                     new_c = InTerms(j,2*k-1) + Eta*delta_2(j,k)*in_mf(j,k)*2/(InTerms(j,2*k)^2)*(TrainData(i,j)-InTerms(j,2*k-1));
                     new_sigma = InTerms(j,2*k) + Eta*delta_2(j,k)*in_mf(j,k)*2*(TrainData(i,j)-InTerms(j,2*k-1))^2/(InTerms(j,2*k)^3);
+
+                    disp('New center'); disp(new_c);
+                    disp('New sigma'); disp(new_sigma);
+
                     InTerms(j,2*k-1) = new_c;
                     InTerms(j,2*k) = new_sigma;
                 end
             end
         end
-    end   
+    end
+    disp('Backtracking has ended')
 end
-                        
-                        
-                        

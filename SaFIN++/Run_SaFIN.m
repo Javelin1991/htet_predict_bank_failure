@@ -11,11 +11,11 @@ if isempty(varargin)
     numSamples = size(TrainData,1);
 else
     numSamples = varargin{1};
-
 end
 
 global abc def ru rmse_gui mse_gui r_gui no_in no_out runningmode
 
+disp('SaFIN++ training has started........')
 [no_InTerms,InTerms,no_OutTerms,OutTerms,Rules,Rules_semantic] = SaFIN_train(TrainData,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor,numSamples);  % SAFIN_train is called
 
 structure.IND = IND;
@@ -27,7 +27,11 @@ structure.OutTerms = OutTerms;
 structure.Rules = Rules;
 structure.Rules_semantic = Rules_semantic;
 
+disp('SaFIN++ training has ended........')
+disp('')
+disp('SaFIN++ testing has started')
 [net_out,rule_importance] = SaFIN_test(TestData,structure);   % SAFIN_test is called
+disp('SaFIN++ testing has ended')
 
 structure.rule_importance = rule_importance;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,11 +69,11 @@ disp(' ');
 
 if size(Rules,1) > 10
 
-imp_ruleCount = ceil(size(Rules,1) * 0.1);
+  imp_ruleCount = ceil(size(Rules,1) * 0.1);
 
 else
 
-imp_ruleCount = 2;
+  imp_ruleCount = 2;
 
 end
 
@@ -135,15 +139,15 @@ no_out = OUTD;
 
 
 % figure plotting
-% for i = 1:OUTD
-%    figure;
-%    hold;
-%    str = [sprintf('Actual VS Predicted',i)];
-%    title(str);
-%    plot(1:1:size(TestData,1),TestData(:,i+IND),'b');
-%    plot(1:1:size(net_out,1),net_out(:,i),'r');
-%    legend('Actual','Predicted');
-% end
+for i = 1:OUTD
+   figure;
+   hold;
+   str = [sprintf('Actual VS Predicted',i)];
+   title(str);
+   plot(1:1:size(TestData,1),TestData(:,i+IND),'b');
+   plot(1:1:size(net_out,1),net_out(:,i),'r');
+   legend('Actual','Predicted');
+end
 
 MSE = 0;
 for i = 1:size(TestData,1)
