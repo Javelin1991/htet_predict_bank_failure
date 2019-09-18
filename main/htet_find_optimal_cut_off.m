@@ -65,6 +65,9 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       return;
     end
 
+    out_fpr = [];
+    out_fnr = [];
+
     %%%%%%%%%%%%%% to find out the best cut-off point or EER value %%%%%%%%%%%%%%%%%
     for z=1:length(fnr_penalized_cost)
       while(cut_off <= 1)
@@ -122,6 +125,9 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       MIN_FPR = [MIN_FPR; best_fpr];
       MIN_FNR = [MIN_FNR; best_fnr];
 
+      out_fpr = [out_fpr; {FPR}];
+      out_fnr = [out_fnr; {FNR}];
+
       % reset all values
       unclassified_count = 0;
       after_threshold = zeros(length(testData),1);
@@ -147,4 +153,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
     output.MIN_CUT_OFF = MIN_CUT_OFF;
     output.MIN_FPR = MIN_FPR;
     output.MIN_FNR = MIN_FNR;
+    output.all_fpr = out_fpr;
+    output.all_fnr = out_fnr;
+    output.bisector = Bisector;
 end
