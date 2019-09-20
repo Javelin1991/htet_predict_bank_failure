@@ -40,28 +40,39 @@ for loop = 1:epoch    % number of iterations
         ip = x(i,:);
         op = y(i);
 
+        disp('input'); disp(ip);
+        disp('output'); disp(op);
+
         % Generate a random original mask vector, m1 taking value {0,1}
         m1 = round(rand(1,idim));
+
+        disp('mask 1 looks like'); disp(m1);
 
         % Generate a random action to apply on mask.
         a = round(rand*idim);  % 1st dimension
         if a == 0
             a = idim;
         end
+        disp('random action a'); disp(a);
 
         % Determine forward or reverse action needed. Get modified mask, m2.
         m2 = m1;
         if m2(1,a) == 0
             b = 1;  % Forward action
             m2(1,a) = 1;
+            disp('forward action taken'); disp(m2);
         else
             b = -1;  % Reverse action
             m2(1,a) = 0;
+            disp('reverse action taken'); disp(m2);
         end
 
         % Get input1 and input2.
         ip1 = ip.*m1;   % Input with original mask.
         ip2 = ip.*m2;   % Input with modified mask.
+
+        disp('input with original mask'); disp(ip1);
+        disp('input with modified mask'); disp(ip2);
         % ip1 = ip;
         % ip2 = ip;
         for j = 1:idim
@@ -73,9 +84,15 @@ for loop = 1:epoch    % number of iterations
             end
         end
 
+        disp('disabled input 1'); disp(ip1);
+        disp('disabled input 2'); disp(ip2);
+
         % Get actual output from the underlying model.
         y1 = test_model(net,ip1,model, i);
         y2 = test_model(net,ip2,model, i);
+
+        disp('test model y1'); disp(y1);
+        disp('test model y2'); disp(y2);
 
         % Get the mean square error of the actual output.
         % se1 = mmse(y1,y(i));
@@ -89,10 +106,15 @@ for loop = 1:epoch    % number of iterations
         % end
 
         % Derive reinforcement for the action based on Truth Error.
+
+        disp('y(i), y1,y2'); disp([y(i) y1 y2]);
         if (abs(y2-y(i)) < (abs(y1-y(i))+ tol)) % y2 is nearer than y1 to true solution, y
             r = abs(y1-y2); %1;     % Get positive reinforcement
+            disp('positive reinforcement'); disp([y(i) y1 y2]);
         else
             r = -abs(y2-y1); %-1;    % Get negative reinforcement
+            disp('y(i), y1,y2'); disp([y(i) y1 y2]);
+            disp('negative reinforcement'); disp([y(i) y1 y2]);
         end
 
         action(a,1) = action(a,1)+b*r;

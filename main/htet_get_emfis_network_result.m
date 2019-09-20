@@ -61,43 +61,49 @@ function out = htet_get_emfis_network_result(cv, params, x, y)
       system = ron_calcErrors(system, data_target(start_test : target_size));
       system.num_rules = mean(system.net.ruleCount(start_test : target_size));
 
-      after_threshold = zeros(target_size,1);
-      for i=1: size(data_target, 1)
-          if system.predicted(i) > 0.5
-              after_threshold(i) = 1;
-          elseif system.predicted(i) < 0.5
-              after_threshold(i) = 0;
-          elseif system.predicted(i) == 0.5
-              after_threshold(i) = 0.5;
-              eer_count = eer_count + 1;
-          else
-              unclassified_count = unclassified_count + 1;
-          end
-      end
+      % after_threshold = zeros(target_size,1);
+      % for i=1: size(data_target, 1)
+      %     if system.predicted(i) > 0.5
+      %         after_threshold(i) = 1;
+      %     elseif system.predicted(i) < 0.5
+      %         after_threshold(i) = 0;
+      %     elseif system.predicted(i) == 0.5
+      %         after_threshold(i) = 0.5;
+      %         eer_count = eer_count + 1;
+      %     else
+      %         unclassified_count = unclassified_count + 1;
+      %     end
+      % end
 
-      net_result.rmse = system.RMSE;
-      net_result.num_rules = system.num_rules;
-      net_result.R = system.R;
-      net_result.predicted = {system.predicted};
-      net_result.after_threshold = {after_threshold};
+      target_length = length(data_target);
+      testData = data_target(start_test: target_length, :);
+      testPredicted = system.predicted(start_test: target_length,:);
 
-      target = data_target(start_test: target_size, :);
-      pv = after_threshold(start_test: target_size, :);
+      % net_result.rmse = system.RMSE;
+      % net_result.num_rules = system.num_rules;
+      % net_result.R = system.R;
+      % net_result.predicted = {system.predicted};
+      % net_result.after_threshold = {after_threshold};
+      %
+      % target = data_target(start_test: target_size, :);
+      % pv = after_threshold(start_test: target_size, :);
+      %
+      % cp = 0;
+      % for j=1:length(target)
+      %     if (target(j,:) == pv(j,:))
+      %       cp = cp + 1;
+      %     end
+      % end
+      % net_result.ac2 = (cp * 100)/length(target);
+      % correct_predictions = length(find(data_target(start_test : target_size) - after_threshold(start_test :target_size) == 0));
+      % test_examples = (target_size - start_test) + 1;
+      % net_result.accuracy = (correct_predictions * 100)/test_examples;
+      % net_result.unclassified = (unclassified_count * 100)/test_examples;
+      % net_result.EER = (eer_count * 100)/test_examples;
+      % net_result.data_input = {data_input};
+      % net_result.data_target = {data_target};
 
-      cp = 0;
-      for j=1:length(target)
-          if (target(j,:) == pv(j,:))
-            cp = cp + 1;
-          end
-      end
-      net_result.ac2 = (cp * 100)/length(target);
-      correct_predictions = length(find(data_target(start_test : target_size) - after_threshold(start_test :target_size) == 0));
-      test_examples = (target_size - start_test) + 1;
-      net_result.accuracy = (correct_predictions * 100)/test_examples;
-      net_result.unclassified = (unclassified_count * 100)/test_examples;
-      net_result.EER = (eer_count * 100)/test_examples;
-      net_result.data_input = {data_input};
-      net_result.data_target = {data_target};
-
-      out = net_result;
+      out.opt = htet_find_optimal_cut_off(testData, testPredicted, 0);
+      out.testData = testData;
+      out.testPredicted = testPredicted;
 end
