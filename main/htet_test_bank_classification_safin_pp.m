@@ -1,8 +1,8 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_safin_frie XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_safin++ XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   used to test bank failure prediction/classification using SaFIN_FRIE
+% Function  :   used to test bank failure prediction/classification using SaFIN++
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 % diary SaFIN_Learning_Process_Trace;
 
@@ -16,16 +16,11 @@ load CV3_Classification;
 
 IND = 3;
 OUTD = 1;
-Epochs = 300;
-Eta = 0.05;
-Sigma0 = sqrt(0.16);
+Alpha = 0.25;
+Beta = 0.65;
+Eta = 0.01;
 Forgetfactor = 0.99;
-Lamda = 0.3;
-Rate = 0.25;
-Omega = 0.7;
-Gamma = 0.1;
-forget = 1;
-tau = 0.2;
+Epochs = 0;
 
 % for k = 1:3
 %   backward_offset = k-1;
@@ -59,14 +54,14 @@ for cv_num = 1:1
   D1 = CV2{cv_num};
   D2 = CV3{cv_num};
 
-  D0 = D0(:,[3 7 10 2]);
+  D0 = D0(1:30,[3 7 10 2]);
   D1 = D1(:,[3 7 10 2]);
   D2 = D2(:,[3 7 10 2]);
 
   % D0 = CV1_with_top_3_features{cv_num};
   % D1 = CV2_with_top_3_features{cv_num};
   % D2 = CV3_with_top_3_features{cv_num};
-
+  %
   % D0 = D0(:,[3 4 5 2]);
   % D1 = D1(:,[3 4 5 2]);
   % D2 = D2(:,[3 4 5 2]);
@@ -82,26 +77,30 @@ for cv_num = 1:1
   testData_D2 = D2(start_test:length(D2), :);
 
   % network prediction
-  [net_out_0, net_structure_0] = Run_SaFIN_FRIE(3, trainData_D0,testData_D0,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+  [net_out_0, net_structure_0] = Run_SaFIN(trainData_D0,testData_D0,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor);
   output_0 = htet_find_optimal_cut_off(testData_D0(:,4), net_out_0, threshold);
   result_0.net_out = net_out_0;
   result_0.net_structure = net_structure_0;
   result_0.output = output_0;
   net_result_for_last_record(cv_num) = result_0;
 
-  [net_out_1, net_structure_1] = Run_SaFIN_FRIE(3, trainData_D1,testData_D1,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  output_1 = htet_find_optimal_cut_off(testData_D1(:,4), net_out_1, threshold);
-  result_1.net_out = net_out_1;
-  result_1.net_structure = net_structure_1;
-  result_1.output = output_1;
-  net_result_for_one_year_prior(cv_num) = result_1;
-
-  [net_out_2, net_structure_2] = Run_SaFIN_FRIE(3, trainData_D2,testData_D2,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  output_2 = htet_find_optimal_cut_off(testData_D2(:,4), net_out_2, threshold);
-  result_2.net_out = net_out_2;
-  result_2.net_structure = net_structure_2;
-  result_2.output = output_2;
-  net_result_for_two_year_prior(cv_num) = result_2;
+%   [net_out_1, net_structure_1] = Run_SaFIN(trainData_D1,testData_D1,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor);
+%   output_1 = htet_find_optimal_cut_off(testData_D1(:,4), net_out_1, threshold);
+%   result_1.net_out = net_out_1;
+%   result_1.net_structure = net_structure_1;
+%   result_1.output = output_1;
+%   net_result_for_one_year_prior(cv_num) = result_1;
+%
+%   [net_out_2, net_structure_2] = Run_SaFIN(trainData_D2,testData_D2,IND,OUTD,Alpha,Beta,Epochs,Eta,Forgetfactor);
+%   output_2 = htet_find_optimal_cut_off(testData_D2(:,4), net_out_2, threshold);
+%   result_2.net_out = net_out_2;
+%   result_2.net_structure = net_structure_2;
+%   result_2.output = output_2;
+%   net_result_for_two_year_prior(cv_num) = result_2;
 
   disp('Processing of one CV group has completed');
 end
+
+
+% load handel
+% sound(y,Fs)

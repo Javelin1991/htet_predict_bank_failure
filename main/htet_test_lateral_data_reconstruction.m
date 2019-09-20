@@ -21,7 +21,7 @@ load SURVIVED_BANK_DATA_HORIZONTAL;
 bank_type = [{FAILED_BANK_DATA_HORIZONTAL}; {SURVIVED_BANK_DATA_HORIZONTAL}];
 bank_type_name = {'Failed_Banks'; 'Survived_Banks'};
 % algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
-algo_type = {'safin++'};
+algo_type = {'safin_frie'};
 target_feature_name = {'CAPADE', 'PLAQLY', 'ROE'};
 target_feature_col_no = [1; 5; 8];
 
@@ -66,8 +66,8 @@ for i=1:length(bank_type)
     end
 
     % for dummy run
-    D_train = D_train(1:50, :);
-    D_test = D_train(1:50, :);
+    % D_train = D_train(1:50, :);
+    % D_test = D_train(1:50, :);
 
     D = vertcat(D_train, D_test);
 
@@ -238,6 +238,37 @@ for i=1:length(bank_type)
               safin_pp_system.predicted = net_out;
               safin_pp_system.num_rules = length(net_structure.Rules);
 
+          case 'safin_frie'
+              disp('Processing SaFIN_FRIE.....')
+
+              start_test = size(D_train, 1) + 1;
+              trnData = [data_input(1 : start_test - 1, :), data_target(1 : start_test - 1, :)];
+              tstData = [data_input(start_test : size(data_target, 1), :), data_target(start_test : size(data_target, 1), :)];
+
+              IND = 2;
+              OUTD = 1;
+              Epochs = 300;
+              Eta = 0.05;
+              Sigma0 = sqrt(0.16);
+              Forgetfactor = 0.99;
+              Lamda = 0.3;
+              Rate = 0.25;
+              Omega = 0.7;
+              Gamma = 0.1;
+              forget = 1;
+              tau = 0.2;
+              % network prediction
+              [net_out, net_structure] = Run_SaFIN_FRIE(3, trnData,tstData,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+
+              safin_frie_system = htet_calculate_errors(net_out, data_target(start_test : size(data_target, 1)));
+              safin_frie_system.input = data_input;
+              safin_frie_system.target = data_target;
+              safin_frie_system.target_feature_name = feature_name;
+              safin_frie_system.name = algo;
+              safin_frie_system.net = net_structure;
+              safin_frie_system.predicted = net_out;
+              safin_frie_system.num_rules = net_structure.ruleCount;
+
       end
       disp('Processing of the algorithm completed.....')
     end
@@ -248,9 +279,9 @@ for i=1:length(bank_type)
     % clear data_input; clear data_target;
     % clear emfis_system; clear denfis_system; clear anfis_system; clear ensemble_system_sa; clear ensemble_system_bs;
 
-    RESULTS(j,:) = [{safin_pp_system}];
+    RESULTS(j,:) = [{safin_frie_system}];
     clear data_input; clear data_target;
-    clear safin_pp_system;
+    clear safin_frie_system;
   end
   disp('Storing the results...')
   clear D; clear input;
