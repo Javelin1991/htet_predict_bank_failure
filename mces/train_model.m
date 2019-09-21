@@ -29,9 +29,7 @@ elseif (strcmp(model, 'eMFIS'))
     system = mar_trainOnline(ie_rules_no ,create_ie_rule, data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
     net = system;
 elseif strcmp(model, 'eMFIS_classification')
-    data_input = x;
-    data_target = y;
-
+    TrainData = x;
     algo = params.algo;
     max_cluster = params.max_cluster;
     half_life = params.half_life;
@@ -42,6 +40,46 @@ elseif strcmp(model, 'eMFIS_classification')
     create_ie_rule = params.create_ie_rule
     system = mar_trainOnline(ie_rules_no ,create_ie_rule, data_input, data_target, algo, max_cluster, half_life, threshold_mf, min_rule_weight);
     net = system;
+elseif strcmp(model, 'SaFIN_FRIE')
+    data_input = x;
+    data_target = y;
+
+    IND = 3;
+    OUTD = 1;
+    Epochs = 0;
+    Eta = 0.05;
+    Sigma0 = sqrt(0.16);
+    Forgetfactor = 0.99;
+    Lamda = 0.3;
+    Rate = 0.25;
+    Omega = 0.7;
+    Gamma = 0.1;
+    forget = 1;
+    tau = 0.2;
+    threshold = 0;
+
+
+    system.total_network = 1;
+    system.net.name = 'SAFIN++(FRIE)';
+    system.net.Epochs = Epochs;
+    system.net.Eta = Eta;
+    system.net.Sigma0 = Sigma0; %SMALL PERTURBATION
+    system.net.Rate = Rate; %LEARNING RATE
+    system.net.Forgetfactor = Forgetfactor; %FORGETTING FACTOR
+    system.net.Lamda = Lamda; %THRESHOLD FOR INTERPOLATION
+    system.net.Omega = Omega;
+    system.net.Gamma = Gamma;
+    system.net.interpolated = zeros(1,size(TrainData,1));
+    system.net.ruleCount = zeros(size(TrainData,1),1);
+    net = system.net;
+    %INITIALIZE NEURAL NET WITH FIRST ROW OF DATA
+    net = SAFIN_FRIE_init(net, TrainData(1,1:IND), TrainData(1,IND+1:IND+OUTD), Sigma0);
+
+    %TRAINING THE NET
+    net = SaFIN_FRIE_train(1, net, TrainData(i,1:IND), TrainData(i,IND+1:IND+OUTD),IND, OUTD, net.no_InTerms, net.InTerms, net.no_OutTerms, net.OutTerms,net.Rules, net.Rules_Weight, Eta, forget, Forgetfactor,Lamda,tau, Rate, Omega, Gamma);
+    ruleCount(i,1) = size(net.Rules,1);
+    net_out = zeros(size(TestData,1), OUTD);
+    net.rule_importance = zeros(size(net.Rules,1),1);
 else
     display(['Model ' model ' not supported!!!'])
 end

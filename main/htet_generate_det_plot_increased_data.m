@@ -7,7 +7,8 @@
 clc;
 clear;
 
-load safin_cv5_top3_feat_results;
+% load safin_cv5_top3_feat_results;
+load safin_frie_cv5_top3_feat_increased;
 color_str = 'rgbcm'
 MEAN_INCREASED = [];
 ACC = [];

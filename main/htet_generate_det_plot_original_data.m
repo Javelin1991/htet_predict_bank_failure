@@ -7,7 +7,9 @@
 clc;
 clear;
 
-load safin_cv5_top3_feat_original_num_records_results;
+% load safin_cv5_top3_feat_original_num_records_results;
+load safin_frie_cv5_top3_feat_original;
+
 color_str = 'rgbcm'
 MEAN_ORIGINAL = [];
 ACC = [];

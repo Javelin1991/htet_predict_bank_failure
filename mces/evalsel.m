@@ -3,7 +3,7 @@
 % [returning weight vector of features] = evalsel(..
 %   .. input matrix, output matrix, number of learning epoch, underlying model)
 % function [weight] = evalsel(x,y,epoch,model,net)
-function [weight] = evalsel(x,y,epoch,model, params)
+function [weight, net] = evalsel(x,y,epoch,model, params)
 
 tol = 0;    % Tolerance of difference
 % epoch = 2;  % Number of epoch
