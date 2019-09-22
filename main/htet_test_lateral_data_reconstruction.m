@@ -10,6 +10,7 @@
 % 4) SA - Simple Averaging Ensemble Learning using ANFIS and DENFIS
 % 5) BS - Best Selection between ANFIS, DENFIS, and SA
 % 6) SaFIN++ - offline model
+% 7) SaFIN_FRIE
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;
@@ -247,7 +248,7 @@ for i=1:length(bank_type)
 
               IND = 2;
               OUTD = 1;
-              Epochs = 300;
+              Epochs = 0;
               Eta = 0.05;
               Sigma0 = sqrt(0.16);
               Forgetfactor = 0.99;
@@ -258,7 +259,7 @@ for i=1:length(bank_type)
               forget = 1;
               tau = 0.2;
               % network prediction
-              [net_out, net_structure] = Run_SaFIN_FRIE(3, trnData,tstData,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+              [net_out, net_structure] = Run_SaFIN_FRIE(1, trnData,tstData,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
 
               safin_frie_system = htet_calculate_errors(net_out, data_target(start_test : size(data_target, 1)));
               safin_frie_system.input = data_input;

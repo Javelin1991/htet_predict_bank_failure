@@ -15,8 +15,12 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
     after_threshold = zeros(length(testData),1);
     RESOLUTION = 0.001;
     cut_off = RESOLUTION;
+    optimal_cut_off = cut_off;
     min_mean_cost = intmax;
+    best_eer = min_mean_cost;
     best_acc = intmin;
+    best_fpr = 0;
+    best_fnr = 100;
     eer_count = 0;
 
     fpr_penalized_cost = 1;

@@ -9,7 +9,9 @@ elseif (strcmp(model, 'eMFIS') || strcmp(model, 'eMFIS_classification'))
     % test an input to eMFIS network
     output = htet_test_emfis(net, input, current_count);
 elseif strcmp(model, 'SaFIN_FRIE')
-    output = SaFIN_FRIE_test(input,3,1,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
+    input_dimen = 10;
+    output_dimen = 1;
+    output = SaFIN_FRIE_test(input,input_dimen,output_dimen,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
 else
     display(['Model ' model ' not supported!!!'])
 end
