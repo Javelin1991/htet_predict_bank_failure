@@ -1,8 +1,8 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_safin_frie XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_ierspop XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   used to test bank failure prediction/classification using SaFIN_FRIE
+% Function  :   used to test bank failure prediction/classification using ieRSPOP++
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 % diary SaFIN_Learning_Process_Trace;
 

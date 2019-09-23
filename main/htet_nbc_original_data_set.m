@@ -1,8 +1,10 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_playground_test_any_code_snippet XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_nbc_original_data_set XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   dummy file that is used to test any code snippet in matlab
+% File  :   htet_nbc_original_data_set
+% Testing bank failure prediction using Naive Bayes Classifier (with original data set)
+% Refer to FYP for more details
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;

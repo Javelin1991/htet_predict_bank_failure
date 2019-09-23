@@ -1,4 +1,4 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_safin_frie XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_find_optimal_cut_off XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
@@ -41,6 +41,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       Bisector = [Bisector, k];
     end
 
+    % when threshold is given, no need to find the best cut_off point, can use the threshold
     if threshold ~= 0
 
       for i=1: length(testData)
