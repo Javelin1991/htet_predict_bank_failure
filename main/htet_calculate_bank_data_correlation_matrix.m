@@ -2,81 +2,83 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   to generate correlation matrix for 10 features
+% Function  :   to generate correlation matrix for given set of features
 % Syntax    :
 %
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clc;
 clear;
-% load Prepared_Data_For_Correlation;
-B = [];
 
-load Failed_Banks;
-load Survived_Banks;
-
-FB_1 = htet_pre_process_bank_data(Failed_Banks, 1, 0);
-SB_1 = htet_pre_process_bank_data(Survived_Banks, 1, 0);
-
-for k = 1:3
-  backward_offset = k-1;
-  Failed_Banks_Group_By_Bank_ID = [];
-  Survived_Banks_Group_By_Bank_ID = [];
-
-  output_1 = htet_filter_bank_data_by_index(SB_1, backward_offset);
-  output_2 = htet_filter_bank_data_by_index(FB_1, backward_offset);
-
-  Survived_Banks_Group_By_Bank_ID = output_1.result;
-  Failed_Banks_Group_By_Bank_ID = output_2.result;
-
-  if k == 1
-    SB_last_available_original = Survived_Banks_Group_By_Bank_ID;
-    FB_last_available_original = Failed_Banks_Group_By_Bank_ID;
-
-    B = [{SB_last_available_original(:,[1 2 3 7 10])}; {FB_last_available_original(:,[1 2 3 7 10])}];
-  elseif k == 2
-    SB_one_year_prior_original = Survived_Banks_Group_By_Bank_ID;
-    FB_one_year_prior_original = Failed_Banks_Group_By_Bank_ID;
-    B = [B; {SB_one_year_prior_original(:,[1 2 3 7 10])}; {FB_one_year_prior_original(:,[1 2 3 7 10])}];
-  else
-    SB_two_year_prior_original = Survived_Banks_Group_By_Bank_ID;
-    FB_two_year_prior_original = Failed_Banks_Group_By_Bank_ID;
-    B = [B; {SB_two_year_prior_original(:,[1 2 3 7 10])}; {FB_two_year_prior_original(:,[1 2 3 7 10])}];
-  end
-end
-
-FB_2 = htet_pre_process_bank_data(Failed_Banks(:,[1 2 3 7 10]), 1, 0);
-SB_2 = htet_pre_process_bank_data(Survived_Banks(:,[1 2 3 7 10]), 1, 0);
-
-for k = 1:3
-  backward_offset = k-1;
-
-  Survived_Banks_Group_By_Bank_ID_1 = [];
-  Failed_Banks_Group_By_Bank_ID_1 = [];
-
-  output_3 = htet_filter_bank_data_by_index(SB_2, backward_offset);
-  output_4 = htet_filter_bank_data_by_index(FB_2, backward_offset);
-
-  Survived_Banks_Group_By_Bank_ID_1 = output_3.result;
-  Failed_Banks_Group_By_Bank_ID_1 = output_4.result;
-
-  if k == 1
-
-    SB_last_available_increased = Survived_Banks_Group_By_Bank_ID_1;
-    FB_last_available_increased = Failed_Banks_Group_By_Bank_ID_1;
-
-    B = [B; {SB_last_available_increased}; {FB_last_available_increased}];
-  elseif k == 2
-    SB_one_year_prior_increased = Survived_Banks_Group_By_Bank_ID_1;
-    FB_one_year_prior_increased = Failed_Banks_Group_By_Bank_ID_1;
-    B = [B; {SB_one_year_prior_increased}; {FB_one_year_prior_increased}];
-  else
-
-    SB_two_year_prior_increased = Survived_Banks_Group_By_Bank_ID_1;
-    FB_two_year_prior_increased = Failed_Banks_Group_By_Bank_ID_1;
-
-    B = [B; {SB_two_year_prior_increased}; {FB_two_year_prior_increased}];
-  end
-end
+load Data_for_correlation_matrix;
+%
+% B = [];
+%
+% load Failed_Banks;
+% load Survived_Banks;
+%
+% FB_1 = htet_pre_process_bank_data(Failed_Banks, 1, 0);
+% SB_1 = htet_pre_process_bank_data(Survived_Banks, 1, 0);
+%
+% for k = 1:3
+%   backward_offset = k-1;
+%   Failed_Banks_Group_By_Bank_ID = [];
+%   Survived_Banks_Group_By_Bank_ID = [];
+%
+%   output_1 = htet_filter_bank_data_by_index(SB_1, backward_offset);
+%   output_2 = htet_filter_bank_data_by_index(FB_1, backward_offset);
+%
+%   Survived_Banks_Group_By_Bank_ID = output_1.result;
+%   Failed_Banks_Group_By_Bank_ID = output_2.result;
+%
+%   if k == 1
+%     SB_last_available_original = Survived_Banks_Group_By_Bank_ID;
+%     FB_last_available_original = Failed_Banks_Group_By_Bank_ID;
+%
+%     B = [{SB_last_available_original(:,[1 2 3 7 10])}; {FB_last_available_original(:,[1 2 3 7 10])}];
+%   elseif k == 2
+%     SB_one_year_prior_original = Survived_Banks_Group_By_Bank_ID;
+%     FB_one_year_prior_original = Failed_Banks_Group_By_Bank_ID;
+%     B = [B; {SB_one_year_prior_original(:,[1 2 3 7 10])}; {FB_one_year_prior_original(:,[1 2 3 7 10])}];
+%   else
+%     SB_two_year_prior_original = Survived_Banks_Group_By_Bank_ID;
+%     FB_two_year_prior_original = Failed_Banks_Group_By_Bank_ID;
+%     B = [B; {SB_two_year_prior_original(:,[1 2 3 7 10])}; {FB_two_year_prior_original(:,[1 2 3 7 10])}];
+%   end
+% end
+%
+% FB_2 = htet_pre_process_bank_data(Failed_Banks(:,[1 2 3 7 10]), 1, 0);
+% SB_2 = htet_pre_process_bank_data(Survived_Banks(:,[1 2 3 7 10]), 1, 0);
+%
+% for k = 1:3
+%   backward_offset = k-1;
+%
+%   Survived_Banks_Group_By_Bank_ID_1 = [];
+%   Failed_Banks_Group_By_Bank_ID_1 = [];
+%
+%   output_3 = htet_filter_bank_data_by_index(SB_2, backward_offset);
+%   output_4 = htet_filter_bank_data_by_index(FB_2, backward_offset);
+%
+%   Survived_Banks_Group_By_Bank_ID_1 = output_3.result;
+%   Failed_Banks_Group_By_Bank_ID_1 = output_4.result;
+%
+%   if k == 1
+%
+%     SB_last_available_increased = Survived_Banks_Group_By_Bank_ID_1;
+%     FB_last_available_increased = Failed_Banks_Group_By_Bank_ID_1;
+%
+%     B = [B; {SB_last_available_increased}; {FB_last_available_increased}];
+%   elseif k == 2
+%     SB_one_year_prior_increased = Survived_Banks_Group_By_Bank_ID_1;
+%     FB_one_year_prior_increased = Failed_Banks_Group_By_Bank_ID_1;
+%     B = [B; {SB_one_year_prior_increased}; {FB_one_year_prior_increased}];
+%   else
+%
+%     SB_two_year_prior_increased = Survived_Banks_Group_By_Bank_ID_1;
+%     FB_two_year_prior_increased = Failed_Banks_Group_By_Bank_ID_1;
+%
+%     B = [B; {SB_two_year_prior_increased}; {FB_two_year_prior_increased}];
+%   end
+% end
 
 % B = [{SB_last_available_original(:,[3 7 10])}; {FB_last_available_original(:,[3 7 10])}; {SB_last_available_increased}; {FB_last_available_increased}];
 % B = [B; {SB_one_year_prior_original(:,[3 7 10])}; {FB_one_year_prior_original(:,[3 7 10])}; {SB_one_year_prior_increased}; {FB_one_year_prior_increased}];
