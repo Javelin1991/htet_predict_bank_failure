@@ -5,6 +5,7 @@ function [Rules_semantic Rule_importance] = interpret(net, IND, OUTD)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DISPLAY RULE SEMANTIC %%%%%%%%%%%%%%%%%%%%%%%%%%
     semantic_list = {'M  ';'H  ';'VH ';'VVH ';'L  ';'VL ';'VVL '}; %
     Rule_importance = [];
+    Rules_semantic = [];
     %Rules_semantic = Rules;
     if (max(net.no_InTerms) <=7 && max(net.no_OutTerms) <=7)  % only if max. no of clusters for any variable is <=7
         net.Rules_semantic = cell(size(net.Rules,1), IND+OUTD);  %a cell array equal to rule base
