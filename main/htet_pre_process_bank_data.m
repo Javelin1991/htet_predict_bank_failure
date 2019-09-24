@@ -12,7 +12,9 @@
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function sample = htet_pre_process_bank_data(input, data_percent, fixed_size)
-  input(any(isnan(input), 2), :) = [];
+  if ~iscell(input)
+    input(any(isnan(input), 2), :) = [];
+  end
   [m,n] = size(input);
   if (fixed_size ~= 0)
     %sample size is fixed to 2000

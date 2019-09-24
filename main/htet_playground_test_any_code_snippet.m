@@ -7,57 +7,38 @@
 clear;
 clc;
 
-load 'CV1_Classification';
-% load 'CV1_with_top_3_features';
-ACC = 0;
-fn = 0;
-total_FN = [];
-total_FP = [];
-for cv_num = 1:5
-  D = CV1{cv_num,1};
-  data_input = D(:,[3 7 10]);
-  data_target = D(:,2);
-  start_test = (size(D, 1) * 0.2) + 1;
-  trainDataInput = data_input(1:start_test-1,:);
-  trainDataTarget = data_target(1:start_test-1,:);
-  clf = fitcnb(trainDataInput, trainDataTarget);
+load Failed_Banks;
+load Survived_Banks;
 
-  testDataInput = data_input(start_test:length(data_input),:);
-  testDataTarget = data_target(start_test:length(data_target),:);
 
-  label = predict(clf,testDataInput)
-  [TP, FP, TN, FN, FNR, FPR, Acc] = htet_get_classification_results(testDataTarget, label);
-  total_FN = [total_FN; FNR];
-  total_FP = [total_FP; FPR];
-  ACC = ACC + Acc;
-  fn = FN + fn;
-end
-fn = fn/5;
-ACC = ACC/5;
+backward_offset = 0;
+Failed_Banks_Group_By_Bank_ID = [];
+Survived_Banks_Group_By_Bank_ID = [];
 
-ACC_1 = 0;
-fn_1 = 0;
-total_FN_1 = [];
-total_FP_1 = [];
+output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset);
+output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset);
+
+Survived_Banks_Group_By_Bank_ID = output_1.result;
+Failed_Banks_Group_By_Bank_ID = output_2.result;
+
+CV = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
+
+% used to generate 9 inputs taking 3 input each from t, t-1 and t-2
+CV_3T = [];
 
 for cv_num = 1:5
-  D = CV1{cv_num,1};
-  data_input = D(:,[6 10 11]);
-  data_target = D(:,2);
-  start_test = (size(D, 1) * 0.2) + 1;
-  trainDataInput = data_input(1:start_test-1,:);
-  trainDataTarget = data_target(1:start_test-1,:);
-  clf = fitcnb(trainDataInput, trainDataTarget);
-
-  testDataInput = data_input(start_test:length(data_input),:);
-  testDataTarget = data_target(start_test:length(data_target),:);
-
-  label = predict(clf,testDataInput)
-  [TP, FP, TN, FN, FNR, FPR, Acc] = htet_get_classification_results(testDataTarget, label);
-  total_FN_1 = [total_FN_1; FNR];
-  total_FP_1 = [total_FP_1; FPR];
-  ACC_1 = ACC_1 + Acc;
-  fn_1 = FN + fn_1;
+  DATA = [];
+  TMP = CV{cv_num, 1}
+  for j=1:size(TMP,1)
+    mat = cell2mat(TMP(j));
+    input_record = [];
+    for k=1:3
+      input_record = [input_record, mat(k,[3 7 10])]
+    end
+    label = mat(k,2);
+    input_record = [input_record, label];
+    DATA = [DATA; input_record];
+  end
+  CV_3T = [CV_3T; {DATA}];
+  clear DATA;
 end
-fn_1 = fn_1/5;
-ACC_1 = ACC_1/5;

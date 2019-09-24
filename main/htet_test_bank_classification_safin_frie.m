@@ -10,7 +10,7 @@ clear;
 clc;
 
 % load '5_Fold_CVs_with_top_3_features';
-load CV1_Classification;
+% load CV1_Classification;
 % load CV2_Classification;
 % load CV3_Classification;
 % load 'Reconstructed_Data_LL';
@@ -18,6 +18,9 @@ load CV1_Classification;
 % load Failed_Banks;
 % load Survived_Banks;
 % load '5_fold_CV_top3_feat_FB';
+% load '5_fold_CV_Bank_Cells';
+% load DATA_5_CV;
+load CV_3T_Increased_V2;
 
 Epochs = 0;
 Eta = 0.05;
@@ -30,16 +33,19 @@ Gamma = 0.1;
 forget = 1;
 tau = 0.2;
 
+% % used to generate 5 fold CV
 % for k = 1:3
 %   backward_offset = k-1;
 %   Failed_Banks_Group_By_Bank_ID = [];
 %   Survived_Banks_Group_By_Bank_ID = [];
 %
-%   output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10 12]), backward_offset);
-%   output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10 12]), backward_offset);
+%   output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10]), backward_offset);
+%   output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10]), backward_offset);
 %
 %   Survived_Banks_Group_By_Bank_ID = output_1.result;
 %   Failed_Banks_Group_By_Bank_ID = output_2.result;
+%
+%   CV1_with_top_5_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
 %
 %   if k == 1
 %     CV1_with_top_5_features = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
@@ -50,10 +56,31 @@ tau = 0.2;
 %   end
 % end
 
-threshold = 0;
-target_col = 4;
+% % used to generate 9 inputs taking 3 input each from t, t-1 and t-2
+% DATA_5_CV = [];
+%
+% for cv_num = 1:5
+%   DATA = [];
+%   TMP = CV5_FB_SB_Cells{cv_num, 1}
+%   for j=1:size(TMP,1)
+%     mat = cell2mat(TMP(j));
+%     input_record = [];
+%     for k=1:3
+%       input_record = [input_record, mat(k,[3:5])]
+%     end
+%     label = mat(k,2);
+%     input_record = [input_record, label];
+%     DATA = [DATA; input_record];
+%   end
+%   DATA_5_CV = [DATA_5_CV; {DATA}];
+%   clear DATA;
+% end
 
-IND_a = 3;
+
+threshold = 0;
+target_col = 10;
+
+IND_a = 9;
 OUTD_a = 1;
 
 A = [];
@@ -66,13 +93,16 @@ for cv_num = 1:5
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
-  D0 = CV1{cv_num,1}
-  % D1 = CV2{cv_num,1}
-  % D2 = CV3{cv_num,1}
-
-  D0 = D0(:,[3 7 10 2]);
+  % D0 = CV1{cv_num,1}
+  % % D1 = CV2{cv_num,1}
+  % % D2 = CV3{cv_num,1}
+  %
+  % D0 = D0(:,[3 7 10 2]);
   % D1 = D1(:,[3 7 10 2]);
   % D2 = D2(:,[3 7 10 2]);
+
+  % D0 = DATA_5_CV{cv_num,1};
+  D0 = CV_3T{cv_num,1};
 
   start_test = (size(D0, 1) * 0.2) + 1;
   trainData_D0 = D0(1:start_test-1,:);
