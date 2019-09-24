@@ -77,7 +77,7 @@ switch choice
             ruleCount(i,1) = size(net.Rules,1);
         end
         net_out = zeros(size(TestData,1), OUTD);
-        net.rule_importance = zeros(size(net.Rules,1),1);
+        % net.rule_importance = zeros(size(net.Rules,1),1);
         for i = 1 : size(TestData,1)
             net_out(i,:) = SaFIN_FRIE_test(TestData(i, 1:IND),IND,OUTD,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
         end
@@ -121,55 +121,55 @@ switch choice
 end
 system.ruleCountVariant = ruleCount;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DISPLAY INPUT AND OUTPUT CLUSTERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% for i = 1:IND
-%     colorArray = 'bgrcmyk';
-%     figure;
-%     hold;
-%     str = [sprintf('Input %d',i)];
-%     title(str);
-%     for j = 1:net.no_InTerms(i)
-%         color = colorArray(mod(j,7)+1);
-%         x = [min(TrainData(:,i)):0.05:max(TrainData(:,i))];
-%         plot(x, gaussmf(x, [net.InTerms(i,2*j)/sqrt(2) net.InTerms(i,2*j-1)]), color);
-%         axis([min(TrainData(:,i)) max(TrainData(:,i)) 0 1]);
-%     end
-% end
-% for i = 1:OUTD
-%     colorArray = 'bgrcmyk';
-%     figure;
-%     hold;
-%     str = [sprintf('Output %d',i)];
-%     title(str);
-%     for j = 1:net.no_OutTerms(i)
-%         color = colorArray(mod(j,7)+1);
-%         x = [min(TrainData(:,IND+i)):0.05:max(TrainData(:,IND+i))];
-%         plot(x, gaussmf(x, [net.OutTerms(i,2*j)/sqrt(2) net.OutTerms(i,2*j-1)]), color);
-%         axis([min(TrainData(:,IND+i)) max(TrainData(:,IND+i)) 0 1]);
-%     end
-% end
-% %%%%%%%%%%%%%%% INTERPRET FEATURES%%%%%%%%%%%%%%%%%
-% interpret(net, IND, OUTD);
-%
-% %%%%%%%%%DISPLAY PREDICTION VS ACTUAL DATA %%%%%%%%%%%%%%%%%%%
-% for i = 1:OUTD
-%    max_output = max(TestData(:,IND+i));
-%    min_output = min(TestData(:,IND+i));
-%    unit = (max_output - min_output) / 5; %UNIT FOR PLOTTING INTERPOLATION INDICATOR
-%    figure; hold;
-%    str = [sprintf('Actual VS Predicted Data',i)]; title(str);
-%    plot(1:1:size(TestData,1),TestData(:,i+IND),'b'); %PLOT ACTUAL DATA
-%    plot(1:1:size(TestData,1),net_out(:,i),'r');      %PLOT PREDICTED DATA
-%    plot(1:1:size(TrainData,1), unit*net.interpolated(1,:),'g'); %INDICATE INTERPOLATED POINTS
-%    %plot(1:1:size(TrainData,1), ruleCount(:,1),'m')
-%    legend('Actual','Predicted', 'I/E Points', '#Rules');
-% end
-% % %%%%%%%%% DISPLAY NUMBER OF RULES GENERATED %%%%%%%%%%%%%%%%%%%
-% for i = 1:OUTD
-%    figure; hold;
-%    str = [sprintf('Number of rules generated',i)]; title(str);
-%    plot(1:1:size(TrainData,1), ruleCount(:,1),'m')
-%    legend('Actual','Predicted', 'Interpolated/Extrapolated Points', '# Rules Generated');
-% end
+for i = 1:IND
+    colorArray = 'bgrcmyk';
+    figure;
+    hold;
+    str = [sprintf('Input %d',i)];
+    title(str);
+    for j = 1:net.no_InTerms(i)
+        color = colorArray(mod(j,7)+1);
+        x = [min(TrainData(:,i)):0.05:max(TrainData(:,i))];
+        plot(x, gaussmf(x, [net.InTerms(i,2*j)/sqrt(2) net.InTerms(i,2*j-1)]), color);
+        axis([min(TrainData(:,i)) max(TrainData(:,i)) 0 1]);
+    end
+end
+for i = 1:OUTD
+    colorArray = 'bgrcmyk';
+    figure;
+    hold;
+    str = [sprintf('Output %d',i)];
+    title(str);
+    for j = 1:net.no_OutTerms(i)
+        color = colorArray(mod(j,7)+1);
+        x = [min(TrainData(:,IND+i)):0.05:max(TrainData(:,IND+i))];
+        plot(x, gaussmf(x, [net.OutTerms(i,2*j)/sqrt(2) net.OutTerms(i,2*j-1)]), color);
+        axis([min(TrainData(:,IND+i)) max(TrainData(:,IND+i)) 0 1]);
+    end
+end
+%%%%%%%%%%%%%%% INTERPRET FEATURES%%%%%%%%%%%%%%%%%
+[net.Rules_semantic net.Rule_importance] = interpret(net, IND, OUTD);
+
+%%%%%%%%%DISPLAY PREDICTION VS ACTUAL DATA %%%%%%%%%%%%%%%%%%%
+for i = 1:OUTD
+   max_output = max(TestData(:,IND+i));
+   min_output = min(TestData(:,IND+i));
+   unit = (max_output - min_output) / 5; %UNIT FOR PLOTTING INTERPOLATION INDICATOR
+   figure; hold;
+   str = [sprintf('Actual VS Predicted Data',i)]; title(str);
+   plot(1:1:size(TestData,1),TestData(:,i+IND),'b'); %PLOT ACTUAL DATA
+   plot(1:1:size(TestData,1),net_out(:,i),'r');      %PLOT PREDICTED DATA
+   plot(1:1:size(TrainData,1), unit*net.interpolated(1,:),'g'); %INDICATE INTERPOLATED POINTS
+   %plot(1:1:size(TrainData,1), ruleCount(:,1),'m')
+   legend('Actual','Predicted', 'I/E Points', '#Rules');
+end
+% %%%%%%%%% DISPLAY NUMBER OF RULES GENERATED %%%%%%%%%%%%%%%%%%%
+for i = 1:OUTD
+   figure; hold;
+   str = [sprintf('Number of rules generated',i)]; title(str);
+   plot(1:1:size(TrainData,1), ruleCount(:,1),'m')
+   legend('Actual','Predicted', 'Interpolated/Extrapolated Points', '# Rules Generated');
+end
 %%%%%%%%%%%%%%%%%% MEAN SQUARE ERROR COMPUTATION %%%%%%%%%%
 MSE = 0;
 for i = 1:size(TestData,1)
@@ -210,6 +210,7 @@ X = 'Number of output clusters = ';
 disp(X);
 disp(net.no_OutTerms);
 %STORE TO SYSTEM
+
 system.MSE = MSE;
 system.RMSE = sqrt(MSE);
 system.R = R;

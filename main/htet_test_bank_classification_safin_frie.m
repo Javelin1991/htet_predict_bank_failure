@@ -4,10 +4,10 @@
 % Date      :   Sep 11, 2019
 % Function  :   used to test bank failure prediction/classification using SaFIN_FRIE
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-% diary SaFIN_Learning_Process_Trace;
+% diary SaFIN_FRIE_Learning_Trace;
 %
-% clear;
-% clc;
+clear;
+clc;
 
 % load '5_Fold_CVs_with_top_3_features';
 load CV1_Classification;
