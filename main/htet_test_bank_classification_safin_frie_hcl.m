@@ -81,9 +81,6 @@ threshold = 0;
 target_col = 4;
 original_acc = 0;
 
-IND_a = 3;
-OUTD_a = 1;
-
 A = [];
 B = [];
 C = [];
@@ -91,7 +88,7 @@ C = [];
 final_eer = 0;
 final_acc = 0;
 
-for cv_num = 1:5
+for cv_num = 1:1
   disp('');
   formatSpec = 'The current cv used is: %d';
   str = sprintf(formatSpec,cv_num)
@@ -107,7 +104,7 @@ for cv_num = 1:5
 
   % D0 = DATA_5_CV{cv_num,1};
   D0 = CV_3T{cv_num,1};
-  D0 = D0(:,[3 6 9 10]);
+  D0 = D0(:,:);
   % D0 = D0(:,[10 2]);
 
   start_test = (size(D0, 1) * 0.2) + 1;
@@ -130,29 +127,51 @@ for cv_num = 1:5
   % net_result_for_last_record(cv_num,:) = result_0;
   % final_eer = final_eer + output_0.MIN_EER(1,1);
 
-  max_acc = 0;
-  trainData_Neg = [];
-  trainData_Pos = [];
+  best_list = [];
+  best_eer = 100;
+  comparison = [];
 
-  for j=1:size(trainData_D0,1)
-    if trainData_D0(j,target_col) == 0
-        trainData_Neg = [trainData_Neg; trainData_D0(j,:)]
-    else
-        trainData_Pos = [trainData_Pos; trainData_D0(j,:)]
+  for l=1:9
+    curr_list = [best_list trainData_D0(:,1:l) trainData_D0(:,10)]
+    CL(l) = {curr_list};
+
+    max_acc = 0;
+    trainData_Neg = [];
+    trainData_Pos = [];
+
+    target = size(curr_list,2);
+
+    for j=1:size(curr_list,1)
+      if curr_list(j,target) == 0
+          trainData_Neg = [trainData_Neg; curr_list(j,:)]
+      else
+          trainData_Pos = [trainData_Pos; curr_list(j,:)]
+      end
     end
-  end
 
-  % ensemble learning with hcl
-  [net_out, net_out_2, final_out, system, system_2] = htet_SaFIN_FRIE_with_HCL(1,trainData_Pos,trainData_Neg,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % [no, ns] = Run_SaFIN_FRIE(1,trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % out_after_cut_off = htet_find_optimal_cut_off(testData_D0(:,target_col), no, 0);
-  % ensemble_result = final_out + out_after_cut_off.after_threshold;
-  [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,target_col), final_out);
-  output.fnr = fnr;
-  output.fpr = fpr;
-  output.eer = (fnr+fpr)/2;
-  class_results(cv_num) = output;
-  comparison(cv_num) = {[net_out net_out_2 final_out testData_D0(:,target_col)]}
+    IND_a = size(curr_list,2) - 1;
+    OUTD_a = 1;
+
+    % ensemble learning with hcl
+    [net_out, net_out_2, final_out, system, system_2] = htet_SaFIN_FRIE_with_HCL(1,trainData_Pos,trainData_Neg,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+    % [no, ns] = Run_SaFIN_FRIE(1,trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+    % out_after_cut_off = htet_find_optimal_cut_off(testData_D0(:,target_col), no, 0);
+    % ensemble_result = final_out + out_after_cut_off.after_threshold;
+    [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,10), final_out);
+    output.fnr = fnr;
+    output.fpr = fpr;
+    output.eer = (fnr+fpr)/2;
+
+    comparison = [comparison; [fnr fpr output.eer]];
+
+    if output.eer < best_eer
+      best_list = curr_list(:,target-1);
+      best_eer = output.eer;
+      best_acc = 100 - best_eer;
+    end
+    % class_results(cv_num) = output;
+    % comparison(cv_num) = {[net_out net_out_2 final_out testData_D0(:,target)]}
+  end
 
   % final_result = [];
   % for z=1:size(ensemble_result,1)
@@ -167,7 +186,6 @@ for cv_num = 1:5
   % end
   %
   % [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,target_col), final_result);
-  final_eer = final_eer + (fnr+fpr)/2;
 
   % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), final_out, 0.5);
   % result_0.net_out = net_out;
@@ -200,6 +218,3 @@ for cv_num = 1:5
 
   disp('Processing of one CV group has completed');
 end
-
-final_eer = final_eer/5;
-final_acc = 100 - final_eer;

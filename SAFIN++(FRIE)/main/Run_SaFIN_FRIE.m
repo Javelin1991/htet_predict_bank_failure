@@ -79,7 +79,7 @@ switch choice
         net_out = zeros(size(TestData,1), OUTD);
         % net.rule_importance = zeros(size(net.Rules,1),1);
         for i = 1 : size(TestData,1)
-            net_out(i,:) = SaFIN_FRIE_test(TestData(i, 1:IND),IND,OUTD,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
+            net_out(i,:) = SaFIN_FRIE_test(TestData(i, 1:IND),IND,OUTD,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules,false);
         end
     case 2
         net_out = zeros(size(TestData,1), OUTD);  %PREDICTED VALUES
@@ -94,7 +94,7 @@ switch choice
             ruleCount(i,1) = size(net.Rules,1);
             if (i+1) <= size(TestData,1)
                 %PASS (I+1)-TH ROW TO TEST
-                net_out(i+1,:) = SaFIN_FRIE_test(TestData(i+1,1:IND), IND, OUTD, net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
+                net_out(i+1,:) = SaFIN_FRIE_test(TestData(i+1,1:IND), IND, OUTD, net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules,0);
             end
         end
         net_out = net_out(2:size(net_out,1),:); %PASSING NET_OUT TO PLOT
@@ -116,7 +116,7 @@ switch choice
         end
         net_out = zeros(size(TestData,1), OUTD); %
         for i = 1:size(TestData,1)
-            net_out(i,:) = SaFIN_FRIE_test(TestData(i,1:IND), IND, OUTD, net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules);
+            net_out(i,:) = SaFIN_FRIE_test(TestData(i,1:IND), IND, OUTD, net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules,false);
         end
 end
 system.ruleCountVariant = ruleCount;

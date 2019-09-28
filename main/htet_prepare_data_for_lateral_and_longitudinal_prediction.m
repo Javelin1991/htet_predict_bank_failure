@@ -8,6 +8,7 @@
 % as well as longitudinal reconstruction
 % train data will include 80% of the full data set, i.e. no NaN / missing values
 % test data will include 20% of the full data set, i.e. no NaN / missing values
+% (but treated as missing to simulate the prediction of the missing data)
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;

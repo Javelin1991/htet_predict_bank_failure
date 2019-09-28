@@ -65,8 +65,10 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
 
       output.MIN_EER = (fpr + fnr)/2;
       output.MIN_CUT_OFF = threshold;
+      output.after_threshold = after_threshold;
       output.MIN_FPR = fpr;
       output.MIN_FNR = fnr;
+      output.acc = acc;
       return;
     end
 
@@ -109,6 +111,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
             best_eer = round(eer, 2);
             best_fpr = round(fpr, 2);
             best_fnr = round(fnr, 2);
+            output.after_threshold = after_threshold;
           end
 
           if acc > best_acc
