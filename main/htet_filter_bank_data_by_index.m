@@ -34,7 +34,12 @@ function out = htet_filter_bank_data_by_index(input, offset, type)
                 record = A(idx, :);
                 record_1 = A(idx_1, :);
                 record_2 = A(idx_2, :);
-                if sum(isnan(record)) == 0 && sum(isnan(record_1)) == 0 && sum(isnan(record_2)) == 0
+
+                last_col = size(record,2);
+                diff_1 = record(:,last_col) - record_1(:,last_col);
+                diff_2 = record_1(:,last_col) - record_2(:,last_col);
+
+                if sum(isnan(record)) == 0 && sum(isnan(record_1)) == 0 && sum(isnan(record_2)) == 0 && diff_1 == 1 && diff_2 == 1
                     out1 = [out1; {[record; record_1; record_2]}];
                 else
                     is_nan_count = is_nan_count + 1;
