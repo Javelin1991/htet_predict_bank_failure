@@ -2,7 +2,9 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   htet_generate_data_for_combined_T_preidction
+% File  :   htet_generate_data_for_combined_T_preidction
+% This file can be used to generate data for combined t prediction
+% e.g, top 3 feat from last avaiable + top 3 feat from one year prior + top 3 feat from two year prior
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;
@@ -16,11 +18,11 @@ backward_offset = 0;
 Failed_Banks_Group_By_Bank_ID = [];
 Survived_Banks_Group_By_Bank_ID = [];
 
-output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset, type);
-output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset, type);
+% output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset, type);
+% output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset, type);
 
-% output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10]), backward_offset, type);
-% output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10]), backward_offset, type);
+output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10]), backward_offset, type);
+output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10]), backward_offset, type);
 
 Survived_Banks_Group_By_Bank_ID = output_1.result;
 Failed_Banks_Group_By_Bank_ID = output_2.result;

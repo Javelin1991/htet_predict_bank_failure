@@ -20,13 +20,14 @@ load '5_Fold_CVs_with_top_3_features';
 % load '5_fold_CV_top3_feat_FB';
 % load '5_fold_CV_Bank_Cells';
 % load DATA_5_CV;
-load CV_3T_Increased;
+load CV_3T_Original;
+% load CV_3T_Increased_V2;
 
 Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.3;
+Lamda = 0.8;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
@@ -87,8 +88,13 @@ C = [];
 
 final_eer = 0;
 final_acc = 0;
+mean_acc = 0;
 
-for cv_num = 1:1
+BEST_LIST = [];
+
+epoch = 0;
+
+for cv_num = 1:5
   disp('');
   formatSpec = 'The current cv used is: %d';
   str = sprintf(formatSpec,cv_num)
@@ -105,116 +111,113 @@ for cv_num = 1:1
   % D0 = DATA_5_CV{cv_num,1};
   D0 = CV_3T{cv_num,1};
   D0 = D0(:,:);
-  % D0 = D0(:,[10 2]);
+  BEST_LIST = [BEST_LIST; {D0}];
+  INX_LIST = [];
 
-  start_test = (size(D0, 1) * 0.2) + 1;
-  trainData_D0 = D0(1:start_test-1,:);
-  testData_D0 = D0(start_test:length(D0), :);
+  not_done_yet = true;
 
-  % trainData_D1 = D1(1:start_test-1,:);
-  % testData_D1 = D1(start_test:length(D1), :);
-  %
-  %
-  % trainData_D2 = D2(1:start_test-1,:);
-  % testData_D2 = D2(start_test:length(D2), :);
+  while(not_done_yet)
 
-  % network prediction
-  % [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), net_out_0, threshold);
-  % result_0.net_out = net_out_0;
-  % result_0.net_structure = net_structure_0;
-  % result_0.output = output_0;
-  % net_result_for_last_record(cv_num,:) = result_0;
-  % final_eer = final_eer + output_0.MIN_EER(1,1);
+      limit = size(D0,2) - 1;
 
-  best_list = [];
-  best_eer = 100;
-  comparison = [];
+      [idx,scores] = fscmrmr(D0(:,[1:limit]), D0(:,limit+1));
+      input = D0(:,[1:limit]);
+      input = input(:,idx);
+      output = D0(:,limit+1);
 
-  for l=1:9
-    curr_list = [best_list trainData_D0(:,1:l) trainData_D0(:,10)]
-    CL(l) = {curr_list};
+      D0 = [input output];
+      % D0 = D0(:,[10 2]);
 
-    max_acc = 0;
-    trainData_Neg = [];
-    trainData_Pos = [];
+      start_test = (size(D0, 1) * 0.2) + 1;
+      trainData_D0 = D0(1:start_test-1,:);
+      testData_D0 = D0(start_test:length(D0), :);
 
-    target = size(curr_list,2);
+      % trainData_D1 = D1(1:start_test-1,:);
+      % testData_D1 = D1(start_test:length(D1), :);
+      %
+      %
+      % trainData_D2 = D2(1:start_test-1,:);
+      % testData_D2 = D2(start_test:length(D2), :);
 
-    for j=1:size(curr_list,1)
-      if curr_list(j,target) == 0
-          trainData_Neg = [trainData_Neg; curr_list(j,:)]
-      else
-          trainData_Pos = [trainData_Pos; curr_list(j,:)]
+      % network prediction
+      % [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+      % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), net_out_0, threshold);
+      % result_0.net_out = net_out_0;
+      % result_0.net_structure = net_structure_0;
+      % result_0.output = output_0;
+      % net_result_for_last_record(cv_num,:) = result_0;
+      % final_eer = final_eer + output_0.MIN_EER(1,1);
+
+      best_list = [];
+      best_tst_list = [];
+      best_eer = 100;
+      comparison = [];
+      best_indices = [];
+      filter_indices = [];
+
+      for l=1:limit
+        curr_list = [best_list trainData_D0(:,l) trainData_D0(:,limit+1)]
+        curr_tstData = [best_tst_list testData_D0(:,l) testData_D0(:,limit+1)]
+
+        CL(l) = {curr_list};
+
+        max_acc = 0;
+        trainData_Neg = [];
+        trainData_Pos = [];
+
+        target = size(curr_list,2);
+
+        for j=1:size(curr_list,1)
+          if curr_list(j,target) == 0
+              trainData_Neg = [trainData_Neg; curr_list(j,:)]
+          else
+              trainData_Pos = [trainData_Pos; curr_list(j,:)]
+          end
+        end
+        INX_LIST = [INX_LIST; {curr_list}];
+        IND_a = size(curr_list,2) - 1;
+        OUTD_a = 1;
+
+        % ensemble learning with hcl
+        [net_out, net_out_2, final_out, system, system_2] = htet_SaFIN_FRIE_with_HCL(1,trainData_Pos,trainData_Neg,curr_tstData,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+        % [no, ns] = Run_SaFIN_FRIE(1,trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+        % out_after_cut_off = htet_find_optimal_cut_off(testData_D0(:,target_col), no, 0);
+        % ensemble_result = final_out + out_after_cut_off.after_threshold;
+        [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,limit+1), final_out);
+        op.fnr = fnr;
+        op.fpr = fpr;
+        op.eer = (fnr+fpr)/2;
+
+        comparison = [comparison; [fnr fpr op.eer]];
+
+        if op.eer < best_eer
+          best_list = [best_list trainData_D0(:,l)];
+          best_tst_list = [best_tst_list testData_D0(:,l)];
+
+          best_indices = [best_indices, idx(1,l)];
+          filter_indices = [filter_indices, l];
+          best_eer = op.eer;
+          best_acc = 100 - best_eer;
+        end
+        % class_results(cv_num) = output;
+        % comparison(cv_num) = {[net_out net_out_2 final_out testData_D0(:,target)]}
       end
-    end
+      epoch = epoch + 1;
 
-    IND_a = size(curr_list,2) - 1;
-    OUTD_a = 1;
-
-    % ensemble learning with hcl
-    [net_out, net_out_2, final_out, system, system_2] = htet_SaFIN_FRIE_with_HCL(1,trainData_Pos,trainData_Neg,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-    % [no, ns] = Run_SaFIN_FRIE(1,trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-    % out_after_cut_off = htet_find_optimal_cut_off(testData_D0(:,target_col), no, 0);
-    % ensemble_result = final_out + out_after_cut_off.after_threshold;
-    [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,10), final_out);
-    output.fnr = fnr;
-    output.fpr = fpr;
-    output.eer = (fnr+fpr)/2;
-
-    comparison = [comparison; [fnr fpr output.eer]];
-
-    if output.eer < best_eer
-      best_list = curr_list(:,target-1);
-      best_eer = output.eer;
-      best_acc = 100 - best_eer;
-    end
-    % class_results(cv_num) = output;
-    % comparison(cv_num) = {[net_out net_out_2 final_out testData_D0(:,target)]}
+      if best_acc > 99 || epoch > 2
+        break;
+      else
+        filter_indices = [filter_indices, limit+1];
+        D0 = D0(:,filter_indices);
+        BEST_LIST = [BEST_LIST; {D0}];
+      end
   end
 
-  % final_result = [];
-  % for z=1:size(ensemble_result,1)
-  %     if ensemble_result(z,1) == 2
-  %       final_result = [final_result; 1]
-  %     elseif ensemble_result(z,1) == 1
-  %       X = randi(2) - 1;
-  %       final_result = [final_result; X]
-  %     else
-  %       final_result = [final_result; 0]
-  %     end
-  % end
-  %
-  % [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,target_col), final_result);
-
-  % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), final_out, 0.5);
-  % result_0.net_out = net_out;
-  % result_0.net_out_2 = net_out_2;
-  % result_0.final_out = final_out;
-  % result_0.test_data = testData_D0(:,target_col);
-  % result_0.net_structure_1 = system;
-  % result_0.net_structure_2 = system_2;
-  % result_0.output = output_0;
-  % net_result_for_last_record(cv_num,:) = result_0;
-  % final_eer = final_eer + output_0.MIN_EER(1,1);
-  % original_acc = original_acc + output_0.acc;
-  %
-  % if (final_acc > max_acc)
-  %     max_acc = final_acc;
-  % end
-
-  % [net_out_1, net_structure_1] = Run_SaFIN_FRIE(1, trainData_D1,testData_D1,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_1 = htet_find_optimal_cut_off(testData_D1(:,target_col), net_out_1, threshold);  output_1avg = htet_find_optimal_cut_off(testData_D1(:,target_col), avg_net_out_1, threshold);
-  % result_1.net_out = net_out_1;
-  % result_1.net_structure = net_structure_1;
-  % result_1.output = output_1;  result_1.outputavg = output_1avg;
-  % net_result_for_one_year_prior(cv_num,:) = result_1;
-  % [net_out_2, net_structure_2] = Run_SaFIN_FRIE(1, trainData_D2,testData_D2,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_2 = htet_find_optimal_cut_off(testData_D2(:,target_col), net_out_2, threshold);
-  % result_2.net_out = net_out_2;
-  % result_2.net_structure = net_structure_2;
-  % result_2.output = output_2;
-  % net_result_for_two_year_prior(cv_num,:) = result_2;
-
-  disp('Processing of one CV group has completed');
+  final_acc(cv_num) = best_acc;
+  mean_acc = mean_acc + best_acc;
 end
+
+mean_acc = mean_acc/5;
+% alarm sound to alert that the program has ended
+load handel;
+sound(y,Fs);
