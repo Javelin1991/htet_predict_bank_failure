@@ -11,29 +11,32 @@ clc;
 
 % load '5_Fold_CVs_with_top_3_features';
 % load CV1_Classification;
-% load CV2_Classification;
+% load CV3_Classification;
 % load CV3_Classification;
 % load 'Reconstructed_Data_LL';
 % load RECON_5_fold_cv_top_3_feat;
 % load Failed_Banks;
 % load Survived_Banks;
-load '5_fold_CV_top3_feat_FB';
+% load '5_fold_CV_top3_feat_FB';
 % load '5_fold_CV_Bank_Cells';
 % load DATA_5_CV;
 % load CV_3T_Original_Updated;
+% load CV_3T_Increased_Updated;
 % load CV_3T_Increased_one_year_prior;
 % load CV_3T_Increased_two_year_prior;
+% load CV_3T_27_feat_one_year;
+load CV_2T_18_feat;
 
 Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.45;
+Lamda = 0.5;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
-tau = 0.7;
+tau = 0.2;
 
 threshold = 0;
 mean_acc = 0;
@@ -44,21 +47,31 @@ epoch = 0;
 
 for cv_num = 1:5
 
-  Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
+  % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
+  % Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+  Labels = ["CAPADE_t", "OLAQLY_t", "PROBLO_t","PLAQLY_t", "NIEOIN_t", "NINMAR_t", "ROE_t", "LIQUID_t", "GROWLA_t", "CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1", "CAPADE_t_2", "OLAQLY_t_2", "PROBLO_t_2","PLAQLY_t_2", "NIEOIN_t_2", "NINMAR_t_2", "ROE_t_2", "LIQUID_t_2", "GROWLA_t_2"];
+% Labels = ["CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1"];
+% Labels = ["CAPADE_t_2", "OLAQLY_t_2", "PROBLO_t_2","PLAQLY_t_2", "NIEOIN_t_2", "NINMAR_t_2", "ROE_t_2", "LIQUID_t_2", "GROWLA_t_2"];
+  % Labels = ["CAPADE","PLAQLY","ROE"];
+
   formatSpec = '\nThe current cv used is: %d';
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
-  % D0 = CV1_with{cv_num,1}
+  D0 = CV_2T{cv_num,1};
+  % D0(:,6) = []; % removing ADQLLP
+  % D0 = D0(:,[3 7 10 2]); % 9 covariates
+
+
   % % D1 = CV2{cv_num,1}
   % % D2 = CV3{cv_num,1}
-  D0 = CV1_with_top_3_features{cv_num,1};
-  D0 = D0(:,[3:5 2]);
+  % D0 = CV1_with_top_3_features{cv_num,1};
+  % D0 = D0(:,[3:5 2]);
   % D1 = D1(:,[3 7 10 2]);
   % D2 = D2(:,[3 7 10 2]);
   % D0 = DATA_5_CV{cv_num,1};
+  % D0 = CV_3T{cv_num,1};
 
-%   D0 = CV_3T{cv_num,1};
   epoch = 0;
   not_done_yet = true;
 
@@ -143,7 +156,7 @@ for cv_num = 1:5
       end
       epoch = epoch + 1;
 
-      if best_acc <= prev_acc
+      if best_acc > 99 || epoch > 2
         break;
       else
         Labels = Labels(:,filter_indices);

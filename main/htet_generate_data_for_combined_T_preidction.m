@@ -17,11 +17,16 @@ load Survived_Banks;
 % %
 % % Failed_Banks = DENFIS_FB;
 % % Survived_Banks = DENFIS_SB;
-Failed_Banks = Failed_Banks(:,[1 2 3 7 10 13]);
-Survived_Banks = Survived_Banks(:,[1 2 3 7 10 13]);
+% Failed_Banks = Failed_Banks(:,[1 2 3 7 10 13]);
+% Survived_Banks = Survived_Banks(:,[1 2 3 7 10 13]);
 %
 Survived_Banks(any(isnan(Survived_Banks), 2), :) = [];
 Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
+
+Survived_Banks(:,6) = [];
+Failed_Banks(:,6) = [];
+
+
 %
 % FB = RECONSTRUCTED_DATA{1, 1};
 % SB = RECONSTRUCTED_DATA{2, 1};
@@ -39,7 +44,7 @@ Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
 % Failed_Banks = RECONSTRUCTED_DATA{1, 1};
 % Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
-type = '3T_two';
+type = '2T_two';
 index = 3;
 backward_offset = 0;
 Failed_Banks_Group_By_Bank_ID = [];
@@ -63,13 +68,19 @@ CV_1T = [];
 
 for cv_num = 1:5
   DATA = [];
+
+  if index == 1
+    CV_1T = CV;
+    return;
+  end
+
   TMP = CV{cv_num, 1}
   for j=1:size(TMP,1)
     mat = cell2mat(TMP(j));
     input_record = [];
     for k=1:index
       % input_record = [input_record, mat(k,[3 7 10])]
-      input_record = [input_record, mat(k,[3:5])]
+      input_record = [input_record, mat(k,[3:11])]
     end
     label = mat(k,2);
     input_record = [input_record, label];
