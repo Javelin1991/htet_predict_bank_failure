@@ -10,7 +10,7 @@ clear;
 clc;
 
 % load '5_Fold_CVs_with_top_3_features';
-% load CV1_Classification;
+load CV1_Classification;
 % load CV3_Classification;
 % load CV3_Classification;
 % load 'Reconstructed_Data_LL';
@@ -25,18 +25,18 @@ clc;
 % load CV_3T_Increased_one_year_prior;
 % load CV_3T_Increased_two_year_prior;
 % load CV_3T_27_feat_one_year;
-load CV_2T_18_feat;
+% load CV_2T_18_feat;
 
 Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.5;
+Lamda = 0.45;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
-tau = 0.2;
+tau = 0.7;
 
 threshold = 0;
 mean_acc = 0;
@@ -58,11 +58,13 @@ for cv_num = 1:5
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
-  D0 = CV_2T{cv_num,1};
+  % D0 = CV_2T{cv_num,1};
   % D0(:,6) = []; % removing ADQLLP
   % D0 = D0(:,[3 7 10 2]); % 9 covariates
 
-
+  D0 = CV1{cv_num,1}
+  D0(:,6) = [];
+  D0 = D0(:,[3:11 2])
   % % D1 = CV2{cv_num,1}
   % % D2 = CV3{cv_num,1}
   % D0 = CV1_with_top_3_features{cv_num,1};

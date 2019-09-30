@@ -9,8 +9,8 @@
 clear;
 clc;
 
-load '5_Fold_CVs_with_top_3_features';
-% load CV1_Classification;
+% load 'CV_3T_27_Feat';
+load CV1_Classification;
 % load CV2_Classification;
 % load CV3_Classification;
 % load 'Reconstructed_Data_LL';
@@ -20,13 +20,12 @@ load '5_Fold_CVs_with_top_3_features';
 % load '5_fold_CV_top3_feat_FB';
 % load '5_fold_CV_Bank_Cells';
 % load DATA_5_CV;
-load CV_3T_Increased;
 
 Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.3;
+Lamda = 0.45;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
@@ -78,10 +77,10 @@ tau = 0.2;
 
 
 threshold = 0;
-target_col = 4;
+target_col = 10;
 original_acc = 0;
 
-IND_a = 3;
+IND_a = 9;
 OUTD_a = 1;
 
 A = [];
@@ -97,17 +96,22 @@ for cv_num = 1:5
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
-  % D0 = CV1_with{cv_num,1}
-  % % D1 = CV2{cv_num,1}
-  % % D2 = CV3{cv_num,1}
+  % D0 = CV_3T{cv_num,1};
+  D0 = CV1{cv_num,1};
+  D0(:,6) = [];
+  % D1 = CV2{cv_num,1};
+  % D1(:,6) = [];
+  % D2 = CV3{cv_num,1};
+  % D2(:,6) = [];
+
+
   % D0 = CV1_with_top_3_features{cv_num,1};
-  % D0 = D0(:,[3 7 10 2]);
-  % D1 = D1(:,[3 7 10 2]);
-  % D2 = D2(:,[3 7 10 2]);
+  D0 = D0(:,[3:11 2]);
+  % D1 = D1(:,[3:11 2]);
+  % D2 = D2(:,[3:11 2]);
 
   % D0 = DATA_5_CV{cv_num,1};
-  D0 = CV_3T{cv_num,1};
-  D0 = D0(:,[3 6 9 10]);
+  % D0 = CV_3T{cv_num,1};
   % D0 = D0(:,[10 2]);
 
   start_test = (size(D0, 1) * 0.2) + 1;
@@ -117,85 +121,46 @@ for cv_num = 1:5
   % trainData_D1 = D1(1:start_test-1,:);
   % testData_D1 = D1(start_test:length(D1), :);
   %
-  %
   % trainData_D2 = D2(1:start_test-1,:);
   % testData_D2 = D2(start_test:length(D2), :);
 
   % network prediction
-  % [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), net_out_0, threshold);
-  % result_0.net_out = net_out_0;
-  % result_0.net_structure = net_structure_0;
-  % result_0.output = output_0;
-  % net_result_for_last_record(cv_num,:) = result_0;
-  % final_eer = final_eer + output_0.MIN_EER(1,1);
-
-  max_acc = 0;
-  trainData_Neg = [];
-  trainData_Pos = [];
-
-  for j=1:size(trainData_D0,1)
-    if trainData_D0(j,target_col) == 0
-        trainData_Neg = [trainData_Neg; trainData_D0(j,:)]
-    else
-        trainData_Pos = [trainData_Pos; trainData_D0(j,:)]
-    end
-  end
-
-  % ensemble learning with hcl
-  [net_out, net_out_2, final_out, system, system_2] = htet_SaFIN_FRIE_with_HCL(1,trainData_Pos,trainData_Neg,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % [no, ns] = Run_SaFIN_FRIE(1,trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % out_after_cut_off = htet_find_optimal_cut_off(testData_D0(:,target_col), no, 0);
-  % ensemble_result = final_out + out_after_cut_off.after_threshold;
-  [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,target_col), final_out);
-  output.fnr = fnr;
-  output.fpr = fpr;
-  output.eer = (fnr+fpr)/2;
-  class_results(cv_num) = output;
-  comparison(cv_num) = {[net_out net_out_2 final_out testData_D0(:,target_col)]}
-
-  % final_result = [];
-  % for z=1:size(ensemble_result,1)
-  %     if ensemble_result(z,1) == 2
-  %       final_result = [final_result; 1]
-  %     elseif ensemble_result(z,1) == 1
-  %       X = randi(2) - 1;
-  %       final_result = [final_result; X]
-  %     else
-  %       final_result = [final_result; 0]
-  %     end
-  % end
-  %
-  % [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData_D0(:,target_col), final_result);
-  final_eer = final_eer + (fnr+fpr)/2;
-
-  % output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), final_out, 0.5);
-  % result_0.net_out = net_out;
-  % result_0.net_out_2 = net_out_2;
-  % result_0.final_out = final_out;
-  % result_0.test_data = testData_D0(:,target_col);
-  % result_0.net_structure_1 = system;
-  % result_0.net_structure_2 = system_2;
-  % result_0.output = output_0;
-  % net_result_for_last_record(cv_num,:) = result_0;
-  % final_eer = final_eer + output_0.MIN_EER(1,1);
-  % original_acc = original_acc + output_0.acc;
-  %
-  % if (final_acc > max_acc)
-  %     max_acc = final_acc;
-  % end
+  [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+  output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), net_out_0, threshold);
+  result_0.net_out = net_out_0;
+  result_0.net_structure = net_structure_0;
+  result_0.output = output_0;
+  result_0.FNR = output_0.MIN_FNR(1,1);
+  result_0.FPR = output_0.MIN_FPR(1,1);
+  result_0.EER = output_0.MIN_EER(1,1);
+  result_0.ACC = 100 - output_0.MIN_EER(1,1);
+  result_0.Feat = IND_a;
+  result_0.Rules = net_structure_0.ruleCount;
+  net_result_for_last_record(cv_num,:) = result_0;
 
   % [net_out_1, net_structure_1] = Run_SaFIN_FRIE(1, trainData_D1,testData_D1,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_1 = htet_find_optimal_cut_off(testData_D1(:,target_col), net_out_1, threshold);  output_1avg = htet_find_optimal_cut_off(testData_D1(:,target_col), avg_net_out_1, threshold);
-  % result_1.net_out = net_out_1;
+  % output_1 = htet_find_optimal_cut_off(testData_D1(:,target_col), net_out_1, threshold);
   % result_1.net_structure = net_structure_1;
-  % result_1.output = output_1;  result_1.outputavg = output_1avg;
+  % result_1.output = output_1;
+  % result_1.FNR = output_1.MIN_FNR(1,1);
+  % result_1.FPR = output_1.MIN_FPR(1,1);
+  % result_1.EER = output_1.MIN_EER(1,1);
+  % result_1.ACC = 100 - output_1.MIN_EER(1,1);
+  % result_1.Feat = IND_a;
+  % result_1.Rules = net_structure_1.ruleCount;
   % net_result_for_one_year_prior(cv_num,:) = result_1;
+  %
   % [net_out_2, net_structure_2] = Run_SaFIN_FRIE(1, trainData_D2,testData_D2,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
   % output_2 = htet_find_optimal_cut_off(testData_D2(:,target_col), net_out_2, threshold);
   % result_2.net_out = net_out_2;
   % result_2.net_structure = net_structure_2;
   % result_2.output = output_2;
+  % result_2.FNR = output_2.MIN_FNR(1,1);
+  % result_2.FPR = output_2.MIN_FPR(1,1);
+  % result_2.EER = output_2.MIN_EER(1,1);
+  % result_2.ACC = 100 - output_2.MIN_EER(1,1);
+  % result_2.Feat = IND_a;
+  % result_2.Rules = net_structure_2.ruleCount;
   % net_result_for_two_year_prior(cv_num,:) = result_2;
 
   disp('Processing of one CV group has completed');
