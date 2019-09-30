@@ -31,14 +31,12 @@ function net_out = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms
         for k = 1:OUTD %for each output dimension
             if inferred(k,Rules(j,IND+k)) < act_rules(j)
                 inferred(k,Rules(j,IND+k)) = act_rules(j);       %get the maximum activation value of the term for each output dimension
-                disp('HN DEBUG curr inferred'); disp(inferred(k,Rules(j,IND+k)))
                 total_rule_strength = total_rule_strength + inferred(k,Rules(j,IND+k));
                 rule_counter = rule_counter + 1;
             end
             check(k,Rules(j,IND+k)) = 1;  % Rules(j,IND+k) will give you the output cluster for the output variable/dimension k.
         end
     end
-    disp('HN DEBUG inferred'); disp(inferred)
     % Layer 5
     for j = 1:OUTD
         top = 0; bottom = 0;
@@ -60,7 +58,6 @@ function net_out = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms
     net_out = top/bottom;
 
     if isHcl
-      disp('HN DEBUG net_out'); disp(inferred)
       if rule_counter == 0
         rule_counter = 1;
       end

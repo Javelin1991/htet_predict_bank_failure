@@ -95,10 +95,8 @@ function [Rules_semantic Rule_importance] = interpret(net, IND, OUTD)
                 if (max(net.no_InTerms) <=7 & max(net.no_OutTerms) <=7)
                     st = sprintf('%s', net.Rules_semantic{b,:});
                     disp(st);
-                    disp('HN DEBUG comes here condition 1');
                     Rule_importance = [Rule_importance; {net.Rules_semantic{b,:}}]
                 else
-                    disp('HN DEBUG comes here condition 2');
                     disp(net.Rules(b,:));
                 end
                 disp(' '); % printing a line break

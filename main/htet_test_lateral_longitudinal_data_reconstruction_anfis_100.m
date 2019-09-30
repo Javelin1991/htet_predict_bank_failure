@@ -35,18 +35,25 @@ warning;
 
 load Output_LL_S;
 load Output_LL_F;
+load DATA_for_recon_test_with_year; % ignore this line, this is just to help add year in the last col
 
 SB_Full_Records = output_1.full_record;
 FB_Full_Records = output_2.full_record;
 
+SB_Full_Records_2 = Survived_Banks; % ignore this line, this is just to help add year in the last col
+FB_Full_Records_2 = Failed_Banks; % ignore this line, this is just to help add year in the last col
+
 RECONSTRUCTED_DATA = [];
 TRC = [];
 bank_type = [{FB_Full_Records}; {SB_Full_Records}];
+bank_type_2 = [{FB_Full_Records_2}; {SB_Full_Records_2}];
 
 for n=1:2
     banks = bank_type(n);
-    BANK = banks{1};
+    banks_2 = bank_type_2(n); % ignore this line, this is just to help add year in the last col
 
+    BANK = banks{1};
+    BANK_2 = banks_2{1}; % ignore this line, this is just to help add year in the last col
     % step 1 is lateral single feature reconstruction
     state_after_step1 = [];
     % step 2 is longitudinal single feature reconstruction
@@ -57,7 +64,7 @@ for n=1:2
     RESULTS = [];
     MEAN_LL = [];
     Data = [];
-    H = [];
+    H = []; H2 = [];
     total_lat_construct = 0;
     total_long_construct = 0;
     % pre-filtering data for corner cases where reconstruction could not take place
@@ -66,7 +73,13 @@ for n=1:2
       H = [H; t];
     end
 
+    for i=1:length(BANK_2) % ignore this line, this is just to help add year in the last col
+      t2 = filter(BANK_2(i)); % ignore this line, this is just to help add year in the last col
+      H2 = [H2; t2]; % ignore this line, this is just to help add year in the last col
+    end
+
     Data = H;
+    Data_2 = H2; % ignore this line, this is just to help add year in the last col
 
     not_done_yet = true;
     counter = 0;
@@ -113,7 +126,9 @@ for n=1:2
     D = [];
     for m=1:length(MEAN_LL)
       mat = cell2mat(MEAN_LL(m));
-      D = [D; mat]; % to display consecutively in rows
+      mat2 = cell2mat(Data_2(m));
+      last_col = mat2(:,size(mat2,2));
+      D = [D; [mat last_col]]; % to display consecutively in rows with year as the last column
     end
     RECONSTRUCTED_DATA = [RECONSTRUCTED_DATA; {D}];
     trc.total_lat_construct = total_lat_construct;

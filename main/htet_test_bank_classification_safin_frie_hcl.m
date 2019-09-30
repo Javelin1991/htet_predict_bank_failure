@@ -17,11 +17,12 @@ clc;
 % load RECON_5_fold_cv_top_3_feat;
 % load Failed_Banks;
 % load Survived_Banks;
-% load '5_fold_CV_top3_feat_FB';
+load '5_fold_CV_top3_feat_FB';
 % load '5_fold_CV_Bank_Cells';
 % load DATA_5_CV;
-load CV_3T_Original;
-% load CV_3T_Increased;
+% load CV_3T_Original_Updated;
+% load CV_3T_Increased_one_year_prior;
+% load CV_3T_Increased_two_year_prior;
 
 Epochs = 0;
 Eta = 0.05;
@@ -32,13 +33,9 @@ Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
-tau = 0.2;
+tau = 0.7;
 
 threshold = 0;
-target_col = 4;
-original_acc = 0;
-
-
 mean_acc = 0;
 best_acc = 0;
 BEST_SYSTEMS = [];
@@ -55,14 +52,13 @@ for cv_num = 1:5
   % D0 = CV1_with{cv_num,1}
   % % D1 = CV2{cv_num,1}
   % % D2 = CV3{cv_num,1}
-  % D0 = CV1_with_top_3_features{cv_num,1};
-  % D0 = D0(:,[3 7 10 2]);
+  D0 = CV1_with_top_3_features{cv_num,1};
+  D0 = D0(:,[3:5 2]);
   % D1 = D1(:,[3 7 10 2]);
   % D2 = D2(:,[3 7 10 2]);
   % D0 = DATA_5_CV{cv_num,1};
 
-  D0 = CV_3T{cv_num,1};
-  D0 = D0;
+%   D0 = CV_3T{cv_num,1};
   epoch = 0;
   not_done_yet = true;
 

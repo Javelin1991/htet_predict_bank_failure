@@ -11,14 +11,15 @@ clc;
 
 load Failed_Banks;
 load Survived_Banks;
-%
-% load denfis_recon_original_20_percent_data;
-%
-% Failed_Banks = DENFIS_FB;
-% Survived_Banks = DENFIS_SB;
+
+% %
+% % load denfis_recon_original_20_percent_data;
+% %
+% % Failed_Banks = DENFIS_FB;
+% % Survived_Banks = DENFIS_SB;
 Failed_Banks = Failed_Banks(:,[1 2 3 7 10 13]);
 Survived_Banks = Survived_Banks(:,[1 2 3 7 10 13]);
-
+%
 Survived_Banks(any(isnan(Survived_Banks), 2), :) = [];
 Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
 %
@@ -34,8 +35,11 @@ Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
 % for i=1:size(SB,1)
 %   Survived_Banks = [Survived_Banks; cell2mat(SB(i))];
 % end
+% load Full_reconstructed_data_anfis;
+% Failed_Banks = RECONSTRUCTED_DATA{1, 1};
+% Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
-type = '3T';
+type = '3T_two';
 index = 3;
 backward_offset = 0;
 Failed_Banks_Group_By_Bank_ID = [];
@@ -43,7 +47,7 @@ Survived_Banks_Group_By_Bank_ID = [];
 
 output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset, type);
 output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset, type);
-
+%
 % output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
 % output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
 
