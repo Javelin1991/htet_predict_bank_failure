@@ -42,14 +42,15 @@ tau = 0.2;
 threshold = 0;
 mean_acc = 0;
 BEST_SYSTEMS = [];
+primary_threshold = 90;
 
-for cv_num = 1:1
+for cv_num = 1:5
 
   % top 3 feat x 3 , combined 3 timeline
   % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
 
   % 9 feat t
-  Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
+  % Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
   % 9 feat t-1
   % Labels = ["CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1"];
   % 9 feat t-2
@@ -59,22 +60,22 @@ for cv_num = 1:1
   % Labels = ["CAPADE_t", "OLAQLY_t", "PROBLO_t","PLAQLY_t", "NIEOIN_t", "NINMAR_t", "ROE_t", "LIQUID_t", "GROWLA_t", "CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1", "CAPADE_t_2", "OLAQLY_t_2", "PROBLO_t_2","PLAQLY_t_2", "NIEOIN_t_2", "NINMAR_t_2", "ROE_t_2", "LIQUID_t_2", "GROWLA_t_2"];
 
   % top 3 feat as per FCMAC
-  % Labels = ["CAPADE","PLAQLY","ROE"];
+  Labels = ["CAPADE","PLAQLY","ROE"];
 
   formatSpec = '\nThe current cv used is: %d';
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
   %%% assign required data %%%
-  %
-  % D0 = CV1{cv_num,1};
-  % D0(:,6) = []; % removing ADQLLP
-  % D0 = D0(:,[3 7 10 2]); % 9 covariates
+
+  % Top 3 features data size same as FCMAC
+  Data = CV1{cv_num,1};
+  Data = Data(:,[3 7 10 2]); % 9 covariates
 
   % for 9 variable, timeline - last available
-  Data = CV1{cv_num,1}
-  Data(:,6) = [];
-  Data = Data(:,[3:11 2])
+  % Data = CV1{cv_num,1}
+  % Data(:,6) = [];
+  % Data = Data(:,[3:11 2])
 
   % % for 9 variable, timeline - one year prior
   % Data = CV2{cv_num,1}
@@ -98,7 +99,7 @@ for cv_num = 1:1
   best_eer = 100;
   D0 = Data;
 
-  while(not_done_yet)
+  % while(not_done_yet)
 
       %%% keep track of the previous accuracy %%%
       prev_acc = best_acc;
@@ -129,8 +130,8 @@ for cv_num = 1:1
       for l=1:limit
 
         %%% maintain a list for current iteration %%%
-        curr_list = [best_list trainData_D0(:,l) trainData_D0(:,limit+1)]
-        curr_valData = [best_val_list valData_D0(:,l) valData_D0(:,limit+1)]
+        curr_list = [trainData_D0(:,l) trainData_D0(:,limit+1)]
+        curr_valData = [valData_D0(:,l) valData_D0(:,limit+1)]
 
         trainData_Neg = [];
         trainData_Pos = [];
@@ -156,9 +157,9 @@ for cv_num = 1:1
 
         %%% balanced error %%%
         curr_eer = (fnr+fpr)/2;
-
+        curr_acc = 100 - curr_eer;
         %%% if the current error is lower than best error, then update the best error %%%
-        if curr_eer < best_eer
+        if curr_acc > primary_threshold
             best_list = [best_list trainData_D0(:,l)];
             best_val_list = [best_val_list valData_D0(:,l)];
 
@@ -172,17 +173,17 @@ for cv_num = 1:1
           end
       end
 
-      epoch = epoch + 1;
-      if best_acc > 99 || epoch > 2 || size(filter_indices,2) == 1
-        break;
-      else
-        if ~isempty(filter_indices)
-           Labels = Labels(:,filter_indices);
-           filter_indices = [filter_indices, limit+1];
-           D0 = D0(:,filter_indices);
-        end
-      end
-  end
+  %     epoch = epoch + 1;
+  %     if best_acc > 99 || epoch > 2 || size(filter_indices,2) == 1
+  %       break;
+  %     else
+  %       if ~isempty(filter_indices)
+  %          Labels = Labels(:,filter_indices);
+  %          filter_indices = [filter_indices, limit+1];
+  %          D0 = D0(:,filter_indices);
+  %       end
+  %     end
+  % end
 
   %%% getting the label dimension %%%
   last_idx = size(Data,2);
@@ -217,7 +218,7 @@ for cv_num = 1:1
   best_systems.neg_rules = size(system_2.net.Rules,1);
   best_systems.best_feat = {best_indices};
   best_systems.best_labels = {best_labels};
-  best_systems.feat_num = size(best_indices,2);
+  best_systems.feat_num = size(best_features,2);
   best_systems.total_rules = size(system.net.Rules,1) + size(system_2.net.Rules,1);
   best_systems.fnr = fnr;
   best_systems.fpr = fpr;

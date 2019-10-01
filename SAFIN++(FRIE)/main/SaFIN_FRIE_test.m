@@ -1,4 +1,4 @@
-function net_out = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms,OutTerms,Rules, isHcl)
+function [net_out max_act] = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms,OutTerms,Rules, isHcl)
     net.rule_importance = zeros(size(Rules,1),1);
     % Initialize
     in_mf = zeros(IND,max(no_InTerms));
@@ -24,15 +24,17 @@ function net_out = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms
         end
         act_rules(j) = min(tmp); % get the activation value of the rule by min-operation
         clear tmp;               % act_rules stores importance of each role with respect to the particular input data instance
+        total_rule_strength = total_rule_strength + act_rules(j);
+        rule_counter = rule_counter + 1;
     end
+
+    max_act = max(act_rules)
 
     % Layer 4
     for j = 1:size(Rules,1) %for each rule
         for k = 1:OUTD %for each output dimension
             if inferred(k,Rules(j,IND+k)) < act_rules(j)
                 inferred(k,Rules(j,IND+k)) = act_rules(j);       %get the maximum activation value of the term for each output dimension
-                total_rule_strength = total_rule_strength + inferred(k,Rules(j,IND+k));
-                rule_counter = rule_counter + 1;
             end
             check(k,Rules(j,IND+k)) = 1;  % Rules(j,IND+k) will give you the output cluster for the output variable/dimension k.
         end
@@ -59,8 +61,9 @@ function net_out = SaFIN_FRIE_test(input,IND,OUTD,no_InTerms,InTerms,no_OutTerms
 
     if isHcl
       if rule_counter == 0
-        rule_counter = 1;
+        net_out = 0;
+      else
+        net_out = total_rule_strength/rule_counter;
       end
-      net_out = total_rule_strength/rule_counter;
     end
 end
