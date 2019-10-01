@@ -31,6 +31,7 @@ Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
 tau = 0.2;
+threshold = 0;
 
 % % used to generate 5 fold CV
 % for k = 1:3
@@ -74,19 +75,6 @@ tau = 0.2;
 %   DATA_5_CV = [DATA_5_CV; {DATA}];
 %   clear DATA;
 % end
-
-
-threshold = 0;
-target_col = 10;
-original_acc = 0;
-
-IND_a = 9;
-OUTD_a = 1;
-
-A = [];
-B = [];
-C = [];
-
 final_eer = 0;
 final_acc = 0;
 
@@ -107,6 +95,8 @@ for cv_num = 1:5
 
   % D0 = CV1_with_top_3_features{cv_num,1};
   D0 = D0(:,[3:11 2]);
+  IND_a = size(D0,2) - 1;
+  OUTD_a = 1;
   % D1 = D1(:,[3:11 2]);
   % D2 = D2(:,[3:11 2]);
 
@@ -126,7 +116,7 @@ for cv_num = 1:5
 
   % network prediction
   [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  output_0 = htet_find_optimal_cut_off(testData_D0(:,target_col), net_out_0, threshold);
+  output_0 = htet_find_optimal_cut_off(testData_D0(:,IND_a+OUTD_a), net_out_0, threshold);
   result_0.net_out = net_out_0;
   result_0.net_structure = net_structure_0;
   result_0.output = output_0;
@@ -137,9 +127,9 @@ for cv_num = 1:5
   result_0.Feat = IND_a;
   result_0.Rules = net_structure_0.ruleCount;
   net_result_for_last_record(cv_num,:) = result_0;
-
+  final_eer = final_eer + result_0.EER;
   % [net_out_1, net_structure_1] = Run_SaFIN_FRIE(1, trainData_D1,testData_D1,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_1 = htet_find_optimal_cut_off(testData_D1(:,target_col), net_out_1, threshold);
+  % output_1 = htet_find_optimal_cut_off(testData_D1(:,IND_a+OUTD_a), net_out_1, threshold);
   % result_1.net_structure = net_structure_1;
   % result_1.output = output_1;
   % result_1.FNR = output_1.MIN_FNR(1,1);
@@ -151,7 +141,7 @@ for cv_num = 1:5
   % net_result_for_one_year_prior(cv_num,:) = result_1;
   %
   % [net_out_2, net_structure_2] = Run_SaFIN_FRIE(1, trainData_D2,testData_D2,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_2 = htet_find_optimal_cut_off(testData_D2(:,target_col), net_out_2, threshold);
+  % output_2 = htet_find_optimal_cut_off(testData_D2(:,IND_a+OUTD_a), net_out_2, threshold);
   % result_2.net_out = net_out_2;
   % result_2.net_structure = net_structure_2;
   % result_2.output = output_2;
