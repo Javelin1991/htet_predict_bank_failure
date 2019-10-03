@@ -34,6 +34,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
     Acc = [];
     FPR = [];
     FNR = [];
+    BEST_AFTER_THRESHOLD = [];
 
     % to plot EER bisector line
     Bisector = [];
@@ -111,7 +112,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
             best_eer = round(eer, 2);
             best_fpr = round(fpr, 2);
             best_fnr = round(fnr, 2);
-            output.after_threshold = after_threshold;
+            best_after_threshold = after_threshold;
           end
 
           if acc > best_acc
@@ -132,6 +133,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       MIN_CUT_OFF = [MIN_CUT_OFF; optimal_cut_off]
       MIN_FPR = [MIN_FPR; best_fpr];
       MIN_FNR = [MIN_FNR; best_fnr];
+      BEST_AFTER_THRESHOLD = [BEST_AFTER_THRESHOLD; {best_after_threshold}];
 
       out_fpr = [out_fpr; {FPR}];
       out_fnr = [out_fnr; {FNR}];
@@ -157,6 +159,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
     % bar(Acc); % plot the matrix
     % title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
     % colormap('jet'); % set the colorscheme
+    output.BEST_AFTER_THRESHOLD = BEST_AFTER_THRESHOLD;
     output.MIN_EER = MIN_EER;
     output.MIN_CUT_OFF = MIN_CUT_OFF;
     output.MIN_FPR = MIN_FPR;

@@ -104,14 +104,8 @@ for i = 1 : size(TestData,1)
     [net_out(i,:) max_net_out(i,:)] = SaFIN_FRIE_test(TestData(i, 1:IND),IND,OUTD,net.no_InTerms,net.InTerms,net.no_OutTerms,net.OutTerms,net.Rules, isHcl);
     [net_out_2(i,:) max_net_out_2(i,:)] = SaFIN_FRIE_test(TestData(i, 1:IND),IND,OUTD,net_2.no_InTerms,net_2.InTerms,net_2.no_OutTerms,net_2.OutTerms,net_2.Rules, isHcl);
 
-    if (abs(net_out(i,:) - net_out_2(i,:)) <= 0.03)
-      if max_net_out(i,:) > max_net_out_2(i,:)
-        final_out(i,:) = max_net_out(i,:)
-      else
-        final_out(i,:) = max_net_out_2(i,:)
-      end
-    elseif (net_out(i,:) > net_out_2(i,:))
-        final_out(i,:) = 1;
+    if (net_out(i,:) > net_out_2(i,:))
+      final_out(i,:) = 1;
     else
       final_out(i,:) = 0;
     end
