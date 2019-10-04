@@ -11,23 +11,22 @@ clear;
 clc;
 
 %%% load different data %%%
-% load '5_Fold_CVs_with_top_3_features';
-load CV1_Classification;
+
+% load CV1_Classification;
+% load CV2_Classification;
 % load CV3_Classification;
-% load CV3_Classification;
-% load 'Reconstructed_Data_LL';
-% load RECON_5_fold_cv_top_3_feat;
-% load Failed_Banks;
-% load Survived_Banks;
-% load '5_fold_CV_top3_feat_FB';
-% load '5_fold_CV_Bank_Cells';
-% load DATA_5_CV;
-% load CV_3T_Original_Updated;
-% load CV_3T_Increased_Updated;
-% load CV_3T_Increased_one_year_prior;
-% load CV_3T_Increased_two_year_prior;
-% load CV_3T_27_feat_one_year;
-% load CV_2T_18_feat;
+
+% load CV1_Classification_Increased;
+% load CV2_Classification_Increased;
+% load CV3_Classification_Increased;
+
+% load CV1_Classification_Denfis;
+% load CV2_Classification_Denfis;
+% load CV3_Classification_Denfis;
+
+load CV1_Classification_Anfis_100;
+% load CV2_Classification_Anfis_100;
+% load CV3_Classification_Anfis_100;
 
 %%% EXPERIMENT PARAMS SETUP %%%
 Epochs = 0;
@@ -40,12 +39,13 @@ Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
 tau = 0.57;
+accuracy_threshold = 80;
+
 threshold = 0;
 best_mean_acc = 0;
 BEST_SYSTEMS = [];
-accuracy_threshold = 90;
 
-for cv_num = 1:1
+for cv_num = 1:5
 
   % top 3 feat x 3 , combined 3 timeline
   % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
@@ -70,8 +70,10 @@ for cv_num = 1:1
   %%% assign required data %%%
 
   % Top 3 features data size same as FCMAC
-  Data = CV1{cv_num,1};
-  Data = Data(:,[3 7 10 2]); % 3 covariates
+  % Data = CV1{cv_num,1}; % last available
+  % Data = CV2{cv_num,1}; % one year prior
+  % Data = CV3{cv_num,1}; % two year prior
+  % Data = Data(:,[3 7 10 2]); % 3 covariates
 
   % for 9 variable, timeline - last available
   % Data = CV1{cv_num,1}
@@ -92,8 +94,8 @@ for cv_num = 1:1
   % Data = CV_3T{cv_num,1};
 
   % top 3 features with increased data set
-  % Data = CV1_with_top_3_features{cv_num,1};
-  % Data = Data(:,[3:5 2])
+  Data = CV{cv_num,1};
+  Data = Data(:,[3:5 2])
 
   epoch = 0; % this epoch is just for a predefined number of iterations
   best_acc = 0;
