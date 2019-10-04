@@ -34,19 +34,18 @@ Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.5;
+Lamda = 0.62;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
-tau = 0.2;
-Alpha = 0.0001;
+tau = 0.57;
 threshold = 0;
 best_mean_acc = 0;
 BEST_SYSTEMS = [];
-primary_threshold = 90;
+accuracy_threshold = 90;
 
-for cv_num = 1:5
+for cv_num = 1:1
 
   % top 3 feat x 3 , combined 3 timeline
   % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
@@ -142,7 +141,7 @@ for cv_num = 1:5
     curr_acc = 100 - output.MIN_EER(1,1);
 
     %%% if the current error is lower than best error, then update the best error %%%
-    if curr_acc > primary_threshold && curr_acc > best_acc
+    if curr_acc > accuracy_threshold && curr_acc > best_acc
         best_list = [best_list trainData_D0(:,l)];
         best_val_list = [best_val_list valData_D0(:,l)];
 
@@ -157,7 +156,7 @@ for cv_num = 1:5
   end
 
   if size(best_indices,1) == 0
-    disp('The required accuracy cannot be found! Please adjust the primary_threshold setting');
+    disp('The required accuracy cannot be found! Please adjust the accuracy_threshold setting');
     return;
   end
 
@@ -186,6 +185,7 @@ for cv_num = 1:5
   result.summary = [net_out cell2mat(output.BEST_AFTER_THRESHOLD(1,1)) test(:,IND+OUTD)];
   result.net_structure = system;
   result.output = output;
+  result.MIN_CUT_OFF = output.MIN_CUT_OFF(1,1);
   result.FNR = output.MIN_FNR(1,1);
   result.FPR = output.MIN_FPR(1,1);
   result.EER = output.MIN_EER(1,1);
