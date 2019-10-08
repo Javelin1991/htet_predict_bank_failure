@@ -95,7 +95,7 @@ for cv_num = 1:5
   % Data = CV_3T{cv_num,1};
   accuracy_threshold = 100;
 
-  while (accuracy_threshold > 0) {
+  while (accuracy_threshold > 0)
 
 
       % top 3 features with increased data set
