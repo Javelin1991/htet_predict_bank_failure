@@ -148,13 +148,13 @@ function out = htet_filter_bank_data_by_index(input, offset, type)
       end
 
       % optional
-      % out2 = [out2; {A}]
+      out2 = [out2; {A}]
       % out3 = [out3; A(1,1)]
       % out4 = [out4; [A(1,1), {A}]];
     end
     out.result = out1;
     % optional
-    % out.full_record = out2;
+    out.full_record = out2;
     % out.id = out3;
     % out.id_full_record = out4;
     % out.is_nan_count = is_nan_count;
