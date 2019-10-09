@@ -2,7 +2,7 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   performs missing data imputation using lateral and longitudinal predictions
+% Function  :   performs missing data reconstruction using lateral and longitudinal predictions
 %
 % Reconstruction process is done separately for failed banks and survived banks
 % since they share different properties during financial distress
@@ -20,6 +20,7 @@
 %
 % The postfix "_anfis_100" in the filename indicates the pretrained systems that are used for reconstruction is of ANFIS
 % and it has utilized 100% of the data for pre-training
+% since the goal is to reconstruct all missing data among top 3 features in the entire data set
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 % It takes 3 min and 13 sec to run this file
@@ -58,7 +59,6 @@ for n=1:2
     state_after_step1 = [];
     % step 2 is longitudinal single feature reconstruction
     state_after_step2 = [];
-    % step 3 is longitudinal single feature reconstruction
     % repeat the process again until no more missing feature left
 
     RESULTS = [];

@@ -2,7 +2,7 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   performs missing data imputation using lateral and longitudinal predictions
+% Function  :   performs missing data reconstruction using lateral and longitudinal predictions
 %
 % Reconstruction process is done separately for failed banks and survived banks
 % since they share different properties during financial distress
