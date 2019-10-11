@@ -10,10 +10,9 @@
 clear;
 clc;
 
-load Correct_All_Banks;
-load Survived_Banks;
-load Failed_Banks;
+t = linspace(0,2*pi);
+r1 = sin(4*t)+2; x1 = r1.*cos(t); y1 = r1.*sin(t);
+r2 = sin(8*t)+2; x2 = r2.*cos(t); y2 = r2.*sin(t);
+P = InterX([x1;y1],[x2;y2]);
 
-o1 = htet_filter_bank_data_by_index(Correct_All_Banks, 0,'1T')
-o2 = htet_filter_bank_data_by_index(Survived_Banks, 0,'1T')
-o3 = htet_filter_bank_data_by_index(Failed_Banks, 0,'1T')
+plot(x1,y1,x2,y2,P(1,:),P(2,:),'ro')
