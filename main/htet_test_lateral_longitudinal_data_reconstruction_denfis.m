@@ -188,7 +188,6 @@ function [result, rc1] = do_lateral_prediction(A, SYSTEMS, bank_type)
 
 
   % for Pre_trained_Systems_Lateral_Prediction
-  % to retreat the best pretrained system which is ANFIS
   % if the missing data is CAPADE, use {1,3};
   % if the missing data is PLAQLY, use {2,3};
   % if the missing data is ROE, use {3,3};

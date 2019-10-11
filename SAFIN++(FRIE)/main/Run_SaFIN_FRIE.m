@@ -13,8 +13,6 @@
 %   TrainData_IN: the N x IND training set where N is the number of training samples, IND is the input dimensions
 %   TrainData_OUT: the N x OUTD training set where N is the number of training samples, OUTD is the output dimensions
 %   TestData: the M x IND testing set where M is the number of testing samples
-%   Alpha: minimum membership threshold
-%   Beta: contrasting threshold
 %   Epochs: number of training epochs
 %   Eta: training constant
 %   Sigma0: first cluster sigma

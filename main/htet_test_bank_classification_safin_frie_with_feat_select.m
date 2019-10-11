@@ -40,6 +40,7 @@ Gamma = 0.1;
 forget = 1;
 tau = 0.57;
 decrement_step = 10;
+val_percent = 0.8
 
 threshold = 0;
 best_mean_acc = 0;
@@ -119,7 +120,7 @@ for cv_num = 1:5
       %%% get train data and validation data %%%
       start_test = (size(Data, 1) * 0.2) + 1;
       trainData_D0 = D0(1:start_test-1,:);
-      start_validate = floor((size(trainData_D0, 1) * 0.8) + 1);
+      start_validate = floor((size(trainData_D0, 1) * val_percent) + 1);
       valData_D0 = trainData_D0(start_validate:length(trainData_D0),:);
       trainData_D0 = trainData_D0(1:start_validate-1,:); % reduce train data size to 80%
 
