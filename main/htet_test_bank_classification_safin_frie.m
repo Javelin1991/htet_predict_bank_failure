@@ -82,17 +82,27 @@ for cv_num = 1:5
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
+  % D0 = CV1{cv_num,1};
+  % D0(:,6) = [];
+  % D1 = CV2{cv_num,1};
+  % D1(:,6) = [];
+  % D2 = CV3{cv_num,1};
+  % D2(:,6) = [];
+  %
+  %
+  % D0 = D0(:,[3:11 2]);
+  % D1 = D1(:,[3:11 2]);
+  % D2 = D2(:,[3:11 2]);
+
+
   D0 = CV1{cv_num,1};
-  D0(:,6) = [];
   D1 = CV2{cv_num,1};
-  D1(:,6) = [];
   D2 = CV3{cv_num,1};
-  D2(:,6) = [];
 
 
-  D0 = D0(:,[3:11 2]);
-  D1 = D1(:,[3:11 2]);
-  D2 = D2(:,[3:11 2]);
+  D0 = D0(:,[3 7 10 2]);
+  D1 = D1(:,[3 7 10 2]);
+  D2 = D2(:,[3 7 10 2]);
 
   IND_a = size(D0,2) - 1;
   OUTD_a = 1;
@@ -113,7 +123,7 @@ for cv_num = 1:5
   result_0.net_out = net_out_0;
   result_0.net_structure = net_structure_0;
   result_0.output = output_0;
-  result_0.MIN_MEE = output_0.MIN_MEE(1,1);
+  result_0.MIN_MEE = output_0.MIN_MME(1,1);
   result_0.FNR = output_0.MIN_FNR(1,1);
   result_0.FPR = output_0.MIN_FPR(1,1);
   result_0.EER = output_0.true_eer;
@@ -127,11 +137,11 @@ for cv_num = 1:5
   output_1 = htet_find_optimal_cut_off(testData_D1(:,IND_a+OUTD_a), net_out_1, threshold);
   result_1.net_structure = net_structure_1;
   result_1.output = output_1;
-  result_1.MIN_MEE = output_0.MIN_MEE(1,1);
+  result_1.MIN_MEE = output_0.MIN_MME(1,1);
   result_1.FNR = output_1.MIN_FNR(1,1);
   result_1.FPR = output_1.MIN_FPR(1,1);
-  result_1.EER = output_0.true_eer;
-  result_1.ACC = output_0.accuracy;
+  result_1.EER = output_1.true_eer;
+  result_1.ACC = output_1.accuracy;
   result_1.Feat = IND_a;
   result_1.Rules = net_structure_1.ruleCount;
   net_result_for_one_year_prior(cv_num,:) = result_1;
@@ -141,10 +151,10 @@ for cv_num = 1:5
   result_2.net_out = net_out_2;
   result_2.net_structure = net_structure_2;
   result_2.output = output_2;
-  result_2.MME = output_2.MIN_MEE(1,1);
+  result_2.MME = output_2.MIN_MME(1,1);
   result_2.FNR = output_2.MIN_FNR(1,1);
   result_2.FPR = output_2.MIN_FPR(1,1);
-  result_2.EER = out_2.true_eer;
+  result_2.EER = output_2.true_eer;
   result_2.ACC = output_2.accuracy;
   result_2.Feat = IND_a;
   result_2.Rules = net_structure_2.ruleCount;

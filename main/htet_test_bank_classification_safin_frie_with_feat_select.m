@@ -3,8 +3,8 @@
 % Author    :   Htet
 % Date      :   Sep 11, 2019
 % File  :   used to test bank failure prediction/classification using SaFIN_FRIE with HCL
-% Running Data Set 1A, 9 features, will take
-% Running Data Set 1B, top 3 features, will take
+% Running Data Set 1A, 9 features, will take ~ 8-10 min
+% Running Data Set 1B, top 3 features, will take ~6.5 min
 % Running Data Set 2A, increased top 3 features, will take
 % Running Data Set 2B, denfis recon top 3 features, will take
 % Running Data Set 3, anfis full recon top 3 features,
@@ -18,9 +18,9 @@ close all;
 
 %%% load different data %%%
 
-load CV1_Classification;
-load CV2_Classification;
-load CV3_Classification;
+% load CV1_Classification;
+% load CV2_Classification;
+% load CV3_Classification;
 
 % load CV1_Classification_Increased;
 % load CV2_Classification_Increased;
@@ -30,9 +30,9 @@ load CV3_Classification;
 % load CV2_Classification_Denfis;
 % load CV3_Classification_Denfis;
 
-% load CV1_Classification_Anfis_100;
-% load CV2_Classification_Anfis_100;
-% load CV3_Classification_Anfis_100;
+load CV1_Classification_Anfis_100;
+load CV2_Classification_Anfis_100;
+load CV3_Classification_Anfis_100;
 
 %%% EXPERIMENT PARAMS SETUP %%%
 Epochs = 0;
@@ -51,7 +51,7 @@ val_percent = 0.8
 
 threshold = 0;
 best_mean_acc = 0;
-SCENARIO = 1;
+SCENARIO = 3;
 
 Last = '(Last available)'
 One = '(One-year prior)'
@@ -121,6 +121,8 @@ for d = 1:3
 
               Data = Data(:,[3 7 10 2]); % 3 covariates
           case 3
+              Labels = ["CAPADE","PLAQLY","ROE"];
+
               % top 3 features with increased data set
               if d == 1
                 Data = CV1{cv_num,1}; % last available

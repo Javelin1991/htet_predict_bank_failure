@@ -28,8 +28,6 @@ function DET_OUT = htet_generate_det_plot(systems, timeline)
         % the last available record
         fpr = systems(i).output.all_fpr{1, 1}
         fnr = systems(i).output.all_fnr{1, 1}
-        FNR = FNR + fnr;
-        FPR = FPR + fpr;
         curve = [fpr, fnr];
         %       P = InterX([x1;y1],[x2;y2]);
         inX = InterX([fpr;fnr],[bisector;bisector]);

@@ -9,10 +9,41 @@
 % data pre-processing
 clear;
 clc;
+close all;
 
-t = linspace(0,2*pi);
-r1 = sin(4*t)+2; x1 = r1.*cos(t); y1 = r1.*sin(t);
-r2 = sin(8*t)+2; x2 = r2.*cos(t); y2 = r2.*sin(t);
-P = InterX([x1;y1],[x2;y2]);
 
-plot(x1,y1,x2,y2,P(1,:),P(2,:),'ro')
+
+
+
+load CV3_Classification_Anfis_100;
+
+FB_anfis = 0;
+SB_anfis = 0;
+
+FB_inc = 0;
+SB_inc = 0;
+
+D = CV3{1,1}
+T_anfis = size(D,1);
+
+for i=1:size(D,1)
+   if D(i,2) == 1
+     FB_anfis =FB_anfis + 1;
+   else
+     SB_anfis =SB_anfis + 1;
+   end
+end
+
+
+
+load CV3_Classification_Increased;
+D = CV3{1,1}
+T_inc = size(D,1);
+
+for i=1:size(D,1)
+   if D(i,2) == 1
+     FB_inc =FB_inc + 1;
+   else
+     SB_inc =SB_inc + 1;
+   end
+end
