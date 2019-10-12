@@ -11,8 +11,8 @@ clc;
 
 % load 'CV_3T_27_Feat';
 load CV1_Classification;
-% load CV2_Classification;
-% load CV3_Classification;
+load CV2_Classification;
+load CV3_Classification;
 % load 'Reconstructed_Data_LL';
 % load RECON_5_fold_cv_top_3_feat;
 % load Failed_Banks;
@@ -25,12 +25,12 @@ Epochs = 0;
 Eta = 0.05;
 Sigma0 = sqrt(0.16);
 Forgetfactor = 0.99;
-Lamda = 0.45;
+Lamda = 0.62;
 Rate = 0.25;
 Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
-tau = 0.2;
+tau = 0.57;
 threshold = 0;
 
 % % used to generate 5 fold CV
@@ -75,8 +75,6 @@ threshold = 0;
 %   DATA_5_CV = [DATA_5_CV; {DATA}];
 %   clear DATA;
 % end
-final_eer = 0;
-final_acc = 0;
 
 for cv_num = 1:5
   disp('');
@@ -84,35 +82,30 @@ for cv_num = 1:5
   str = sprintf(formatSpec,cv_num)
   disp(str);
 
-  % D0 = CV_3T{cv_num,1};
   D0 = CV1{cv_num,1};
   D0(:,6) = [];
-  % D1 = CV2{cv_num,1};
-  % D1(:,6) = [];
-  % D2 = CV3{cv_num,1};
-  % D2(:,6) = [];
+  D1 = CV2{cv_num,1};
+  D1(:,6) = [];
+  D2 = CV3{cv_num,1};
+  D2(:,6) = [];
 
 
-  % D0 = CV1_with_top_3_features{cv_num,1};
   D0 = D0(:,[3:11 2]);
+  D1 = D1(:,[3:11 2]);
+  D2 = D2(:,[3:11 2]);
+
   IND_a = size(D0,2) - 1;
   OUTD_a = 1;
-  % D1 = D1(:,[3:11 2]);
-  % D2 = D2(:,[3:11 2]);
-
-  % D0 = DATA_5_CV{cv_num,1};
-  % D0 = CV_3T{cv_num,1};
-  % D0 = D0(:,[10 2]);
-
   start_test = (size(D0, 1) * 0.2) + 1;
+
   trainData_D0 = D0(1:start_test-1,:);
   testData_D0 = D0(start_test:length(D0), :);
 
-  % trainData_D1 = D1(1:start_test-1,:);
-  % testData_D1 = D1(start_test:length(D1), :);
-  %
-  % trainData_D2 = D2(1:start_test-1,:);
-  % testData_D2 = D2(start_test:length(D2), :);
+  trainData_D1 = D1(1:start_test-1,:);
+  testData_D1 = D1(start_test:length(D1), :);
+
+  trainData_D2 = D2(1:start_test-1,:);
+  testData_D2 = D2(start_test:length(D2), :);
 
   % network prediction
   [net_out_0, net_structure_0] = Run_SaFIN_FRIE(1, trainData_D0,testData_D0,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
@@ -120,41 +113,42 @@ for cv_num = 1:5
   result_0.net_out = net_out_0;
   result_0.net_structure = net_structure_0;
   result_0.output = output_0;
+  result_0.MIN_MEE = output_0.MIN_MEE(1,1);
   result_0.FNR = output_0.MIN_FNR(1,1);
   result_0.FPR = output_0.MIN_FPR(1,1);
-  result_0.EER = output_0.MIN_EER(1,1);
-  result_0.ACC = 100 - output_0.MIN_EER(1,1);
+  result_0.EER = output_0.true_eer;
+  result_0.ACC = output_0.accuracy;
   result_0.Feat = IND_a;
   result_0.Rules = net_structure_0.ruleCount;
   net_result_for_last_record(cv_num,:) = result_0;
-  final_eer = final_eer + result_0.EER;
-  % [net_out_1, net_structure_1] = Run_SaFIN_FRIE(1, trainData_D1,testData_D1,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_1 = htet_find_optimal_cut_off(testData_D1(:,IND_a+OUTD_a), net_out_1, threshold);
-  % result_1.net_structure = net_structure_1;
-  % result_1.output = output_1;
-  % result_1.FNR = output_1.MIN_FNR(1,1);
-  % result_1.FPR = output_1.MIN_FPR(1,1);
-  % result_1.EER = output_1.MIN_EER(1,1);
-  % result_1.ACC = 100 - output_1.MIN_EER(1,1);
-  % result_1.Feat = IND_a;
-  % result_1.Rules = net_structure_1.ruleCount;
-  % net_result_for_one_year_prior(cv_num,:) = result_1;
-  %
-  % [net_out_2, net_structure_2] = Run_SaFIN_FRIE(1, trainData_D2,testData_D2,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-  % output_2 = htet_find_optimal_cut_off(testData_D2(:,IND_a+OUTD_a), net_out_2, threshold);
-  % result_2.net_out = net_out_2;
-  % result_2.net_structure = net_structure_2;
-  % result_2.output = output_2;
-  % result_2.FNR = output_2.MIN_FNR(1,1);
-  % result_2.FPR = output_2.MIN_FPR(1,1);
-  % result_2.EER = output_2.MIN_EER(1,1);
-  % result_2.ACC = 100 - output_2.MIN_EER(1,1);
-  % result_2.Feat = IND_a;
-  % result_2.Rules = net_structure_2.ruleCount;
-  % net_result_for_two_year_prior(cv_num,:) = result_2;
+
+
+  [net_out_1, net_structure_1] = Run_SaFIN_FRIE(1, trainData_D1,testData_D1,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+  output_1 = htet_find_optimal_cut_off(testData_D1(:,IND_a+OUTD_a), net_out_1, threshold);
+  result_1.net_structure = net_structure_1;
+  result_1.output = output_1;
+  result_1.MIN_MEE = output_0.MIN_MEE(1,1);
+  result_1.FNR = output_1.MIN_FNR(1,1);
+  result_1.FPR = output_1.MIN_FPR(1,1);
+  result_1.EER = output_0.true_eer;
+  result_1.ACC = output_0.accuracy;
+  result_1.Feat = IND_a;
+  result_1.Rules = net_structure_1.ruleCount;
+  net_result_for_one_year_prior(cv_num,:) = result_1;
+
+  [net_out_2, net_structure_2] = Run_SaFIN_FRIE(1, trainData_D2,testData_D2,IND_a,OUTD_a,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
+  output_2 = htet_find_optimal_cut_off(testData_D2(:,IND_a+OUTD_a), net_out_2, threshold);
+  result_2.net_out = net_out_2;
+  result_2.net_structure = net_structure_2;
+  result_2.output = output_2;
+  result_2.MME = output_2.MIN_MEE(1,1);
+  result_2.FNR = output_2.MIN_FNR(1,1);
+  result_2.FPR = output_2.MIN_FPR(1,1);
+  result_2.EER = out_2.true_eer;
+  result_2.ACC = output_2.accuracy;
+  result_2.Feat = IND_a;
+  result_2.Rules = net_structure_2.ruleCount;
+  net_result_for_two_year_prior(cv_num,:) = result_2;
 
   disp('Processing of one CV group has completed');
 end
-
-final_eer = final_eer/5;
-final_acc = 100 - final_eer;

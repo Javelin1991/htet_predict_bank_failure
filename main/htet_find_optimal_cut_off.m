@@ -25,7 +25,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
 
     fpr_penalized_cost = 1;
     fnr_penalized_cost = [1; 5; 10; 15; 20; 25; 30];
-    MIN_EER = [];
+    MIN_MME = []; %% minimum of mean error
     MIN_FPR = [];
     MIN_FNR = [];
     MIN_CUT_OFF = [];
@@ -64,7 +64,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       [TP, FP, TN, FN, fnr, fpr, acc] = htet_get_classification_results(testData, after_threshold(:,1))
 
 
-      output.MIN_EER = (fpr + fnr)/2;
+      output.MIN_MME = (fpr + fnr)/2;
       output.MIN_CUT_OFF = threshold;
       output.after_threshold = after_threshold;
       output.MIN_FPR = fpr;
@@ -129,7 +129,7 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
           after_threshold = zeros(length(testData),1);
       end
 
-      MIN_EER = [MIN_EER; best_eer];
+      MIN_MME = [MIN_MME; best_eer];
       MIN_CUT_OFF = [MIN_CUT_OFF; optimal_cut_off]
       MIN_FPR = [MIN_FPR; best_fpr];
       MIN_FNR = [MIN_FNR; best_fnr];
@@ -146,25 +146,21 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       best_acc = intmin;
     end
 
-    % figure;
-    % plot(FPR, FNR, 'b'); % plot the matrix
-    % hold on;
-    % plot(Bisector, Bisector, 'r'); % plot the matrix
-    % title('Bank Failure Detection Error Tradeoff', 'FontSize', 14); % set title
-    % colormap('jet'); % set the colorscheme
-    % hold off;
-    %
-    % % plot accuracy chart
-    % figure;
-    % bar(Acc); % plot the matrix
-    % title('Bank Failure Classification Accuracy', 'FontSize', 14); % set title
-    % colormap('jet'); % set the colorscheme
+
+    inX = InterX([out_fpr{1,1};out_fnr{1,1}],[Bisector;Bisector]);
+    true_eer =  inX(1,1); % achieved from finding the intersection point on ROC curve
+    accuracy = 100 - true_eer;
+
+
     output.BEST_AFTER_THRESHOLD = BEST_AFTER_THRESHOLD;
-    output.MIN_EER = MIN_EER;
+    output.MIN_MME = MIN_MME;
     output.MIN_CUT_OFF = MIN_CUT_OFF;
     output.MIN_FPR = MIN_FPR;
     output.MIN_FNR = MIN_FNR;
     output.all_fpr = out_fpr;
     output.all_fnr = out_fnr;
     output.bisector = Bisector;
+    output.accuracy = round(accuracy,2);
+    output.true_eer = round(true_eer,2);
+    output.eer_point = inX;
 end

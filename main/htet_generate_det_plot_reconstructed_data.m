@@ -28,7 +28,7 @@ for j=1:3
                 fpr = net_result_for_last_record(i).output.all_fpr{1, 1}
                 fnr = net_result_for_last_record(i).output.all_fnr{1, 1}
                 mean_eer_recon_data = mean_eer_recon_data + net_result_for_last_record(i).output.MIN_EER(1,1);
-                plot(fnr, fpr, color_str(i)); % plot the matrix
+                plot(fpr, fnr, color_str(i)); % plot the matrix
                 title('Bank Failure Detection Error Tradeoff (last avaiable)', 'FontSize', 14); % set title
                 colormap('jet'); % set the colorscheme
             case 2
@@ -36,7 +36,7 @@ for j=1:3
                 fpr = net_result_for_one_year_prior(i).output.all_fpr{1, 1}
                 fnr = net_result_for_one_year_prior(i).output.all_fnr{1, 1}
                 mean_eer_recon_data = mean_eer_recon_data + net_result_for_one_year_prior(i).output.MIN_EER(1,1);
-                plot(fnr, fpr, color_str(i)); % plot the matrix
+                plot(fpr, fnr, color_str(i)); % plot the matrix
                 title('Bank Failure Detection Error Tradeoff (one year prior)', 'FontSize', 14); % set title
                 colormap('jet'); % set the colorscheme
             case 3
@@ -44,7 +44,7 @@ for j=1:3
                 fpr = net_result_for_two_year_prior(i).output.all_fpr{1, 1}
                 fnr = net_result_for_two_year_prior(i).output.all_fnr{1, 1}
                 mean_eer_recon_data = mean_eer_recon_data + net_result_for_two_year_prior(i).output.MIN_EER(1,1);
-                plot(fnr, fpr, color_str(i)); % plot the matrix
+                plot(fpr, fnr, color_str(i)); % plot the matrix
                 title('Bank Failure Detection Error Tradeoff (two year prior)', 'FontSize', 14); % set title
                 colormap('jet'); % set the colorscheme
         end
