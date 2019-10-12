@@ -18,6 +18,8 @@ clc;
 load FAILED_BANK_DATA_VERTICAL;
 load SURVIVED_BANK_DATA_VERTICAL;
 
+warning off;
+
 % % longitudinal data includes full data for last three records, for CAPADE, PLAQLY and ROE respectively
 % [longitudinal_data_failed_banks, lateral_data_failed_banks] = htet_prepare_data_for_longitudinal_construction(Failed_Banks);
 % [longitudinal_data_survived_banks, lateral_data_survived_banks] = htet_prepare_data_for_longitudinal_construction(Survived_Banks);
@@ -77,8 +79,8 @@ load handel
 sound(y,Fs);
 
 function out = get_prediction_results(D_train, D_test)
-    % algo_type = {'emfis'; 'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
-    algo_type = {'safin++'};
+    algo_type = {'denfis'; 'anfis'; 'ensemble_anfis_denfis'};
+    % algo_type = {'denfis'};
     % % for dummy run
 %     D_train = D_train(1:50, :);
 %     D_test = D_train(1:50, :);
@@ -250,6 +252,6 @@ function out = get_prediction_results(D_train, D_test)
                 safin_pp_system.num_rules = length(net_structure.Rules);
         end
     end
-    % out = [{emfis_system}; {denfis_system}; {anfis_system}; {ensemble_system_sa}; {ensemble_system_bs}];
-    out = [{safin_pp_system}];
+    out = [{denfis_system}; {anfis_system}; {ensemble_system_sa}];
+    % out = [{denfis_system}];
 end

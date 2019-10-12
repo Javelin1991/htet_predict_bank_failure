@@ -146,7 +146,7 @@ system.ruleCountVariant = ruleCount;
 %     end
 % end
 % %%%%%%%%%%%%%%% INTERPRET FEATURES%%%%%%%%%%%%%%%%%
-% [net.Rules_semantic net.Rule_importance] = interpret(net, IND, OUTD);
+[net.Rules_semantic net.Rule_importance] = interpret(net, IND, OUTD);
 %
 % %%%%%%%%%DISPLAY PREDICTION VS ACTUAL DATA %%%%%%%%%%%%%%%%%%%
 % for i = 1:OUTD

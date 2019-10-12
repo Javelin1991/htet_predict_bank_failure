@@ -18,7 +18,7 @@ close all;
 
 %%% load different data %%%
 
-% load CV1_Classification;
+load CV1_Classification;
 % load CV2_Classification;
 % load CV3_Classification;
 
@@ -30,9 +30,9 @@ close all;
 % load CV2_Classification_Denfis;
 % load CV3_Classification_Denfis;
 
-load CV1_Classification_Anfis_100;
-load CV2_Classification_Anfis_100;
-load CV3_Classification_Anfis_100;
+% load CV1_Classification_Anfis_100;
+% load CV2_Classification_Anfis_100;
+% load CV3_Classification_Anfis_100;
 
 %%% EXPERIMENT PARAMS SETUP %%%
 Epochs = 0;
@@ -51,13 +51,13 @@ val_percent = 0.8
 
 threshold = 0;
 best_mean_acc = 0;
-SCENARIO = 3;
+SCENARIO = 1;
 
 Last = '(Last available)'
 One = '(One-year prior)'
 Two =  '(Two-year prior)'
 
-for d = 1:3
+for d = 1:1
     BEST_SYSTEMS = [];
 
     if d == 1
@@ -68,7 +68,7 @@ for d = 1:3
       det_title = Two;
     end
 
-    for cv_num = 1:5
+    for cv_num = 5:5
 
       % top 3 feat x 3 , combined 3 timeline
       % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
@@ -94,7 +94,7 @@ for d = 1:3
 
       switch SCENARIO
           case 1
-              Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
+              Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
               if d == 1
                 Data = CV1{cv_num,1} % last available
                 Data(:,6) = [];
@@ -210,6 +210,7 @@ for d = 1:3
             disp('The required accuracy cannot be found! Reducing the step...');
             accuracy_threshold = accuracy_threshold - decrement_step;
             have_best_feature_list = false;
+            Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
             continue;
           end
 

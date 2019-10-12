@@ -13,7 +13,7 @@ function result = htet_tabulate_longitudinal_result(SYSTEMS)
   for sys = 1:2
     TABLE = [];
     for j = 1:3
-      for i = 1:5
+      for i = 1:3
         switch j
           case 1
             feat = 'forward_CAPADE';
@@ -55,31 +55,31 @@ function result = htet_tabulate_longitudinal_result(SYSTEMS)
         end
 
         switch (i)
-          case 1
+          case 6
             eMFIS_FRIE = [r;mae;rmse;{feat}];
-            eMFIS_FRIE_Back = [r;mae;rmse;{feat_2}];
+            eMFIS_FRIE_Back = [r_2;mae_2;rmse_2;{feat_2}];
+
+          case 1
+            DENFIS = [r;mae;rmse;{feat}];
+            DENFIS_Back = [r_2;mae_2;rmse_2;{feat_2}];
 
           case 2
-            DENFIS = [r;mae;rmse;{feat}];
-            DENFIS_Back = [r;mae;rmse;{feat_2}];
+            ANFIS = [r;mae;rmse;{feat}];
+            ANFIS_Back = [r_2;mae_2;rmse_2;{feat_2}];
 
           case 3
-            ANFIS = [r;mae;rmse;{feat}];
-            ANFIS_Back = [r;mae;rmse;{feat_2}];
-
-          case 4
             ANFIS_DENFIS_SA = [r;mae;rmse;{feat}];
-            ANFIS_DENFIS_SA_Back = [r;mae;rmse;{feat_2}];
+            ANFIS_DENFIS_SA_Back = [r_2;mae_2;rmse_2;{feat_2}];
 
           case 5
             BEST_SELECT = [r;mae;rmse;{feat}];
-            BEST_SELECT_Back = [r;mae;rmse;{feat_2}];
+            BEST_SELECT_Back = [r_2;mae_2;rmse_2;{feat_2}];
         end
       end
-      T = table(eMFIS_FRIE,DENFIS,ANFIS,ANFIS_DENFIS_SA,BEST_SELECT, 'RowNames', {'r', 'MAE', 'RMSE', 'Target'})
+      T = table(DENFIS,ANFIS,ANFIS_DENFIS_SA, 'RowNames', {'r', 'MAE', 'RMSE', 'Target'})
       TABLE = [TABLE; {T}];
 
-      T_2 = table(eMFIS_FRIE_Back,DENFIS_Back,ANFIS_Back,ANFIS_DENFIS_SA_Back,BEST_SELECT_Back, 'RowNames', {'r', 'MAE', 'RMSE', 'Target'})
+      T_2 = table(DENFIS_Back,ANFIS_Back,ANFIS_DENFIS_SA_Back, 'RowNames', {'r', 'MAE', 'RMSE', 'Target'})
       TABLE = [TABLE; {T_2}];
     end
     result = [result; {TABLE}];

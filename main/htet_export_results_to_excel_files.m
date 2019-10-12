@@ -41,12 +41,10 @@ end
 
 function export_cv_long(T2)
 
-  filename_2 = 'longitudinal_prediction_result_2.xlsx';
+  filename_2 = 'longitudinal_prediction_result.xlsx';
 
   for j=1:2
-    % 7 and 8 for safin++
-    for i=7:8
-    % for i=1:6
+    for i=1:6
         T = T2{j, 1}{i, 1};
         switch i
             case 1
