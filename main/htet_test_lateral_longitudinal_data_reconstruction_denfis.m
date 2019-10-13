@@ -23,6 +23,7 @@
 
 clc;
 clear;
+close all;
 
 load Lateral_Systems;
 load Longitudinal_Systems;
@@ -143,9 +144,36 @@ B1 = RECONSTRUCTED_DATA{1, 1};
 B2 = RECONSTRUCTED_DATA{2, 1};
 
 Z1 = htet_get_predicted_and_ground_truth_values(unseen_testData_1, A1, B1, FB_Original_Full_Records, Failed_IDs);
-Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3));
+Z1_Results = htet_calculate_errors(Z1(:,2), Z1(:,3)); % predicted is column2,  actual is column 3
 Z2 = htet_get_predicted_and_ground_truth_values(unseen_testData_2, A2, B2, SB_Original_Full_Records, Survived_IDs);
-Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3));
+Z2_Results = htet_calculate_errors(Z2(:,2), Z2(:,3)); % predicted is column2,  actual is column 3
+
+
+figure;
+str = 'Actual VS Predicted for data reconstruction among failed banks';
+title(str);
+
+for l = 1:size( Z1(:,3),2)
+    hold on;
+    plot(1:size( Z1(:,3),1), Z1(:,3), 'b');
+    plot(1:size(Z1(:,2),1),Z1(:,2), 'r');
+end
+
+legend('Actual VS Predicted for data reconstruction among survived banks');
+
+
+figure;
+str = 'Actual VS Predicted';
+title(str);
+
+
+for l = 1:size(Z2(:,3),2)
+    hold on;
+    plot(1:size(Z2(:,3),1),Z2(:,3), 'b');
+    plot(1:size(Z2(:,2),1),Z2(:,2), 'r');
+end
+
+legend('Actual','Predicted');
 
 % alarm sound to alert that the program has ended
 load handel;
