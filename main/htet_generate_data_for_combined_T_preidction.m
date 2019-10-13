@@ -9,7 +9,7 @@
 clear;
 clc;
 
-load Full_reconstructed_data_anfis
+load Full_reconstructed_data_denfis;
 % %
 % load denfis_recon_original_20_percent_data;
 % %
@@ -42,7 +42,7 @@ Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
 type = '1T';
 index = 3;
-backward_offset = 2;
+backward_offset =0;
 Failed_Banks_Group_By_Bank_ID = [];
 Survived_Banks_Group_By_Bank_ID = [];
 
