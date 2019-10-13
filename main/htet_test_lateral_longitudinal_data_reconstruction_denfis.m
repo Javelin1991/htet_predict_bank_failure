@@ -159,11 +159,11 @@ for l = 1:size( Z1(:,3),2)
     plot(1:size(Z1(:,2),1),Z1(:,2), 'r');
 end
 
-legend('Actual VS Predicted for data reconstruction among survived banks');
+legend('Actual','Predicted');
 
 
 figure;
-str = 'Actual VS Predicted';
+str = 'Actual VS Predicted for data reconstruction among survived banks';
 title(str);
 
 
