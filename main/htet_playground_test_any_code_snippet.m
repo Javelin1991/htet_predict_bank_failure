@@ -11,7 +11,7 @@ clear;
 clc;
 close all;
 
-load CV1_Classification;
+load CV2_Classification;
 
 tr_fb_cv1 = [];
 tt_fb_cv1 = [];
@@ -19,7 +19,7 @@ tt_fb_cv1 = [];
 tr_sb_cv1 = [];
 tt_sb_cv1 = [];
 
-D = CV1{1,1}
+D = CV2{1,1}
 
 start_test = size(D,1) * 0.2 + 1;
 
