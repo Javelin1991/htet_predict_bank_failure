@@ -1,7 +1,6 @@
 # Final Year Project (FYP) : Application of Fuzzy Neural Networks (FNNs) for bank failure prediction and missing data reconstruction
 ## Learning Outcome
 <t/>I have learnt how a Fuzzy Neural Network (FNN) works as well as how aritifical neural networks and fuzzy logic systems complement each other in FNNs. In this FYP, I have applied a Mamdani-type FNN, namely "SaFIN(FRI/E)++", to bank failure prediction. To further improve its prediction accuracy, I have extended the original model with a novel hierarchical feature selection. I have also invented a missing data reconstruction algorithm in order to rebuild missing values in the given data set. The extended prediction model combined with the proposed missing data reconstruction method, can serve as a powerful hybrid tool for bank failure prediction. 
-
 <br/>
 <br/>
 [1] Extended  a deep five-layer fuzzy neural, SAFIN(FRIE)++, with hierarchical feature selection to improve its prediction accuracy <br/>
