@@ -12,12 +12,12 @@ clc;
 % load Failed_Banks;
 % load Survived_Banks;
 
-% load Full_reconstructed_data_denfis;
+load Full_reconstructed_data_denfis;
 % %
-load denfis_recon_original_20_percent_data;
+% load denfis_recon_original_20_percent_data;
 % %
-Failed_Banks = DENFIS_FB;
-Survived_Banks = DENFIS_SB;
+% Failed_Banks = DENFIS_FB;
+% Survived_Banks = DENFIS_SB;
 % Failed_Banks = Failed_Banks(:,[1 2 3 7 10 13]);
 % Survived_Banks = Survived_Banks(:,[1 2 3 7 10 13]);
 %
@@ -40,12 +40,12 @@ Survived_Banks = DENFIS_SB;
 %   Survived_Banks = [Survived_Banks; cell2mat(SB(i))];
 % end
 % load Full_reconstructed_data_anfis;
-% Failed_Banks = RECONSTRUCTED_DATA{1, 1};
-% Survived_Banks = RECONSTRUCTED_DATA{2, 1};
+Failed_Banks = RECONSTRUCTED_DATA{1, 1};
+Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
 type = '1T';
 index = 3;
-backward_offset = 2;
+backward_offset = 0;
 Failed_Banks_Group_By_Bank_ID = [];
 Survived_Banks_Group_By_Bank_ID = [];
 
