@@ -45,7 +45,7 @@ Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
 type = '1T';
 index = 3;
-backward_offset = 0;
+backward_offset = 2;
 Failed_Banks_Group_By_Bank_ID = [];
 Survived_Banks_Group_By_Bank_ID = [];
 
