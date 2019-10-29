@@ -22,25 +22,17 @@ close all;
 % load CV2_Classification;
 % load CV3_Classification;
 
-% load CV1_Corrected_Original;
-% load CV2_Corrected_Original;
-% load CV3_Corrected_Original;
+load CV1_Corrected_Original;
+load CV2_Corrected_Original;
+load CV3_Corrected_Original;
 
-% load CV1_Corrected_Recon;
-% load CV2_Corrected_Recon;
-% load CV3_Corrected_Recon;
+% load CV1_Corrected_Denfis_Recon_20;
+% load CV2_Corrected_Denfis_Recon_20;
+% load CV3_Corrected_Denfis_Recon_20;
 
-% load CV1_Classification_Anfis_100;
-% load CV2_Classification_Anfis_100;
-% load CV3_Classification_Anfis_100;
-
-% load CV1_Classification_Denfis_100;
-% load CV2_Classification_Denfis_100;
-% load CV3_Classification_Denfis_100;
-
-load CV1_Corrected_Denfis_Recon_100;
-load CV2_Corrected_Denfis_Recon_100;
-load CV3_Corrected_Denfis_Recon_100;
+% load CV1_Corrected_Denfis_Recon_100;
+% load CV2_Corrected_Denfis_Recon_100;
+% load CV3_Corrected_Denfis_Recon_100;
 
 %%% EXPERIMENT PARAMS SETUP %%%
 Epochs = 0;

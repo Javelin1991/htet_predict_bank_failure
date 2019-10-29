@@ -11,11 +11,22 @@ clear;
 clc;
 close all;
 
-load CV1_Corrected_Original;
-load CV2_Corrected_Original;
-load CV3_Corrected_Original;
+load CV1_Corrected_Denfis_Recon_100;
+load CV2_Corrected_Denfis_Recon_100;
+load CV3_Corrected_Denfis_Recon_100;
 
+fb = 0;
+sb = 0;
 
+D = CV3{1,1}
+
+for i=1:size(D,1)
+    if D(i,2) == 0
+        sb = sb + 1;
+    else
+        fb = fb + 1;
+    end
+end
 
 %
 % tr_fb_cv1 = [];
