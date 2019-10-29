@@ -103,9 +103,9 @@ function out = htet_filter_bank_data_by_index(input, offset, type)
                 end
             end
           case '1T'
-            idx = size(A, 1) - 1;
-            idx_1 = size(A, 1) - 2;
-            idx_2 = size(A, 1) - 3;
+            idx = size(A, 1);
+            idx_1 = size(A, 1) - 1;
+            idx_2 = size(A, 1) - 2;
 
             if (idx > 0 && offset == 0)
                 record = A(idx, :);

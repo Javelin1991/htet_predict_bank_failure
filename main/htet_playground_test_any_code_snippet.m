@@ -11,7 +11,7 @@ clear;
 clc;
 close all;
 
-load CV2_Classification;
+load CV1_Classification_Increased;
 
 tr_fb_cv1 = [];
 tt_fb_cv1 = [];
@@ -19,7 +19,7 @@ tt_fb_cv1 = [];
 tr_sb_cv1 = [];
 tt_sb_cv1 = [];
 
-D = CV2{1,1}
+D = CV1{1,1}
 
 start_test = size(D,1) * 0.2 + 1;
 
@@ -43,6 +43,6 @@ for i=1:size(D_tt,1)
 end
 
 TRAIN_DATA = (vertcat(tr_fb_cv1, tr_sb_cv1))'
-TRAIN_DATA([1 2 6 13], :) = []
+TRAIN_DATA([1 2 6], :) = []
 TEST_DATA = (vertcat(tt_fb_cv1, tt_sb_cv1))'
-TEST_DATA([1 2 6 13], :) = []
+TEST_DATA([1 2 6], :) = []

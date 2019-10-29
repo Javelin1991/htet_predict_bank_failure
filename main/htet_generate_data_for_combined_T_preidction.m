@@ -9,7 +9,10 @@
 clear;
 clc;
 
-load Full_reconstructed_data_denfis;
+load Failed_Banks;
+load Survived_Banks;
+
+% load Full_reconstructed_data_denfis;
 % %
 % load denfis_recon_original_20_percent_data;
 % %
@@ -24,8 +27,8 @@ load Full_reconstructed_data_denfis;
 
 
 %
-Failed_Banks = RECONSTRUCTED_DATA{1, 1};
-Survived_Banks = RECONSTRUCTED_DATA{2, 1};
+% Failed_Banks = RECONSTRUCTED_DATA{1, 1};
+% Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 % Failed_Banks = [];
 % Survived_Banks = [];
 %
@@ -42,23 +45,30 @@ Survived_Banks = RECONSTRUCTED_DATA{2, 1};
 
 type = '1T';
 index = 3;
-backward_offset =0;
+backward_offset = 2;
 Failed_Banks_Group_By_Bank_ID = [];
 Survived_Banks_Group_By_Bank_ID = [];
 
 Failed_Banks(any(isnan(Failed_Banks), 2), :) = [];
 Survived_Banks(any(isnan(Survived_Banks), 2), :) = [];
 
-output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset, type);
-output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset, type);
+% output_1 = htet_filter_bank_data_by_index(Survived_Banks, backward_offset, type);
+% output_2 = htet_filter_bank_data_by_index(Failed_Banks, backward_offset, type);
 %
-% output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
-% output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
+output_1 = htet_filter_bank_data_by_index(Survived_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
+output_2 = htet_filter_bank_data_by_index(Failed_Banks(:,[1 2 3 7 10 13]), backward_offset, type);
 
 Survived_Banks_Group_By_Bank_ID = output_1.result;
 Failed_Banks_Group_By_Bank_ID = output_2.result;
 
-CV = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
+if backward_offset == 0
+    CV1 = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
+elseif backward_offset == 1
+    CV2 = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
+else
+    CV3 = htet_generate_cross_validation_data(Survived_Banks_Group_By_Bank_ID, Failed_Banks_Group_By_Bank_ID, 5, true);
+end
+
 
 % % used to generate 9 inputs taking 3 input each from t, t-1 and t-2
 % CV_3T = [];
