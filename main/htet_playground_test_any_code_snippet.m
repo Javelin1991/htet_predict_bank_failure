@@ -11,38 +11,43 @@ clear;
 clc;
 close all;
 
-load CV1_Classification_Increased;
+load CV1_Corrected_Original;
+load CV2_Corrected_Original;
+load CV3_Corrected_Original;
 
-tr_fb_cv1 = [];
-tt_fb_cv1 = [];
 
-tr_sb_cv1 = [];
-tt_sb_cv1 = [];
 
-D = CV1{1,1}
-
-start_test = size(D,1) * 0.2 + 1;
-
-D_tr = D(1:start_test-1, :)
-D_tt = D(start_test:size(D,1),:)
-
-for i=1:size(D_tr,1)
-    if D_tr(i,2) == 1
-        tr_fb_cv1 = [tr_fb_cv1; D_tr(i,:)]
-    else
-        tr_sb_cv1 = [tr_sb_cv1; D_tr(i,:)]
-    end
-end
-
-for i=1:size(D_tt,1)
-    if D_tt(i,2) == 1
-        tt_fb_cv1 = [tt_fb_cv1; D_tt(i,:)]
-    else
-        tt_sb_cv1 = [tt_sb_cv1; D_tt(i,:)]
-    end
-end
-
-TRAIN_DATA = (vertcat(tr_fb_cv1, tr_sb_cv1))'
-TRAIN_DATA([1 2 6], :) = []
-TEST_DATA = (vertcat(tt_fb_cv1, tt_sb_cv1))'
-TEST_DATA([1 2 6], :) = []
+%
+% tr_fb_cv1 = [];
+% tt_fb_cv1 = [];
+%
+% tr_sb_cv1 = [];
+% tt_sb_cv1 = [];
+%
+% D = CV1{1,1}
+%
+% start_test = size(D,1) * 0.2 + 1;
+%
+% D_tr = D(1:start_test-1, :)
+% D_tt = D(start_test:size(D,1),:)
+%
+% for i=1:size(D_tr,1)
+%     if D_tr(i,2) == 1
+%         tr_fb_cv1 = [tr_fb_cv1; D_tr(i,:)]
+%     else
+%         tr_sb_cv1 = [tr_sb_cv1; D_tr(i,:)]
+%     end
+% end
+%
+% for i=1:size(D_tt,1)
+%     if D_tt(i,2) == 1
+%         tt_fb_cv1 = [tt_fb_cv1; D_tt(i,:)]
+%     else
+%         tt_sb_cv1 = [tt_sb_cv1; D_tt(i,:)]
+%     end
+% end
+%
+% TRAIN_DATA = (vertcat(tr_fb_cv1, tr_sb_cv1))'
+% TRAIN_DATA([1 2 6], :) = []
+% TEST_DATA = (vertcat(tt_fb_cv1, tt_sb_cv1))'
+% TEST_DATA([1 2 6], :) = []

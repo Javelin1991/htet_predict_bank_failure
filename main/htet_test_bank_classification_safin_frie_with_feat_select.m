@@ -22,9 +22,9 @@ close all;
 % load CV2_Classification;
 % load CV3_Classification;
 
-% load CV1_Classification_Increased;
-% load CV2_Classification_Increased;
-% load CV3_Classification_Increased;
+% load CV1_Corrected_Original;
+% load CV2_Corrected_Original;
+% load CV3_Corrected_Original;
 
 % load CV1_Classification_Denfis;
 % load CV2_Classification_Denfis;
@@ -38,9 +38,6 @@ close all;
 % load CV2_Classification_Denfis_100;
 % load CV3_Classification_Denfis_100;
 
-load CV1_Corrected_Original;
-load CV2_Corrected_Original;
-load CV3_Corrected_Original;
 
 %%% EXPERIMENT PARAMS SETUP %%%
 Epochs = 0;
