@@ -7,7 +7,7 @@
 % Running Data Set 1B, top 3 features, will take ~6.5 min
 % Running Data Set 2A, increased top 3 features, will take
 % Running Data Set 2B, denfis recon top 3 features, will take
-% Running Data Set 3, anfis full recon top 3 features,
+% Running Data Set 3, denfis full recon top 3 features,
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 % diary SaFIN_FRIE_Learning_Trace;,:
 %
@@ -17,19 +17,18 @@ clc;
 close all;
 
 %%% load different data %%%
+load CV1_Classification;
+load CV2_Classification;
+load CV3_Classification;
 
-% load CV1_Classification;
-% load CV2_Classification;
-% load CV3_Classification;
-
-load CV1_Corrected_Original;
-load CV2_Corrected_Original;
-load CV3_Corrected_Original;
+% load CV1_Corrected_Original;
+% load CV2_Corrected_Original;
+% load CV3_Corrected_Original;
 
 % load CV1_Corrected_Denfis_Recon_20;
 % load CV2_Corrected_Denfis_Recon_20;
 % load CV3_Corrected_Denfis_Recon_20;
-
+%
 % load CV1_Corrected_Denfis_Recon_100;
 % load CV2_Corrected_Denfis_Recon_100;
 % load CV3_Corrected_Denfis_Recon_100;
@@ -51,13 +50,13 @@ val_percent = 0.8
 
 threshold = 0;
 best_mean_acc = 0;
-SCENARIO = 3;
+SCENARIO = 2;
 
 Last = '(Last available)'
 One = '(One-year prior)'
 Two =  '(Two-year prior)'
 
-for d = 1:3
+for d = 1:1
     BEST_SYSTEMS = [];
 
     if d == 1
@@ -68,30 +67,13 @@ for d = 1:3
       det_title = Two;
     end
 
-    for cv_num = 1:5
-
-      % top 3 feat x 3 , combined 3 timeline
-      % Labels = ["CAPADE_t", "PLAQLY_t","ROE_t","CAPADE_t_1","PLAQLY_t_1","ROE_t_1","CAPADE_t_2","PLAQLY_t_2","ROE_t_2"]
-
-      % 9 feat t
-      % Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
-      % 9 feat t-1
-      % Labels = ["CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1"];
-      % 9 feat t-2
-      % Labels = ["CAPADE_t_2", "OLAQLY_t_2", "PROBLO_t_2","PLAQLY_t_2", "NIEOIN_t_2", "NINMAR_t_2", "ROE_t_2", "LIQUID_t_2", "GROWLA_t_2"];
-
-      % 27 feat
-      % Labels = ["CAPADE_t", "OLAQLY_t", "PROBLO_t","PLAQLY_t", "NIEOIN_t", "NINMAR_t", "ROE_t", "LIQUID_t", "GROWLA_t", "CAPADE_t_1", "OLAQLY_t_1", "PROBLO_t_1","PLAQLY_t_1", "NIEOIN_t_1", "NINMAR_t_1", "ROE_t_1", "LIQUID_t_1", "GROWLA_t_1", "CAPADE_t_2", "OLAQLY_t_2", "PROBLO_t_2","PLAQLY_t_2", "NIEOIN_t_2", "NINMAR_t_2", "ROE_t_2", "LIQUID_t_2", "GROWLA_t_2"];
-
-      % top 3 feat as per FCMAC
-      % Labels = ["CAPADE","PLAQLY","ROE"];
+    for cv_num = 5:5
 
       formatSpec = '\nThe current cv used is: %d';
       str = sprintf(formatSpec,cv_num)
       disp(str);
 
       %%% assign required data %%%
-
       switch SCENARIO
           case 1
               Labels = ["CAPADE", "OLAQLY", "PROBLO","PLAQLY", "NIEOIN", "NINMAR", "ROE", "LIQUID", "GROWLA"];
@@ -133,12 +115,7 @@ for d = 1:3
               end
 
               Data = Data(:,[3:5 2])
-          case 4
-
-          case 5
-
       end
-
 
 
       while (accuracy_threshold > 0)
@@ -186,11 +163,11 @@ for d = 1:3
             [net_out, system] = Run_SaFIN_FRIE(1,curr_list,curr_valData,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
             output = htet_find_optimal_cut_off(curr_valData(:,IND+OUTD), net_out, 0);
 
-            curr_eer = output.true_eer;
-            curr_acc = output.accuracy;
+            curr_eer = output.MIN_MME;
+            curr_acc = 100 - curr_eer;
 
             %%% if the current error is lower than best error, then update the best error %%%
-            if curr_acc > accuracy_threshold && curr_acc > best_acc
+            if (curr_acc > accuracy_threshold && curr_acc > best_acc) || (curr_acc == 100)
                 best_list = [best_list trainData_D0(:,l)];
                 best_val_list = [best_val_list valData_D0(:,l)];
 
@@ -201,6 +178,12 @@ for d = 1:3
                 best_features = best_indices;
                 best_eer = curr_eer;
                 best_acc = curr_acc;
+
+                optimal_cut_off_point = output.MIN_CUT_OFF(1,1);
+                best_train_data = curr_list;
+                % all_fpr = output.all_fpr;
+                % all_fnr = output.all_fnr;
+                % bisector = output.bisector;
             end
           end
 
@@ -224,33 +207,41 @@ for d = 1:3
           %%% getting the label dimension %%%
           last_idx = size(Data,2);
 
-          %%% preparing the data for new training + testing %%%
-          %%% reuse validation data now for training as well %%%
+          %%% getting the best feature subset %%%
           Data = Data(:,[best_features last_idx]);
-          start_test = (size(Data, 1) * 0.2) + 1;
-          train = Data(1:start_test-1,:);
-          test = Data(start_test:length(Data), :);
-          target = size(train,2);
 
+          %%% train 20%, test 80% %%%
+          start_test = (size(Data, 1) * 0.2) + 1;
+          train_end = Data(1:start_test-1,:);
+
+          % however, we use the best train data set, found in the previous step
+          train = best_train_data;
+
+          % unseen test data 80% remains the same
+          test = Data(start_test:length(Data), :);
+
+          target = size(train_end,2);
           limit = target-1;
           IND = limit;
           OUTD = 1;
           [net_out, system] = Run_SaFIN_FRIE(1,train,test,IND,OUTD,Epochs,Eta,Sigma0,Forgetfactor, forget,Lamda, tau,Rate, Omega, Gamma);
-          output = htet_find_optimal_cut_off(test(:,IND+OUTD), net_out, 0);
+          output = htet_find_optimal_cut_off(test(:,IND+OUTD), net_out, optimal_cut_off_point);
+
+          % output.all_fnr = all_fnr; % validation fnrs to plot det graph
+          % output.all_fpr = all_fpr; % validation fpr to plot det graph
+          % output.bisector = bisector; % validation bisector to plot det graph
 
           % summary includes 3 columns
           % column 1 is raw output value,
           % column 2 is the value converted from raw output to either 0 or 1
           % column 3 is the ground truth label
-          result.summary = [net_out cell2mat(output.BEST_AFTER_THRESHOLD(1,1)) test(:,IND+OUTD)];
+          result.summary = [net_out output.after_threshold test(:,IND+OUTD)];
           result.net_structure = system;
           result.output = output;
-          result.MME = output.MIN_MME(1,1);
-          result.MIN_CUT_OFF = output.MIN_CUT_OFF(1,1);
           result.FNR = output.MIN_FNR(1,1);
           result.FPR = output.MIN_FPR(1,1);
-          result.EER = output.true_eer;
-          result.ACC = output.accuracy;
+          result.EER = output.MIN_MME(1,1);
+          result.ACC =  100 - output.MIN_MME(1,1);
           result.Feat = IND;
           result.Rules = system.ruleCount;
           result.best_feat = best_indices;
@@ -269,35 +260,20 @@ for d = 1:3
     end
 
     best_mean_acc = best_mean_acc/5;
-    DET_OUT = htet_generate_det_plot(BEST_SYSTEMS, det_title)
 
+    % htet_generate_det_plot(BEST_SYSTEMS, det_title)
 
     if d == 1
       net_result_for_last_record(1,:) = BEST_SYSTEMS
-      det_out_for_last_record(1,:) = DET_OUT
+      % det_out_for_last_record(1,:) = DET_OUT
     elseif d == 2
       net_result_for_one_year_prior(1,:) = BEST_SYSTEMS
-      det_out_for_one_year_prior(1,:) = DET_OUT
+      % det_out_for_one_year_prior(1,:) = DET_OUT
     else
       net_result_for_two_year_prior(1,:) = BEST_SYSTEMS
-      det_out_for_two_year_prior(1,:) = DET_OUT
+      % det_out_for_two_year_prior(1,:) = DET_OUT
     end
 end
-
-% sys1(1,:).output.all_fpr = {(net_result_for_last_record(1).output.all_fpr{1, 1} + net_result_for_last_record(2).output.all_fpr{1, 1} + net_result_for_last_record(3).output.all_fpr{1, 1} + net_result_for_last_record(4).output.all_fpr{1, 1} +net_result_for_last_record(5).output.all_fpr{1, 1})/5};
-% sys1(1,:).output.all_fnr = {(net_result_for_last_record(1).output.all_fnr{1, 1} + net_result_for_last_record(2).output.all_fnr{1, 1} + net_result_for_last_record(3).output.all_fnr{1, 1} + net_result_for_last_record(4).output.all_fnr{1, 1} +net_result_for_last_record(5).output.all_fnr{1, 1})/5}
-% sys1(1,:).output.bisector = net_result_for_last_record(1).output.bisector;
-%
-% sys1(2,:).output.all_fpr = {(net_result_for_one_year_prior(1).output.all_fpr{1, 1} + net_result_for_one_year_prior(2).output.all_fpr{1, 1} + net_result_for_one_year_prior(3).output.all_fpr{1, 1} + net_result_for_one_year_prior(4).output.all_fpr{1, 1} +net_result_for_one_year_prior(5).output.all_fpr{1, 1})/5};
-% sys1(2,:).output.all_fnr = {(net_result_for_one_year_prior(1).output.all_fnr{1, 1} + net_result_for_one_year_prior(2).output.all_fnr{1, 1} + net_result_for_one_year_prior(3).output.all_fnr{1, 1} + net_result_for_one_year_prior(4).output.all_fnr{1, 1} +net_result_for_one_year_prior(5).output.all_fnr{1, 1})/5}
-% sys1(2,:).output.bisector = net_result_for_one_year_prior(1).output.bisector;
-%
-% sys1(3,:).output.all_fpr = {(net_result_for_two_year_prior(1).output.all_fpr{1, 1} + net_result_for_two_year_prior(2).output.all_fpr{1, 1} + net_result_for_two_year_prior(3).output.all_fpr{1, 1} + net_result_for_two_year_prior(4).output.all_fpr{1, 1} +net_result_for_two_year_prior(5).output.all_fpr{1, 1})/5};
-% sys1(3,:).output.all_fnr = {(net_result_for_two_year_prior(1).output.all_fnr{1, 1} + net_result_for_two_year_prior(2).output.all_fnr{1, 1} + net_result_for_two_year_prior(3).output.all_fnr{1, 1} + net_result_for_two_year_prior(4).output.all_fnr{1, 1} +net_result_for_two_year_prior(5).output.all_fnr{1, 1})/5}
-% sys1(3,:).output.bisector = net_result_for_two_year_prior(1).output.bisector;
-%
-% DET_OUT = htet_generate_det_plot(sys1, 'Overall results')
-% det_out_for_overall(1,:) = DET_OUT
 
 % alarm sound to alert that the program has ended
 load handel;

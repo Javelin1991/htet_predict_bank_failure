@@ -7,7 +7,7 @@
 % timeline - last avaiable, One-year prior, Two-year prior
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-function DET_OUT = htet_generate_det_plot(systems, timeline)
+function htet_generate_det_plot(systems, timeline)
     color_str = 'rgbcm'
     MEAN = [];
     ACC = [];
@@ -26,16 +26,16 @@ function DET_OUT = htet_generate_det_plot(systems, timeline)
 
     for i=1:size(systems,1)
         % the last available record
-        fpr = systems(i).output.all_fpr{1, 1}
-        fnr = systems(i).output.all_fnr{1, 1}
+        fpr = systems(i).output.all_fpr
+        fnr = systems(i).output.all_fnr
         curve = [fpr, fnr];
         %       P = InterX([x1;y1],[x2;y2]);
-        inX = InterX([fpr;fnr],[bisector;bisector]);
-        P = [P; inX'];
-        mean_eer = mean_eer + inX(1,1);
-        mean_acc = mean_acc + (100 - inX(1,1));
-        EER = [EER; inX(1,1)]
-        ACC = [ACC; (100 - inX(1,1))]
+        % inX = InterX([fpr;fnr],[bisector;bisector]);
+        % P = [P; inX'];
+        % mean_eer = mean_eer + inX(1,1);
+        % mean_acc = mean_acc + (100 - inX(1,1));
+        % EER = [EER; inX(1,1)]
+        % ACC = [ACC; (100 - inX(1,1))]
         xlabel('Error II (%)');
         ylabel('Error I (%)');
         plot(fpr, fnr, color_str(i)); % plot the matrix
@@ -57,8 +57,8 @@ function DET_OUT = htet_generate_det_plot(systems, timeline)
     end
     legend('EER','CV1','CV2', 'CV3', 'CV4', 'CV5');
     hold off;
-    DET_OUT.mean_eer = mean_eer/5;
-    DET_OUT.mean_acc = mean_acc/5;
-    DET_OUT.ALL_EER = {[EER; mean_eer]}
-    DET_OUT.ALL_ACC = {[ACC; mean_acc]};
+    % DET_OUT.mean_eer = mean_eer/5;
+    % DET_OUT.mean_acc = mean_acc/5;
+    % DET_OUT.ALL_EER = {[EER; mean_eer]}
+    % DET_OUT.ALL_ACC = {[ACC; mean_acc]};
 end
