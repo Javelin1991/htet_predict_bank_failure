@@ -44,7 +44,7 @@ Omega = 0.7;
 Gamma = 0.1;
 forget = 1;
 tau = 0.57;
-accuracy_threshold = 100;
+accuracy_threshold = 99.99;
 decrement_step = 10;
 val_percent = 0.8
 
@@ -56,7 +56,7 @@ Last = '(Last available)'
 One = '(One-year prior)'
 Two =  '(Two-year prior)'
 
-for d = 1:1
+for d = 1:3
     BEST_SYSTEMS = [];
 
     if d == 1
@@ -67,7 +67,7 @@ for d = 1:1
       det_title = Two;
     end
 
-    for cv_num = 5:5
+    for cv_num = 1:5
 
       formatSpec = '\nThe current cv used is: %d';
       str = sprintf(formatSpec,cv_num)
@@ -167,7 +167,7 @@ for d = 1:1
             curr_acc = 100 - curr_eer;
 
             %%% if the current error is lower than best error, then update the best error %%%
-            if (curr_acc > accuracy_threshold && curr_acc > best_acc) || (curr_acc == 100)
+            if (curr_acc > accuracy_threshold && curr_acc > best_acc)
                 best_list = [best_list trainData_D0(:,l)];
                 best_val_list = [best_val_list valData_D0(:,l)];
 
@@ -238,10 +238,10 @@ for d = 1:1
           result.summary = [net_out output.after_threshold test(:,IND+OUTD)];
           result.net_structure = system;
           result.output = output;
-          result.FNR = output.MIN_FNR(1,1);
-          result.FPR = output.MIN_FPR(1,1);
-          result.EER = output.MIN_MME(1,1);
-          result.ACC =  100 - output.MIN_MME(1,1);
+          result.FNR = round(output.MIN_FNR(1,1),2);
+          result.FPR = round(output.MIN_FPR(1,1),2);
+          result.EER = round(output.MIN_MME(1,1),2);
+          result.ACC =  round(100 - output.MIN_MME(1,1),2);
           result.Feat = IND;
           result.Rules = system.ruleCount;
           result.best_feat = best_indices;
