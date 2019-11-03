@@ -7,7 +7,7 @@
 %
 % SYSTEMS - can be either lateral systems or longitudinal systems
 % isLateral - flag to determine whether the system is lateral or longitudinal
-%
+% Stars     :   **
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function htet_export_results_to_excel_files(SYSTEMS, isLateral)

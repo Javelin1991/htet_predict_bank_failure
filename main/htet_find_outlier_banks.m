@@ -3,6 +3,7 @@
 % Author    :   Htet
 % Date      :   Sep 11, 2019
 % Function  :   find banks that do not have financial data in the consecutive years
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;

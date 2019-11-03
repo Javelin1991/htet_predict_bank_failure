@@ -6,6 +6,7 @@
 % Syntax    :
 % Copyright and credit goes to : Jason Joseph Rebello (see the link below for more details)
 % https://www.mathworks.com/matlabcentral/fileexchange/47364-true-positives-false-positives-true-negatives-false-negatives-from-2-matrices
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function [TP, FP, TN, FN, FNR, FPR, Acc] = htet_get_classification_results(trueMat, predictedMat)

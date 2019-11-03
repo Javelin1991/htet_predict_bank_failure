@@ -6,6 +6,10 @@
 % Syntax    :   htet_find_optimal_cut_off(testData, net_out)
 % testData - target data, the output label
 % net_out - predicted values
+% threshold - the cut-off point for binary classification, when the threshold value is given,
+%             the function will not find the optimal cut-off point, instead it will just use the given threshold
+%             Otherwise, the function will locate the optimal cut-off point
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 

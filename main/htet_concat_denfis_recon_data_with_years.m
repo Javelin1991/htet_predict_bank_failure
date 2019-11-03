@@ -2,7 +2,8 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :
+% Stars     :   *
+% purpose   :   to populate corresponding years in reconstructed data
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;

@@ -5,6 +5,7 @@
 % Function  :   used to tabulate results for lateral systems
 % Syntax    :   htet_tabulate_lateral_result(SYSTEMS)
 % SYSTEMS - already processed Lateral Systems
+% Stars     :   **
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function result = htet_tabulate_lateral_result(SYSTEMS)
@@ -21,7 +22,7 @@ function result = htet_tabulate_lateral_result(SYSTEMS)
           rmse = SYSTEMS{sys, 1}{j, i}.RMSE;
 
           % skip to safin++
-          i = 6; 
+          i = 6;
         switch (i)
           case 1
             eMFIS_FRIE = [r;mae;rmse;{feat}];

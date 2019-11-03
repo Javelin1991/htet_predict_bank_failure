@@ -4,6 +4,7 @@
 % Date      :   Sep 11, 2019
 % Function  :   generate and benchmark experiment results for reconstruction algorithm
 % it takes 10.5 min to run this file
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;

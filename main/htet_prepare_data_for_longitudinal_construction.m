@@ -6,6 +6,7 @@
 % Syntax    :   htet_prepare_data_for_longitudinal_construction(input)
 % input - any given data
 % This file is used to generate train data and test data that are prepared to experiment longitudinal reconstruction
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function [Data_longitudinal, Data_lateral] = htet_prepare_data_for_longitudinal_construction(input)

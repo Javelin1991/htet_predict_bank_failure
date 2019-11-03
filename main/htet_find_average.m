@@ -7,7 +7,7 @@
 %
 % net - a prediction system/model
 % size - the size of the cross validation group (e.g. if it's 5-fold CV, then the size is 5)
-%
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_find_average(net, size)

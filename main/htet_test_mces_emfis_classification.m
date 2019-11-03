@@ -3,6 +3,7 @@
 % Author    :   Htet
 % Date      :   Sep 11, 2019
 % Function  :   used to select important features using MCES and eMFIS(FRIE) for bank failure classification
+% Stars     :
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clear;

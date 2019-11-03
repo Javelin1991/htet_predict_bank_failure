@@ -4,7 +4,7 @@
 % Date      :   Sep 11, 2019
 % Function  :   to calculate percentage of missing data in one feature(column)
 % Syntax    :   htet_cal_nan_percent(input, len, total)
-%
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function result = htet_cal_nan_percent(input, len, total)

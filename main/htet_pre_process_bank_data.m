@@ -9,6 +9,7 @@
 %                when set to 1, it will return all data with shuffled order
 % fixed_size - when the fixed size is specified, the function will return
 %              specified number of records that are randomly selected
+% Stars     :   ***
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function sample = htet_pre_process_bank_data(input, data_percent, fixed_size)

@@ -6,7 +6,7 @@
 % Syntax    :   htet_get_cv_data(input, ref_group)
 % input - matlab cvpartition produces 1 and 0 to indicate whether to include a record in the data set or not
 % ref_group - reference group to retrieve data
-%
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_get_cv_data(input, ref_group)

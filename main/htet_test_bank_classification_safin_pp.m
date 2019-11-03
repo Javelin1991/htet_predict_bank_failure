@@ -2,7 +2,8 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% Function  :   used to test bank failure prediction/classification using SaFIN++
+% Function  :   used to test bank failure prediction/classification using SaFIN++%
+% Stars     :
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 % diary SaFIN_Learning_Process_Trace;
 

@@ -8,7 +8,7 @@
 % params - parameters required for the induction algorithm, which is in this case, "eMFIS(FRIE)"
 % x - input data
 % y - target label
-%
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_get_emfis_network_result(cv, params, x, y)

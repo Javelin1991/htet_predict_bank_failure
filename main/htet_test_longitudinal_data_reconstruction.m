@@ -10,6 +10,7 @@
 % 4) SA - Simple Averaging Ensemble Learning using ANFIS and DENFIS
 % 5) BS - Best Selection between ANFIS, DENFIS, and SA
 % 6) SaFIN++ - offline model
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clear;

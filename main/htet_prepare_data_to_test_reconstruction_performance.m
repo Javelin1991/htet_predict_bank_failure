@@ -5,6 +5,7 @@
 % Function  :   used to generate test data that are randomly populated with NaN values
 %               so that reconstruction algorithm's performance can be measured and tested
 % Syntax    :
+% Stars     :   ****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 clc;

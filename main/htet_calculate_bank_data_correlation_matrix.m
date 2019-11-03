@@ -4,7 +4,7 @@
 % Date      :   Sep 11, 2019
 % Function  :   to generate correlation matrix for given set of features
 % Syntax    :
-%
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clc;
 clear;

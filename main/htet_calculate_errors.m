@@ -8,7 +8,7 @@
 % predicted - predicted value
 % data_target - actual value (ground truth value)
 %
-%
+% Stars     :   ***
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function D = htet_calculate_errors(predicted, data_target)

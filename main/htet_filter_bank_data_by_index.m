@@ -10,7 +10,8 @@
 % type - 3T means record from t,t-1 and t-2; 2T means record from t and t-1, 1T means record from the selected t
 % when set to 1 - the function will retrieve the record from one prior year (e.g. t-1 = 1997)
 % when set to 2 - the function will retrieve the record from two prior year (e.g. t-2 = 1996)
-%
+% for experiments in the FYP paper, only focus on the type '1T'
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function out = htet_filter_bank_data_by_index(input, offset, type)

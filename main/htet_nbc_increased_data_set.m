@@ -2,9 +2,10 @@
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% File  :   htet_nbc_increased_data_set
+% File      :   htet_nbc_increased_data_set
 % Testing bank failure prediction using Naive Bayes Classifier (with increased data set)
 % Refer to FYP for more details
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;

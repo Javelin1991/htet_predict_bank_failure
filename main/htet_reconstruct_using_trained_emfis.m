@@ -6,6 +6,7 @@
 % Syntax    :   htet_reconstruct_using_trained_emfis(input, net)
 % input - input data
 % net - pre-trained eMFIS(FRIE) network
+% Stars     :
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 function output = htet_reconstruct_using_trained_emfis(input, net)

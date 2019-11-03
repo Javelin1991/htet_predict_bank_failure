@@ -1,10 +1,10 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_generate_data_for_combined_T_preidction XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_generate_data_for_bank_failure_prediction_experiments XXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% File  :   htet_generate_data_for_combined_T_preidction
-% This file can be used to generate data for combined t prediction
-% e.g, top 3 feat from last avaiable + top 3 feat from one year prior + top 3 feat from two year prior
+% File      :   htet_generate_data_for_bank_failure_prediction_experiments
+% This file can be used to generate data for bank failure experiments
+% Stars     :   *****
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 clear;
 clc;
