@@ -7,7 +7,8 @@ Important folders:
 - main
 
 Important files:
-All the files under the main folder. Each file is rated with Stars based on their importance and relevance to FYP.
+All the files under the main folder belong to the author. Each file is rated with Stars based on their importance and relevance to FYP.
+
 No Star - not important at all
 1 Stars * - least important
 2 Stars ** - second least important
