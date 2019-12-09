@@ -3,7 +3,7 @@
 % Author    :   Htet
 % Date      :   Sep 11, 2019
 % Function  :   used to test bank failure prediction/classification using denfis or anfis
-% Stars     :   * 
+% Stars     :   *
 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 % clear;

@@ -56,9 +56,6 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
               after_threshold(i) = 1;
           elseif net_out(i) < threshold
               after_threshold(i) = 0;
-          elseif net_out(i) == threshold
-              after_threshold(i) = threshold;
-              eer_count = eer_count + 1;
           else
               unclassified_count = unclassified_count + 1;
           end
@@ -72,9 +69,10 @@ function output = htet_find_optimal_cut_off(testData, net_out, threshold)
       output.MIN_MME = (fpr + fnr)/2;
       output.MIN_CUT_OFF = threshold;
       output.after_threshold = after_threshold;
-      output.MIN_FPR = fpr;
       output.MIN_FNR = fnr;
+      output.MIN_FPR = fpr;
       output.acc = acc; % should not use this accuracy
+      output.unclassified_count = unclassified_count;
       return;
     end
 
