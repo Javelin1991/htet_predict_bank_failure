@@ -1,17 +1,17 @@
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_safin_frie_with_feature_select XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXX htet_test_bank_classification_mlp XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 % Author    :   Htet
 % Date      :   Sep 11, 2019
-% File      :   used to test bank failure prediction/classification using SaFIN_FRIE with HFS
+% File      :   used to test bank failure prediction/classification using MLP
 % Running Data Set 1A, 9 features, will take ~ 8-10 min
 % Running Data Set 1B, top 3 features, will take ~6.5 min
 % Running Data Set 2A, increased top 3 features, will take
 % Running Data Set 2B, denfis recon top 3 features, will take
 % Running Data Set 3, denfis full recon top 3 features,
 % Stars     :   *****
-% The most important file used for the FYP, this file extends original SAFIN(FRIE)++ with hierarchical feature selection (HFS)
-% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-% diary SaFIN_FRIE_Learning_Trace;,:
+% this file is used for bank failure classificaiton experiment conducted for journal paper publications
+% this file is not used in the experiments for FYP
+% XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 %
 
 clear;
