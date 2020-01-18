@@ -6,7 +6,7 @@
 [1] Extended  a deep five-layer fuzzy neural, SAFIN(FRIE)++, with hierarchical feature selection to improve its prediction accuracy <br/>
 [2] Analyzed the data set that includes financial statements of banks in the United States over the course of 20 years <br/>
 [3] Performed online learning to train the model and used 5-fold Cross Validation (CV) for training and testing in bank failure prediction <br/>
-[4] Achieved over 94% accuracy with the new extended model on an imbalanced data set with very low type I and type II error <br/>
+[4] Achieved over 93% accuracy with the new extended model on an imbalanced data set with very low type I and type II error <br/>
 [5] Implemented a missing data reconstruction algorithm based on a combination of longitudinal and lateral
 reconstruction by using DENFIS, i.e. known for its regression accuracy <br/>
 [6] Successfully reconstructed missing data with relatively low mean absolute error (MAE) and decent correlation accuracy (R) <br/>
@@ -18,11 +18,7 @@ SAFIN(FRIE)++: https://repository.ntu.edu.sg/handle/10356/72908 <br/>
 HCL: https://ieeexplore.ieee.org/abstract/document/4359859?section=abstract <br/>
 DENFIS: https://ieeexplore.ieee.org/document/995117 <br/>
 
-### This FYP paper is currently in progress to be submitted to the following journal papers for publication under the supervision of Assoc Prof Quek Hiok Chai (SCSE, NTU): 
-1) Expert systems with applications
-2) Applied soft computing
-3) Information sciences 
-4) IEE Transactions
+This FYP work has been submitted as Research paper to IEEE Congress on Evolutionary Computation 2020, in collaboration with Assoc Prof Quek Hiok Chai (NTU, SCSE) and Assoc Prof Douglas Maskell (NTU, SCSE).
 
 
 
