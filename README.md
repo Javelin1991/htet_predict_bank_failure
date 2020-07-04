@@ -18,9 +18,6 @@ SAFIN(FRIE)++: https://repository.ntu.edu.sg/handle/10356/72908 <br/>
 HCL: https://ieeexplore.ieee.org/abstract/document/4359859?section=abstract <br/>
 DENFIS: https://ieeexplore.ieee.org/document/995117 <br/>
 
-This research work has been accepted as the conference paper to IEEE Congress on Evolutionary Computation 2020, in collaboration with Assoc Prof Quek Hiok Chai (NTU, SCSE) and Assoc Prof Douglas Maskell (NTU, SCSE).
-
-
 
 
 
